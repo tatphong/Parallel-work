@@ -1,0 +1,167 @@
+{% extends 'customer_base.html' %}
+{% load static %}
+{% load humanize %}
+{% block content %}
+<!-- ================ start banner area ================= -->	
+	<section id="category">
+		<div class="container h-100">
+			<div class="blog-banner">
+				<div class="text-center">
+					<h1>GIỎ HÀNG</h1>
+					<nav aria-label="breadcrumb" class="banner-breadcrumb">
+            <ol class="breadcrumb">
+              <li class="breadcrumb-item"><a href="#">Trang chủ</a></li>
+              <li class="breadcrumb-item active" aria-current="page"> Giỏ hàng</li>
+            </ol>
+          </nav>
+				</div>
+			</div>
+    </div>
+	</section>
+	<!-- ================ end banner area ================= -->
+  
+  
+
+  <!--================Cart Area =================-->
+  <section class="cart_area">
+      <div class="container">
+          <div class="cart_inner">
+              <div class="table-responsive">
+                  <table class="table">
+                      <thead>
+                          <tr>
+                              <th scope="col">Sản Phẩm</th>
+                              <th scope="col">Đơn giá</th>
+                              <th scope="col">Số lượng</th>
+                              <th scope="col">Mã giảm giá</th>
+                              <th scope="col">Tổng tiền</th>                             
+                              <th scope="col"></th>
+                          </tr>
+                      </thead>
+                      <tbody>
+                        {% for item in cart_items %}
+                          <tr>
+                              <td style="max-width:270px;">
+                                  <div class="media">
+                                      <div class="d-flex">
+                                          <img src="{{ item.url }}" height="50px" weight="50px" alt="">
+                                      </div>
+                                      <div class="media-body">
+                                          <p><a href="{% url 'book:get_book' item.merchandise_id %}">{{ item.name }}</a></p>
+                                      </div>
+                                  </div>
+                              </td>
+                              <td>
+                                  <h5>{{ item.price|floatformat:0 }}</h5>
+                              </td>
+                              <td>
+                                  <div class="product_count">
+                                      <input type="text" name="qty" id="sst-{{item.id}}" maxlength="12" value="{{ item.quantity }}" title="Quantity:"
+                                          class="input-text qty" onchange="update_quantity(this.value, {{item.id}})">
+                                      <button onclick="var result = document.getElementById('sst-{{item.id}}'); var sst = result.value; if( !isNaN( sst )) update_quantity(++result.value,{{item.id}});return false;"
+                                          class="increase items-count" type="button"><i class="lnr lnr-chevron-up"></i></button>
+                                      <button onclick="var result = document.getElementById('sst-{{item.id}}'); var sst = result.value; if( !isNaN( sst ) &amp;&amp; sst > 1 ) update_quantity(--result.value,{{item.id}});return false;"
+                                          class="reduced items-count" type="button"><i class="lnr lnr-chevron-down"></i></button>
+                                  </div>
+                              </td>
+                              <td>
+                                  <div class="percent-cart-icon">
+                                      <a href="#" data-toggle="modal" data-target="#ModalPercent">
+                                          <p>Nhập mã &nbsp;&nbsp;</p>
+                                          <p></p>
+                                      </a>
+                                  </div>
+                                  
+                                  <!--Modal mã giảm giá-->
+                                  <div class="modal" tabindex="-1" role="dialog" id="ModalPercent"  aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                      <div class="modal-dialog" role="document">
+                                          <div class="modal-content">
+                                              <div class="modal-header">
+                                                  <h5 class="modal-title">Nhập mã giảm giá</h5>
+                                                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                      <span aria-hidden="true">&times;</span>
+                                                  </button>
+                                              </div>
+                                              <div class="cupon_text d-flex align-items-center">
+                                                  <input type="text" placeholder="Mã giảm giá">
+                                              </div>
+                                              <div class="modal-footer">
+                                                  <a class="btn btn-secondary" href="{%url 'cart:get_coupon_code' 'coupon_code_here' %}">Áp dụng mã</a> &nbsp;&nbsp;&nbsp;&nbsp;
+                                                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+                                              </div>
+                                          </div>
+                                      </div>
+                                  </div>
+                                  <!--Modal end-->
+                              </td>
+                              <td>
+                                  <h5>{% widthratio item.price 1 item.quantity %}</h5>
+                              </td>
+                              <td>
+                                  <div class="delete-cart-icon"> 
+                                      <a href="{% url 'cart:delete_cart' item.id %}">
+                                            <i class="far fa-trash-alt fa-1x delete-cart-icon"></i>
+                                      </a>                                
+                                                                           
+                                  </div>                                 
+                              </td>
+                          </tr>
+                        {% endfor %}
+                          <tr>
+                              <td>
+
+                              </td>
+                              <td>
+
+                              </td>
+                              <td>
+                                  <h5>Thành tiền</h5>
+                              </td>
+                              <td>
+                                  <h5>{{ sub_total|floatformat:0 }}</h5>
+                              </td>
+                          </tr>
+                          <tr class="out_button_area">
+                              <td class="d-none-l">
+
+                              </td>
+                              <td class="">
+
+                              </td>
+                              <td>
+
+                              </td>
+                              <td>
+                                  <div class="checkout_btn_inner d-flex align-items-center">
+                                      <a class="gray_btn" href="{% url 'home:index' %}">Tiếp tục mua sắm</a>
+                                      <a class="primary2-btn ml-2" href="{% url 'order:check_out' %}">Đặt hàng</a>
+                                  </div>
+                              </td>
+                          </tr>
+                      </tbody>
+                  </table>
+              </div>
+          </div>
+      </div>
+  </section>
+  <!--================End Cart Area =================-->
+{% endblock %}
+
+{% block js %}
+<script>
+    function update_quantity(quantity, cart_id){
+        console.log("running update_quantity()");
+        /*$.ajax({
+            'url': '', 
+            'type': 'GET',
+            'dataType': 'json', 
+            'data': {cart_id:cart_id, quantity:quantity}, 
+            'success': function(data) {
+                console.log("Ajax success");
+            },
+            'error': function(data) {console.log("Ajax error");}
+        });*/
+        window.location = window.location.href.split("cart/",1) + "cart/cart_id=" + cart_id + "&quantity=" + quantity;
+    }
+</script>
+{% endblock %}

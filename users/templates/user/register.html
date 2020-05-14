@@ -1,0 +1,32 @@
+{% extends 'customer_base.html' %}
+{% block content %}
+<section class="login py-5 border-top-1">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-5 col-md-8 align-item-center">
+                <div class="border border">
+                    <h3 class="bg-gray p-4">Tạo tài khoản</h3>
+                    <form method="POST">
+                        {% csrf_token %}
+                        <fieldset class="p-4">
+                            {% for field in form.visible_fields %}
+                                <div class="fieldWrapper">
+                                    
+                                    {{ field.label_tag }} {{ field }}
+                                    {{ field.errors }}
+                                </div>
+                            {% endfor %}
+                            <div class="loggedin-forgot d-inline-flex my-3">
+                                <label for="registering" class="px-2">Khi bạn nhấn Tạo tài khoản, bạn đã đồng ý thực hiện mọi giao dịch mua bán theo <a
+                                        class="text-primary font-weight-bold" href="{% url 'user:terms' %}">điều kiện sử dụng và chính sách của Chợ Sách</a></label>
+                            </div>
+                            <button type="submit"
+                                class="d-block py-3 px-4 bg-primary text-white border-0 rounded font-weight-bold">Tạo tài khoản</button>
+                        </fieldset>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
