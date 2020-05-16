@@ -1,6 +1,7 @@
 from django.shortcuts import render, get_object_or_404
 from .models import Order, OrderStatus, DetailOrder, HistoryOrderStatus
 from cart.models import Cart
+from users.models import Address
 from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required
 from .forms import NewAddressForm
@@ -46,16 +47,6 @@ def order_detail(request, id_order):
 
 @login_required
 def check_out(request):
-    form = NewAddressForm()
-    if request.method == 'POST':
-        #lưu form nhập thông tin địa chỉ giao hàng mới
-        form = NewAddressForm(request.POST)
-        if form.is_valid():
-            form.save()
-            #lưu đơn hàng
-            order = Order()
-            order.save()
-            return redirect('order:order')
     #get cart item
     cart_items = Cart.objects.raw('''
           select `cart`.`id`, `book`.`name`, `cart`.`quantity`, `m`.`id` `merchandise_id`, `m`.`price`, `image`.`url`
@@ -69,7 +60,22 @@ def check_out(request):
     sub_total = 0
     for i in cart_items:
         sub_total += i.price * i.quantity
-    return render (request, 'order/check_out.html', {'form':form, 'cart':cart_items, 'sub_total':sub_total})
+
+    # form show
+    form = NewAddressForm()
+    if request.method == 'POST':
+        #lưu form nhập thông tin địa chỉ giao hàng mới
+        form = NewAddressForm(request.POST)
+        if form.is_valid():
+            form.save()
+            #lưu đơn hàng
+            order = Order()
+            order.save()
+            return redirect('order:order')
+
+    # get user address
+    address = Address.objects.filter(user_id=request.user.id)
+    return render (request, 'order/check_out.html', {'form':form, 'cart':cart_items, 'sub_total':sub_total, 'address':address})
 
 @login_required
 def cancel_order(request, id_order):

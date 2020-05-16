@@ -6,19 +6,19 @@ from time import gmtime, strftime
 
 class NewAddressForm(forms.Form):
     owner = forms.CharField(label='Họ tên', widget=forms.TextInput(
-        attrs={'class':'col-md-6 form-group p_star'}))
+        attrs={'class':'col-10 form-group p_star bo'}))
     phone = forms.CharField(label='Điện thoại', widget=forms.TextInput(
-        attrs={'class':'col-md-6 form-group p_star'}))
+        attrs={'class':'col-10 form-group p_star bo'}))
     address_no = forms.CharField(label='Số địa chỉ', widget=forms.TextInput(
-        attrs={'class':'col-md-6 form-group p_star'}))
+        attrs={'class':'col-10 form-group p_star bo'}))
     street = forms.CharField(label='Đường', widget=forms.TextInput(
-        attrs={'class':'col-md-6 form-group p_star'}))
+        attrs={'class':'col-10 form-group p_star bo'}))
     ward = forms.CharField(label='Phường', widget=forms.TextInput(
-        attrs={'class':'col-md-6 form-group p_star'}))
+        attrs={'class':'col-10 form-group p_star bo'}))
     district = forms.CharField(label='Quận', widget=forms.TextInput(
-        attrs={'class':'col-md-6 form-group p_star'}))
+        attrs={'class':'col-10 form-group p_star bo'}))
     cỉty = forms.CharField(label='Thành phố', widget=forms.TextInput(
-        attrs={'class':'col-md-6 form-group p_star'}))
+        attrs={'class':'col-10 form-group p_star bo'}))
     
     def clean_owner(self):
         owner = self.cleaned_data('owner')
@@ -58,7 +58,6 @@ class NewAddressForm(forms.Form):
 
     def save(self):
         address = Address(
-            id_user = request.user.id,
             owner = self.cleaned_data['owner'],
             phone_number = self.cleaned_data['phone_number'],
             no = self.cleaned_data['no'],

@@ -7,6 +7,7 @@
 		<div class="container h-100">
 			<div class="blog-banner">
 				<div class="text-center">
+				<br>
 					<h1>THANH TOÁN</h1>
 					<nav aria-label="breadcrumb" class="banner-breadcrumb">
             <ol class="breadcrumb">
@@ -22,76 +23,82 @@
   
   
   <!--================Checkout Area =================-->
-  <section class="checkout_area section-margin--small">
-    <div class="container">
-        <div class="billing_details">
-            <div class="row">
-                <form class="row contact_form" method="post" novalidate>
-                    <div class="col-lg-8">
-                        <h3>Thông tin nhận hàng</h3>
-                            {% csrf_token %}
-                            {% for field in form.visible_fields %}
-                                <div class="fieldWrapper">
-                                    {{ field.label_tag }} {{ field }}
-                                    {{ field.errors }}
+    <section class="checkout_area section-margin--small">
+        <div class="container">
+            <div class="billing_details" id="billing">
+                <form class="row contact_form col-12" method="post" novalidate>
+                    <div class="row col-6">
+                        {%for item in address%}
+                        <div class="col-lg-12">
+                        <h3 id="diachinhanmacdinh"> <input name="diachinhan" type="radio" value="Địa chỉ mặc định"> Địa chỉ mặc định :</h3>
+                                <div class="col-12">    
+                                    Tên người nhận: <h6>{{item.owner}}</h6>
+                                    Số điện thoại: <h6>{{item.phone_number}}</h6>
+                                    Địa chỉ: <h6>{{item.street}} </h6>
+                                    <br>
                                 </div>
-                            {% endfor %}
-                    </div>
-                    <div class="col-md-12 form-group">
-                        <button type="submit" value="submit" class="button button-login">login</button>
-                        <div class="creat_account">
-                            <input type="checkbox" id="f-option" name="selector">
-                            <label for="f-option">Remember me</label>
                         </div>
-                    </div>
-                </form>
-                <div class="col-lg-4">
-                    <div class="order_box">
-                        <h2>Your Order</h2>
-                        <ul class="list">
-                            <li><a href="#"><h4>Product <span>Total</span></h4></a></li>
-                            <li><a href="#">Fresh Blackberry <span class="middle">x 02</span> <span class="last">$720.00</span></a></li>
-                            <li><a href="#">Fresh Tomatoes <span class="middle">x 02</span> <span class="last">$720.00</span></a></li>
-                            <li><a href="#">Fresh Brocoli <span class="middle">x 02</span> <span class="last">$720.00</span></a></li>
-                        </ul>
-                        <ul class="list list_2">
-                            <li><a href="#">Subtotal <span>$2160.00</span></a></li>
-                            <li><a href="#">Shipping <span>Flat rate: $50.00</span></a></li>
-                            <li><a href="#">Total <span>$2210.00</span></a></li>
-                        </ul>
-                        <div class="payment_item">
-                            <div class="radion_btn">
-                                <input type="radio" id="f-option5" name="selector">
-                                <label for="f-option5">Check payments</label>
-                                <div class="check"></div>
+                        {%endfor%}
+                        <div class= "col-lg-12"> <br>
+                            <h3 id="diachinhanmoi"> <input name="diachinhan" type="radio" value="Nhập địa chỉ mới"> Nhập địa chỉ mới :</h3>
+                            <div class="col-12">	
+                                {% csrf_token %}
+                                {% for field in form.visible_fields %}
+                                    <div class="fieldWrapper">
+                                        {{ field.label_tag }} <br>
+                                        {{ field }}
+                                        {{ field.errors }}
+                                    </div>
+                                {% endfor %}
                             </div>
-                            <p>Please send a check to Store Name, Store Street, Store Town, Store State / County,
-                                Store Postcode.</p>
+                            
                         </div>
-                        <div class="payment_item active">
-                            <div class="radion_btn">
-                                <input type="radio" id="f-option6" name="selector">
-                                <label for="f-option6">Paypal </label>
-                                <img src="img/product/card.jpg" alt="">
-                                <div class="check"></div>
+                    </div>
+                    <div class="col-6">
+                        <div class="order_box">
+                            <h2>Your Order</h2>
+                            <ul class="list">
+                                <li><h4>Product <span>Total</span></h4></li>
+                                {% for item in cart %}
+                                    <li><span class="col-2">{{item.name}} </span><span class="middle col-2">x{{item.quantity}}</span> <span class="last col-2">{{item.price|floatformat:0}}đ</span></li>
+                                {% endfor %}
+                            </ul>
+                            <ul class="list list_2">
+                                <li><a href="#">Subtotal <span>{{sub_total|floatformat:0}}đ</span></a></li>
+                                <li><a href="#">Shipping <span>Flat rate: $50.00</span></a></li>
+                                <li><a href="#">Total <span>{{sub_total|floatformat:0}}đ</span></a></li>
+                            </ul>
+                            <div class="payment_item">
+                                <div class="radion_btn">
+                                    <input type="radio" id="f-option5" name="selector">
+                                    <label for="f-option5">Check payments</label>
+                                    <div class="check"></div>
+                                </div>
+                                <p>Please send a check to Store Name, Store Street, Store Town, Store State / County,
+                                    Store Postcode.</p>
                             </div>
-                            <p>Pay via PayPal; you can pay with your credit card if you don’t have a PayPal
-                                account.</p>
-                        </div>
-                        <div class="creat_account">
-                            <input type="checkbox" id="f-option4" name="selector">
-                            <label for="f-option4">I’ve read and accept the </label>
-                            <a href="#">terms & conditions*</a>
-                        </div>
-                        <div class="text-center">
-                          <a class="button button-paypal" href="#">Proceed to Paypal</a>
+                            <div class="payment_item active">
+                                <div class="radion_btn">
+                                    <input type="radio" id="f-option6" name="selector">
+                                    <label for="f-option6">Paypal </label>
+                                    <img src="img/product/card.jpg" alt="">
+                                    <div class="check"></div>
+                                </div>
+                                <p>Pay via PayPal; you can pay with your credit card if you don’t have a PayPal
+                                    account.</p>
+                            </div>
+                            <div class="creat_account">
+                                <input type="checkbox" id="f-option4" name="selector">
+                                <label for="f-option4">I’ve read and accept the </label>
+                                <a href="#">terms & conditions*</a>
+                            </div>
+                            <button type="submit" class="button button-paypal">Thanh toán</button>
                         </div>
                     </div>
                 </div>
-            </div>
+            </form>
         </div>
-    </div>
-  </section>
+    </section>
   <!--================End Checkout Area =================-->
 {% endblock %}
 
