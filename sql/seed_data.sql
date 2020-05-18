@@ -31,3 +31,31 @@ VALUES(1, 1, "khi một họa sĩ vô danh ghép nhiều đoạn văn bản vớ
 INSERT INTO `reply_review`(`id`, `id_review`, `content`, `created_by`, `created_date`, `delete_date`)
 VALUES(2, 1, "Trái với quan điểm chung của số đông, Lorem Ipsum không phải chỉ là một đoạn văn bản ngẫu nhiên.", 1, "2020-04-28 03:04:27", null);
 
+#Report target
+INSERT INTO `report_target`(`id`, `code`, `name`, `description`)
+VALUES (1, "merchandise", "Sản phẩm", "Báo cáo về sản phẩm");
+#Report sample
+INSERT INTO `sample_report`(`id`, `id_report_target`, `sample_content`, `negative_point`, `created_date`, `created_by`, `delete_date`)
+VALUES(1, 1, "Hình ảnh không đúng với sản phẩm", 3, "2020-04-28 03:04:27", 1, null);
+INSERT INTO `sample_report`(`id`, `id_report_target`, `sample_content`, `negative_point`, `created_date`, `created_by`, `delete_date`)
+VALUES(2, 1, "Hình ảnh phản cảm", 4, "2020-04-28 03:04:27", 1, null);
+INSERT INTO `sample_report`(`id`, `id_report_target`, `sample_content`, `negative_point`, `created_date`, `created_by`, `delete_date`)
+VALUES(3, 1, "Hình ảnh gây hiểu nhầm", 3, "2020-04-28 03:04:27", 1, null);
+INSERT INTO `sample_report`(`id`, `id_report_target`, `sample_content`, `negative_point`, `created_date`, `created_by`, `delete_date`)
+VALUES(4, 1, "Hình ảnh mờ, không rõ nét", 1, "2020-04-28 03:04:27", 1, null);
+INSERT INTO `sample_report`(`id`, `id_report_target`, `sample_content`, `negative_point`, `created_date`, `created_by`, `delete_date`)
+VALUES(5, 1, "Thông tin sản phẩm không chính xác", 3, "2020-04-28 03:04:27", 1, null);
+INSERT INTO `sample_report`(`id`, `id_report_target`, `sample_content`, `negative_point`, `created_date`, `created_by`, `delete_date`)
+VALUES(6, 1, "Thông tin sản phẩm bị thiếu", 2, "2020-04-28 03:04:27", 1, null);
+INSERT INTO `sample_report`(`id`, `id_report_target`, `sample_content`, `negative_point`, `created_date`, `created_by`, `delete_date`)
+VALUES(7, 1, "Giới thiệu sản phẩm không chính xác", 2, "2020-04-28 03:04:27", 1, null);
+INSERT INTO `sample_report`(`id`, `id_report_target`, `sample_content`, `negative_point`, `created_date`, `created_by`, `delete_date`)
+VALUES(8, 1, "Giới thiệu sản phẩm phản cảm, bất hợp pháp", 4, "2020-04-28 03:04:27", 1, null);
+INSERT INTO `sample_report`(`id`, `id_report_target`, `sample_content`, `negative_point`, `created_date`, `created_by`, `delete_date`)
+VALUES(9, 1, "Sản phẩm chứa hàng cấm, bất hợp pháp", 8, "2020-04-28 03:04:27", 1, null);
+INSERT INTO `sample_report`(`id`, `id_report_target`, `sample_content`, `negative_point`, `created_date`, `created_by`, `delete_date`)
+VALUES(10, 1, "Sản phẩm là hàng giả, hàng nhái", 1, "2020-04-28 03:04:27", 5, null);
+INSERT INTO `sample_report`(`id`, `id_report_target`, `sample_content`, `negative_point`, `created_date`, `created_by`, `delete_date`)
+VALUES(11, 1, "Sản phẩm có chất lượng kém", 5, "2020-04-28 03:04:27", 1, null);
+INSERT INTO `sample_report`(`id`, `id_report_target`, `sample_content`, `negative_point`, `created_date`, `created_by`, `delete_date`)
+VALUES(12, 1, "Khác", 1, "2020-04-28 03:04:27", 1, null);

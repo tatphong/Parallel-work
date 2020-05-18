@@ -5,7 +5,7 @@ from .models import Review, AllowedReviewTimes, ReplyReview
 from book.models import Book, Merchandise
 from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required
-from common.utils import ajax_login_required
+from common.utils import ajax_login_required, str_to_html
 from django.db import transaction, DatabaseError
 def get_reviews(request):
     if request.is_ajax():
@@ -26,7 +26,7 @@ def get_reviews(request):
                 reps.append({
                     'by': created_by,
                     'date': rep.created_date,
-                    'content': rep.content
+                    'content': str_to_html(rep.content)
                 })
             if review.created_by.id == merchandise.user.id:
                 created_by = review.created_by.store.name + ' <i class="fas fa-store" style="color:#080;"></i>'
@@ -37,7 +37,7 @@ def get_reviews(request):
                     'id' : review.id,
                     'by': created_by,
                     'date': review.created_date,
-                    'content': review.content,
+                    'content': str_to_html(review.content),
                     'star': review.star,
                     'replies':reps
                 }

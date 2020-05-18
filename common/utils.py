@@ -16,6 +16,8 @@ def send_mail_verification_code(send_to, code):
 def get_random_string(length):
     return ''.join(random.choices(string.ascii_letters + string.digits, k=length))
 
+def str_to_html(content):
+    return content.replace('\n', '<br/>')
 
 def ajax_login_required(view_func):
     @wraps(view_func)

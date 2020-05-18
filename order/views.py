@@ -5,6 +5,7 @@ from users.models import Address
 from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required
 from .forms import NewAddressForm
+from datetime import datetime
 
 # Create your views here.
 @login_required
@@ -63,15 +64,15 @@ def check_out(request):
 
     # form show
     form = NewAddressForm()
-    if request.method == 'POST':
-        #lưu form nhập thông tin địa chỉ giao hàng mới
-        form = NewAddressForm(request.POST)
-        if form.is_valid():
-            form.save()
-            #lưu đơn hàng
-            order = Order()
-            order.save()
-            return redirect('order:order')
+    # if request.method == 'POST':
+    #     #lưu form nhập thông tin địa chỉ giao hàng mới
+    #     form = NewAddressForm(request.POST)
+    #     if form.is_valid():
+    #         form.save()
+    #         #lưu đơn hàng
+    #         order = Order.objects.create(user_id = request.user.id, address_id = 1, payment_id = 1, delivery_id = 1, fee_delivery = 0, created_date = datetime.now())
+    #         
+    #         return redirect('order:order')
 
     # get user address
     address = Address.objects.filter(user_id=request.user.id)

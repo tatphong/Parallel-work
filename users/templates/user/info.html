@@ -1,100 +1,73 @@
-{% extends 'customer_base.html' %}
+{% extends 'user/user_base.html' %}
 {% load static %}
-{% block content %}
+{% block content_user %}
 
-<section class="user-profile section">
-	<div class="container">
-		<div class="row">
-			<div class="col-md-10 offset-md-1 col-lg-3 offset-lg-0">
-				<div class="sidebar">
-					<!-- User Widget -->
-					<div class="widget user">
-						<!-- User Image -->
-						<div class="image d-flex justify-content-center">
-							<img src="{% static 'images/user/user.png' %}" alt="" class="">
-						</div>
-						<!-- User Name -->
-						<h5 class="text-center">{{ user.fullname }}</h5>
+<div class="col-md-10 offset-md-1 col-lg-9 offset-lg-0">
+	<!-- Edit Profile Welcome Text -->
+	<div class="widget welcome-message">
+		<h2>Thông tin tài khoản</h2>
+		<p></p>
+	</div>
+	<!-- Edit Personal Info -->
+	<div class="row">
+		<div class="col-lg-6 col-md-6">
+			<div class="widget personal-info">
+				<h3 class="widget-header user">Thông tin cơ bản</h3>
+				<form method="POST">
+					{% csrf_token %}
+					<div class="form-group">
+						{{ info_form.fullname.label_tag }}
+						{{ info_form.fullname }}
+						{{ info_form.fullname.errors }}
 					</div>
-					<!-- Dashboard Links -->
-					<div class="widget dashboard-links">
-						<ul>
-							<li><a class="my-1 d-inline-block" href="{% url 'user:info' %}">Thông tin tài khoản</a></li>
-							<li><a class="my-1 d-inline-block" href="">Saved Offer <span>(5)</span></a></li>
-							<li><a class="my-1 d-inline-block" href="">Favourite Stores <span>(3)</span></a></li>
-							<li><a class="my-1 d-inline-block" href="">Recommended</a></li>
-						</ul>
+					<div class="form-group">
+						{{ info_form.gender.label_tag }}
+						{{ info_form.gender }}
+						{{ info_form.gender.errors }}
 					</div>
-				</div>
-			</div>
-			<div class="col-md-10 offset-md-1 col-lg-9 offset-lg-0">
-				<!-- Edit Profile Welcome Text -->
-				<div class="widget welcome-message">
-					<h2>Thông tin tài khoản</h2>
-					<p></p>
-				</div>
-				<!-- Edit Personal Info -->
-				<div class="row">
-					<div class="col-lg-6 col-md-6">
-						<div class="widget personal-info">
-							<h3 class="widget-header user">Thông tin cơ bản</h3>
-							<form method="POST">
-								{% csrf_token %}
-								<div class="form-group">
-									{{ info_form.fullname.label_tag }}
-									{{ info_form.fullname }}
-									{{ info_form.fullname.errors }}
-								</div>
-								<div class="form-group">
-									{{ info_form.gender.label_tag }}
-									{{ info_form.gender }}
-									{{ info_form.gender.errors }}
-								</div>
-								<div class="form-group">
-									{{ info_form.email.label_tag }}
-									<div
-										{% if user.emailverify.was_verified_email %}
-										class="border border-success"
-										title="Đã xác thực"
-										{% else %}
-										class="border border-danger"
-										title="Chưa xác thực"
-										{% endif %}
-										data-toggle="tooltip" 
-										data-placement="right" 
-									>{{ info_form.email }}</div>
-									{{ info_form.email.errors }}
-								</div>
-								<div class="form-group">
-									{{ info_form.phone_number.label_tag }}
-									{{ info_form.phone_number }}
-									{{ info_form.phone_number.errors }}
-								</div>
-								<!-- Submit button -->
-								<button class="btn btn-transparent" type="submit" name="submit_info_form">Lưu thay đổi</button>
-							</form>
-						</div>
+					<div class="form-group">
+						{{ info_form.email.label_tag }}
+						<div
+							{% if user.emailverify.was_verified_email %}
+							class="border border-success"
+							title="Đã xác thực"
+							{% else %}
+							class="border border-danger"
+							title="Chưa xác thực"
+							{% endif %}
+							data-toggle="tooltip" 
+							data-placement="right" 
+						>{{ info_form.email }}</div>
+						{{ info_form.email.errors }}
 					</div>
-					<div class="col-lg-6 col-md-6">
-						<!-- Change Password -->
-					<div class="widget change-password">
-						<h3 class="widget-header user">Đổi mật khẩu</h3>
-						<form method="POST">
-							{% csrf_token %}
-							{% for field in password_change_form.visible_fields %}
-								<div class="form-group">
-									{{ field.label_tag }} {{ field }}
-									{{ field.errors }}
-								</div>
-							{% endfor %}
-							<!-- Submit Button -->
-							<button class="btn btn-transparent" type="submit" name="submit_password_change_form">Đổi mật khẩu</button>
-						</form>
+					<div class="form-group">
+						{{ info_form.phone_number.label_tag }}
+						{{ info_form.phone_number }}
+						{{ info_form.phone_number.errors }}
 					</div>
-					</div>
-				</div>
+					<!-- Submit button -->
+					<button class="btn btn-transparent" type="submit" name="submit_info_form">Lưu thay đổi</button>
+				</form>
 			</div>
 		</div>
+		<div class="col-lg-6 col-md-6">
+			<!-- Change Password -->
+		<div class="widget change-password">
+			<h3 class="widget-header user">Đổi mật khẩu</h3>
+			<form method="POST">
+				{% csrf_token %}
+				{% for field in password_change_form.visible_fields %}
+					<div class="form-group">
+						{{ field.label_tag }} {{ field }}
+						{{ field.errors }}
+					</div>
+				{% endfor %}
+				<!-- Submit Button -->
+				<button class="btn btn-transparent" type="submit" name="submit_password_change_form">Đổi mật khẩu</button>
+			</form>
+		</div>
+		</div>
 	</div>
-</section>
+</div>
+
 {% endblock %}

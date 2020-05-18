@@ -1,9 +1,14 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.core.paginator import Paginator
 from .models import Book, BookCategory, BookCategoryDetail, Merchandise
+from django.contrib.auth.decorators import login_required
 from django.db.models import Count, Q, F
 from common.utils import SQLUtils
-from store.models import Store
+import json
+from store.models import Store 
+from report.services import get_sample_reports
+from django.core import serializers
+from users.services import CITIES
 # Create your views here.
 SORT_SQL = {
     'newest': '`activated_date` DESC',
@@ -112,6 +117,24 @@ def get_book(request, id):
     merchandise = Merchandise.objects.annotate(rate_point=F('total_star')/F('times_rated')).get(pk=id)
     book = get_object_or_404(Book, pk=merchandise.id_product)
     store = Store.objects.get(pk=merchandise.user)
+    sample_reports = get_sample_reports('merchandise')
     return render(request, 'book/book.html', {
-        'merchandise':merchandise, 'book':book, 'store':store,
+        'merchandise':merchandise, 'book':book, 'store':store, 'sample_reports':sample_reports,
     })
+
+@login_required
+def add_book(request):
+    if request.method == 'POST':
+        print('=> ',request.POST.get('product_description'))
+        return redirect('seller:add_book')
+    book_categories = BookCategory.objects.filter(delete_date=None)
+    book_categories_json = dict()
+    for category in book_categories:
+        book_categories_json[category.id] = {
+            'id': category.id,
+            'name': category.name,
+            'id_parent': category.parent_category.id if category.parent_category else None,
+        }
+    book_categories_json = json.dumps(book_categories_json, ensure_ascii=False)
+    return render(request, 'seller/add_book.html', {'book_categories':book_categories_json,'cities':CITIES})
+    

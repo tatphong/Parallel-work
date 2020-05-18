@@ -9,4 +9,5 @@ urlpatterns = [
     path('terms-condition/', views.user_terms, name='terms'),
     path('verify/<str:code>', views.user_email_verify, name='verify'),
     path('', views.user_info, name='info'),
+    path('notification/', views.user_notification, name='notification')
 ]

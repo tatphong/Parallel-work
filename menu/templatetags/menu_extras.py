@@ -8,3 +8,8 @@ def show_customer_menu(user):
     #english_categories = BookCategory.objects.get(pk=1)
     menu = BookCategory.objects.filter(parent_category=None)
     return {'menu':menu,'user':user}
+
+
+@register.inclusion_tag('seller/menu.html')
+def show_seller_menu(user):
+    return {'user': user}

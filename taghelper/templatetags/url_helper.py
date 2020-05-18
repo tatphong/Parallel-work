@@ -1,5 +1,5 @@
 from django import template
-
+from notification.services import get_number_unread_notifications as number_unread_notifications_service
 register = template.Library()
 
 @register.simple_tag
@@ -18,3 +18,7 @@ HREF = {
 @register.simple_tag
 def get_detail_href(product_portfolio, product_id):
     return HREF.get(product_portfolio, '') + ' product_id'
+
+@register.simple_tag
+def get_number_unread_notifications(user):
+    return number_unread_notifications_service(user)

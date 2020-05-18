@@ -1,0 +1,73 @@
+{% load static %}
+<section>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <nav class="navbar navbar-expand-lg navbar-light navigation">
+                    <a class="navbar-brand" href="{% url 'home:index' %}">
+                        <img src="{% static 'images/LG.png' %}" alt="">
+                    </a>
+                    <button class="navbar-toggler" type="button" data-toggle="collapse"
+                        data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                        <ul class="navbar-nav ml-auto main-nav ">
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'home:index' %}">Trang chủ</a>
+                            </li>
+                            <li class="nav-item dropdown dropdown-slide">
+                                <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown"
+                                    aria-haspopup="true" aria-expanded="false">
+                                    Sản phẩm <span><i class="fa fa-angle-down"></i></span>
+                                </a>
+                                <!-- Dropdown list -->
+                                <div class="dropdown-menu">
+                                    <a class="dropdown-item" href="{% url 'seller:add_book' %}">Tạo sản phẩm</a>
+                                    <a class="dropdown-item" href="#">Tất cả</a>
+                                </div>
+                                
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="about-us.html">Đơn hàng</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="contact-us.html">Bình luận</a>
+                            </li>
+                        </ul>
+                        {% if user.is_authenticated %}
+                        <ul class="navbar-nav ml-auto mt-10">
+                            <li class="nav-item dropdown dropdown-slide">
+                                <a class="nav-link dropdown-toggle" href="store.html" data-toggle="dropdown"
+                                    aria-haspopup="true" aria-expanded="false">
+                                    Chào, {{ user.fullname }} 
+                                </a>
+                                <!-- Dropdown list -->
+                                <div class="dropdown-menu">
+                                    <a class="dropdown-item" href="{% url 'user:info' %}"><i class="fas fa-address-card"></i> Thông tin cá nhân</a>
+                                    <a class="dropdown-item" href="{% url 'cart:get_cart' %}"><i class="fas fa-shopping-cart"></i> Giỏ hàng của tôi</a>
+                                    <hr/>
+                                    <form action="{% url 'user:logout' %}" method="POST">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-light dropdown-item" ><i class="fas fa-sign-out-alt"></i> Đăng xuất</button>
+                                    </form>
+                                </div>
+                            </li>
+                        </ul>
+                        {% else %}
+                        <ul class="navbar-nav ml-auto mt-10">
+                            <li class="nav-item">
+                                <a class="nav-link login-button" href="{% url 'user:login' %}">Đăng nhập</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-white add-button" href="{% url 'user:register' %}">Tạo tài khoản</a>
+                            </li>
+                        </ul>
+                        {% endif %}
+                    </div>
+                </nav>
+            </div>
+        </div>
+    </div>
+</section>

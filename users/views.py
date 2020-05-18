@@ -6,6 +6,7 @@ from django.utils import timezone
 from common.utils import send_mail_verification_code, get_random_string
 from .models import EmailVerify
 from .forms import LoginForm, UpdateProfile, RegistrationForm, PasswordChangeForm
+from notification.services import get_notifications, send_notification_by_system
 # Create your views here.
 def user_login(request):
     errors=[]
@@ -31,6 +32,7 @@ def user_register(request):
             email_verify = EmailVerify(user = user, token = email_token)
             email_verify.save()
             send_mail_verification_code(form.cleaned_data['email'], email_token)
+            send_notification_by_system(user, 'Chào mừng đến với Chợ Sách.')
             login(request, user)
             return redirect('home:index')
     return render(request, 'user/register.html', {'form': form})
@@ -70,7 +72,12 @@ def user_info(request):
     return render(request, 'user/info.html',
         {'info_form':info_form, 'password_change_form':password_change_form})
 
-
+@login_required
+def user_notification(request):
+    page_number = request.GET.get('page')
+    page_size = 10
+    pager, page_navigator = get_notifications(request.user, page_number, page_size)
+    return render(request, 'user/notification.html', {'pager':pager, 'page_navigator': page_navigator})
 
 
 def user_terms(request):

@@ -9,7 +9,7 @@ class NewAddressForm(forms.Form):
         attrs={'class':'col-10 form-group p_star bo'}))
     phone = forms.CharField(label='Điện thoại', widget=forms.TextInput(
         attrs={'class':'col-10 form-group p_star bo'}))
-    address_no = forms.CharField(label='Số địa chỉ', widget=forms.TextInput(
+    no = forms.CharField(label='Số địa chỉ', widget=forms.TextInput(
         attrs={'class':'col-10 form-group p_star bo'}))
     street = forms.CharField(label='Đường', widget=forms.TextInput(
         attrs={'class':'col-10 form-group p_star bo'}))
@@ -32,32 +32,38 @@ class NewAddressForm(forms.Form):
             return phone
         raise forms.ValidationError('Số điện thoại không hợp lệ.', code='invalid_phonenumber')
 
-    def clean_address(self):
-        address = self.cleaned_data('address')
-        if address and not re.search(r'[!@#$%^&*(),.?":{}|<>]', address):
-            return address
-        raise forms.ValidationError('Số địa chỉ không hợp lệ.', code='invalid_address_no')
+    def clean_no(self):
+        no = self.cleaned_data['no']
+        if no and not re.search(r'[!@#$%^&*(),.?":{}|<>]', no):
+            return no
+        raise forms.ValidationError('Số địa chỉ không hợp lệ.', code='invalid_no')
 
+    def clean_street(self):
+        street = self.cleaned_data['street']
+        if street and not re.search(r'[!@#$%^&*(),.?":{}|<>]', street):
+            return street
+        raise forms.ValidationError('Tên người nhận không hợp lệ.', code='invalid_street')
     def clean_ward(self):
-        ward = self.cleaned_data('ward')
+        ward = self.cleaned_data['ward']
         if ward and not re.search(r'[!@#$%^&*(),.?":{}|<>]', ward):
             return ward
         raise forms.ValidationError('Tên người nhận không hợp lệ.', code='invalid_ward')
 
     def clean_district(self):
-        district = self.cleaned_data('district')
+        district = self.cleaned_data['district']
         if district and not re.search(r'[!@#$%^&*(),.?":{}|<>]', district):
             return district
         raise forms.ValidationError('Tên người nhận không hợp lệ.', code='invalid_district')
 
     def clean_city(self):
-        city = self.cleaned_data('city')
+        city = self.cleaned_data['city']
         if city and not re.search(r'[!@#$%^&*(),.?":{}|<>]', city):
             return city
         raise forms.ValidationError('Tên người nhận không hợp lệ.', code='invalid_city')
 
     def save(self):
-        address = Address(
+        # address = 
+        Address.objects.create(
             owner = self.cleaned_data['owner'],
             phone_number = self.cleaned_data['phone_number'],
             no = self.cleaned_data['no'],
@@ -65,7 +71,6 @@ class NewAddressForm(forms.Form):
             ward = self.cleaned_data['ward'],
             district = self.cleaned_data['district'],
             cỉty = self.cleaned_data['cỉty'],
-            created_date = datetime.datetime.now()
         )
-        address.save()
-        return address
+        # address.save()
+        # return address

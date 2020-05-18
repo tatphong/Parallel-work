@@ -1168,6 +1168,7 @@ ul.pagination .active a {
   width: 15%;
 }
 
+/*
 .dashboard-container tbody tr:hover .action a {
   color: #fff;
 }
@@ -1181,6 +1182,25 @@ ul.pagination .active a {
 }
 
 .dashboard-container tbody tr:hover .action a.delete {
+  background: #ff5252;
+}
+*/
+.action a{
+  cursor: pointer;
+}
+.action a:hover {
+  color: #fff;
+}
+
+.action a.edit_icon:hover {
+  background: #C77000;
+}
+
+.action a.view_icon:hover {
+  background: #C77000;
+}
+
+.action a.delete_icon:hover {
   background: #ff5252;
 }
 

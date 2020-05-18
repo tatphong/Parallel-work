@@ -385,6 +385,7 @@ CREATE TABLE `sample_report` (
     `id` INT AUTO_INCREMENT,
     `id_report_target` INT NOT NULL,
     `sample_content` VARCHAR(256) NOT NULL,
+    `negative_point` INT NOT NULL,
     
     `created_date` DATETIME NOT NULL,
     `created_by` INT NOT NULL,
@@ -400,6 +401,7 @@ CREATE TABLE `report` (
     `id_object` INT NOT NULL,
     `id_sample_report` INT NOT NULL,
     `user_description` VARCHAR(512),
+    `negative_point` INT NOT NULL,
     
     `created_date` DATETIME NOT NULL,
     `created_by` INT NOT NULL,

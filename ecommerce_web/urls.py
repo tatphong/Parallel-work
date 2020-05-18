@@ -21,10 +21,13 @@ urlpatterns = [
     path('', include('home.urls')),
     path('user/', include('users.urls')),
 
+    path('report/', include('report.urls')),
     path('book/', include('book.urls')),
     path('order/', include('order.urls')),
     path('cart/', include('cart.urls')),
     path('search/', include('search.urls')),
     path('store/', include('store.urls')),
     path('review/', include('review.urls')),
+    path('notification/', include('notification.urls')),
+    path('seller/', include('seller.urls')),
 ]

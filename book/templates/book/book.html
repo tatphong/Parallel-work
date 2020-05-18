@@ -178,7 +178,8 @@
                                                         placeholder="Nhận xét của bạn về sản phẩm này"></textarea>
                                                 </div>
                                                 <div class="col-12">
-                                                    <button type="button" onclick="submit_review()" class="btn btn-main">Gửi nhận xét</button>
+                                                    <button type="button" onclick="submit_review()"
+                                                        class="btn btn-main">Gửi nhận xét</button>
                                                 </div>
                                             </form>
                                         </div>
@@ -189,7 +190,7 @@
                                         <div class="pagination justify-content-center">
                                             <nav aria-label="Page navigation example">
                                                 <ul id="review_page" class="pagination">
-                                                    
+
                                                 </ul>
                                             </nav>
                                         </div>
@@ -245,39 +246,57 @@
                             </li>
                         </ul>
                     </div>
-                    <!-- Map Widget -->
-                    <div class="widget map">
-                        <div class="map">
-                            <div id="map_canvas" data-latitude="51.507351" data-longitude="-0.127758"></div>
-                        </div>
-                    </div>
-                    <!-- Rate Widget -->
-                    <div class="widget rate">
-                        <!-- Heading -->
-                        <h5 class="widget-header text-center">What would you rate
-                            <br>
-                            this product</h5>
-                        <!-- Rate -->
-                        <div class="starrr"></div>
-                    </div>
                     <!-- Safety tips widget -->
                     <div class="widget disclaimer">
-                        <h5 class="widget-header">Safety Tips</h5>
+                        <h5 class="widget-header">Mẹo mua hàng an toàn</h5>
                         <ul>
-                            <li>Meet seller at a public place</li>
-                            <li>Check the item before you buy</li>
-                            <li>Pay only after collecting the item</li>
-                            <li>Pay only after collecting the item</li>
+                            <li>Xem đánh giá người dùng.</li>
+                            <li>Đọc kỹ các thông tin về sản phẩm và chế độ đổi trả, bảo hành.</li>
+                            <li>Luôn lưu ý về bảo mật thông tin, tránh hacker.</li>
                         </ul>
                     </div>
                     <!-- Coupon Widget -->
                     <div class="widget coupon text-center">
                         <!-- Coupon description -->
-                        <p>Have a great product to post ? Share it with
-                            your fellow users.
-                        </p>
-                        <!-- Submii button -->
-                        <a href="" class="btn btn-transparent-white">Submit Listing</a>
+                        <p>Phản ánh thông tin sản phẩm không chính xác</p>
+
+                        <button type="button" class="btn btn-transparent-white" data-toggle="modal"
+                            data-target=".bd-example-modal-lg">Báo cáo</button>
+
+                        <div class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog"
+                            aria-labelledby="myLargeModalLabel" aria-hidden="true">
+                            <div class="modal-dialog modal-lg">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="exampleModalLabel">Phản ánh sản phẩm</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <form>
+                                            <div class="form-group">
+                                                <label for="sample-report" class="col-form-label">Vấn đề cần phản ánh:</label>
+                                                <select id="sample-report" class="form-control full-size-select">
+                                                    {% for sample_report in sample_reports %}
+                                                    <option value="{{ sample_report.id }}">{{ sample_report.sample_content }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="report_description" class="col-form-label">Mô tả vấn đề:</label>
+                                                <textarea rows="10" class="form-control" id="report_description"></textarea>
+                                            </div>
+                                        </form>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary"
+                                            data-dismiss="modal">Hủy</button>
+                                        <button onclick="send_report()" type="button" class="btn btn-primary">Gửi phản ánh</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                 </div>
@@ -302,8 +321,8 @@
 -->
 {% csrf_token %}
 <script>
-    $.ajaxSetup({ 
-        beforeSend: function(xhr, settings) {
+    $.ajaxSetup({
+        beforeSend: function (xhr, settings) {
             function getCookie(name) {
                 var cookieValue = null;
                 if (document.cookie && document.cookie != '') {
@@ -323,31 +342,34 @@
                 // Only send the token to relative URLs i.e. locally.
                 xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
             }
-        } 
+        }
     });
     get_reviews(1)
-    function get_stars(num_stars){
-        var str_stars = ``, i;
-        for(i = 1; i <= 5; ++i){
-            if(i <= num_stars){
+
+    function get_stars(num_stars) {
+        var str_stars = ``,
+            i;
+        for (i = 1; i <= 5; ++i) {
+            if (i <= num_stars) {
                 str_stars += `<li class="list-inline-item"> <i class="fa fa-star"></i> </li>`;
-            }else{
+            } else {
                 str_stars += `<li class="list-inline-item"> <i class="fa fa-star-o"></i> </li>`;
             }
         }
         return str_stars;
     }
-    function get_reviews(page){
+
+    function get_reviews(page) {
         $.ajax({
             type: 'GET',
             url: "{% url 'review:get_reviews' %}?id_merchandise={{ merchandise.id }}&page=" + page,
             dataType: 'json',
             success: function (response) {
                 $("#reviews").empty()
-                for (review of response.data.reviews){
+                for (review of response.data.reviews) {
                     const d = new Date(review['date'])
                     $("#reviews").append(
-                    `
+                        `
                         <div class="media">
                             <!-- Avater -->
                             <img src="{% static 'images/user/user.png' %}" alt="avater">
@@ -392,10 +414,10 @@
                         </div>
                     `
                     )
-                    for(reply of review["replies"]){
+                    for (reply of review["replies"]) {
                         const d = new Date(reply["date"]);
                         $("#reviews").append(
-                        `
+                            `
                         <div class ="d-flex justify-content-end">
                             <div class="media" style="width:88%; ">
                                 <img src="{% static 'images/user/user.png' %}" alt="avater">
@@ -418,14 +440,14 @@
                     }
                 }
                 $("#review_page").empty();
-                for(page_num of response.data.page_navigator){
-                    if(page == page_num){
+                for (page_num of response.data.page_navigator) {
+                    if (page == page_num) {
                         activated_class = "active";
-                    }else{
+                    } else {
                         activated_class = "";
                     }
                     $("#review_page").append(
-                    `<li class="page-item ${activated_class}"><a onclick=get_reviews(${page_num}) class="page-link" href="#reviews">${page_num}</a></li>`
+                        `<li class="page-item ${activated_class}"><a onclick=get_reviews(${page_num}) class="page-link" href="#reviews">${page_num}</a></li>`
                     );
                 }
             },
@@ -435,30 +457,34 @@
             }
         })
     }
-    
-    function submit_review(){
+
+    function submit_review() {
         var star = 5 - (document.getElementById("review_star").innerHTML.match(/fa-star-o/g) || []).length;
         var review_content = document.getElementById("review").value;
-        
-        if(star<=0 || star>5){
+
+        if (star <= 0 || star > 5) {
             alert("Số sao không hợp lệ. Xin hãy chọn số sao từ 1-5.");
             return;
         }
-        if(review_content===""){
+        if (review_content === "") {
             alert("Xin hãy nhập nội dung.");
             return;
         }
         $.ajax({
             type: "POST",
             url: "{% url 'review:post_review' %}",
-            data: {"id_merchandise": "{{ merchandise.id }}", "star":star, "content":review_content},
+            data: {
+                "id_merchandise": "{{ merchandise.id }}",
+                "star": star,
+                "content": review_content
+            },
             success: function (response) {
                 get_reviews(1)
             },
             error: function (response) {
                 // alert the error if any error occured
                 // console.log(response["responseJSON"]["error"]);
-                switch(response.status){
+                switch (response.status) {
                     case 401:
                         alert("Xin hãy đăng nhập.");
                         break;
@@ -472,26 +498,29 @@
             }
         });
     }
-    
-    function reply_review(id){
+
+    function reply_review(id) {
         var reply_content = document.getElementById("reply_" + id).value;
-        console.log(reply_content)
-        if(reply_content===""){
+        if (reply_content === "") {
             alert("Xin hãy nhập nội dung.");
             return;
         }
         $.ajax({
             type: "POST",
             url: "{% url 'review:post_reply' %}",
-            data: {"id_merchandise": "{{ merchandise.id }}", "id_review":id, "content":reply_content},
+            data: {
+                "id_merchandise": "{{ merchandise.id }}",
+                "id_review": id,
+                "content": reply_content
+            },
             success: function (response) {
-                console.log("DONE" , response)
+                console.log("DONE", response)
                 get_reviews(1)
             },
             error: function (response) {
                 // alert the error if any error occured
                 // console.log(response["responseJSON"]["error"]);
-                switch(response.status){
+                switch (response.status) {
                     case 401:
                         alert("Xin hãy đăng nhập.");
                         break;
@@ -504,6 +533,40 @@
                 }
             }
         });
+    }
+
+    function send_report(){
+        content = document.getElementById("report_description").value;
+        selected_report = document.getElementById("sample-report").value;
+        $.ajax({
+            type: "POST",
+            url: "{% url 'report:post_report' %}",
+            data: {
+                "id_object": "{{ merchandise.id }}",
+                "id_sample_report": selected_report,
+                "content": content
+            },
+            success: function (response) {
+                alert("Báo cáo thành công.")
+                $('.bd-example-modal-lg').modal('hide')
+            },
+            error: function (response) {
+                // alert the error if any error occured
+                // console.log(response["responseJSON"]["error"]);
+                switch (response.status) {
+                    case 401:
+                        alert("Xin hãy đăng nhập.");
+                        break;
+                    case 400:
+                        alert(response["responseJSON"]["error"]);
+                        break;
+                    case 500:
+                        alert("Đã có lỗi xảy ra, xin hãy thử lại sau.")
+                        break;
+                }
+            }
+        });
+
     }
 </script>
 {% endblock %}
