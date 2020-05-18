@@ -64,15 +64,33 @@ def check_out(request):
 
     # form show
     form = NewAddressForm()
-    # if request.method == 'POST':
-    #     #lưu form nhập thông tin địa chỉ giao hàng mới
-    #     form = NewAddressForm(request.POST)
-    #     if form.is_valid():
-    #         form.save()
-    #         #lưu đơn hàng
-    #         order = Order.objects.create(user_id = request.user.id, address_id = 1, payment_id = 1, delivery_id = 1, fee_delivery = 0, created_date = datetime.now())
-    #         
-    #         return redirect('order:order')
+    if request.method == 'POST':
+        #lưu form nhập thông tin địa chỉ giao hàng mới
+        form = NewAddressForm(request.POST)
+        if form.is_valid():
+            form.save()
+            #tách và lưu đơn hàng
+
+            store_address = Address.objects.raw('''
+            select distinct m.id_address
+            from merchandise as m join cart as c 
+            where c.id_user = %s and m.id=c.id_merchandise;
+            ''', str(request.user.id))
+            for i in store_address:
+                cart = Address.objects.raw('''
+                    select *
+                    from cart
+                    where id_address = %d and id_user = %d
+                ''', i.id_address, request.user.id)
+                Order.objects.create(user_id = request.user.id, address_id = cart.id_address, payment_id = 1, delivery_id = 1, fee_delivery = 0,
+                                    created_date = datetime.now())
+                for j in cart:
+
+                
+
+            order = Order.objects.create(user_id = request.user.id, address_id = 1, payment_id = 1, delivery_id = 1, fee_delivery = 0, created_date = datetime.now())
+            
+            return redirect('order:order')
 
     # get user address
     address = Address.objects.filter(user_id=request.user.id)

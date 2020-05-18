@@ -30,11 +30,15 @@
                     <div class="row col-6">
                         {%for item in address%}
                         <div class="col-lg-12">
-                        <h3 id="diachinhanmacdinh"> <input name="diachinhan" type="radio" value="Địa chỉ mặc định"> Địa chỉ mặc định :</h3>
+                        <h3 id="diachinhanmacdinh"> <input name="diachinhan" type="radio" checked="check" value="Địa chỉ mặc định"> Địa chỉ mặc định :</h3>
                                 <div class="col-12">    
-                                    Tên người nhận: <h6>{{item.owner}}</h6>
-                                    Số điện thoại: <h6>{{item.phone_number}}</h6>
-                                    Địa chỉ: <h6>{{item.street}} </h6>
+                                    <h6>Tên người nhận: {{item.owner}}</h6>
+                                    <h6>Số điện thoại: {{item.phone_number}}</h6>
+                                    <h6>
+                                        Địa chỉ: {% with item.no|add:" "|add:item.street|add:" P."|add:item.ward|add:" Q."|add:item.district|add:" "|add:item.city as address_str %} 
+                                        {{ address_str }}
+                                        {% endwith %}
+                                    </h6>
                                     <br>
                                 </div>
                         </div>
@@ -60,7 +64,13 @@
                             <ul class="list">
                                 <li><h4>Product <span>Total</span></h4></li>
                                 {% for item in cart %}
-                                    <li><span class="col-2">{{item.name}} </span><span class="middle col-2">x{{item.quantity}}</span> <span class="last col-2">{{item.price|floatformat:0}}đ</span></li>
+                                    <li>
+                                        <div class="row">
+                                            <div class="check-pro-cl1 col-md-6">{{item.name}} </div>
+                                            <span class="check-pro-cl3 col-md-2">x{{item.quantity}}</span> 
+                                            <span class=" check-pro-cl3 col-md-3 ">{{item.price|floatformat:0}}đ</span>
+                                        </div>
+                                    </li>
                                 {% endfor %}
                             </ul>
                             <ul class="list list_2">

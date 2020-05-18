@@ -4,6 +4,15 @@ body {
   line-height: 1.5;
   font-family: "Muli", sans-serif;
 }
+.check-pro-cl1{
+  max-width: 250px;
+  height: auto;
+  margin-left: 15px;
+}
+.check-pro-cl3{
+  text-align: right;
+  padding: 0px;
+}
 .order_box{
   padding: 50px 50px 100px 50px;
 }
