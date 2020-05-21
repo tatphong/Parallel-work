@@ -27,17 +27,18 @@
         <div class="container">
             <div class="billing_details" id="billing">
                 <form class="row contact_form col-12" method="post" novalidate>
+                    {% csrf_token %}
                     <div class="row col-6">
-                        {%for item in address%}
+                        {% for item in address %}
                         <div class="col-lg-12">
-                        <h3 id="diachinhanmacdinh"> <input name="diachinhan" type="radio" checked="check" value="Địa chỉ mặc định"> Địa chỉ mặc định :</h3>
+                        <h3 id="diachinhanmacdinh"> <input name="diachinhan" type="radio" checked="check" value="{{item.id}}"> Địa chỉ mặc định :</h3>
                                 <div class="col-12">    
                                     <h6>Tên người nhận: {{item.owner}}</h6>
                                     <h6>Số điện thoại: {{item.phone_number}}</h6>
                                     <h6>
                                         Địa chỉ: {% with item.no|add:" "|add:item.street|add:" P."|add:item.ward|add:" Q."|add:item.district|add:" "|add:item.city as address_str %} 
-                                        {{ address_str }}
-                                        {% endwith %}
+                                                {{ address_str }}
+                                                {% endwith %}
                                     </h6>
                                     <br>
                                 </div>
@@ -45,7 +46,7 @@
                         {%endfor%}
                         <div class= "col-lg-12"> <br>
                             <h3 id="diachinhanmoi"> <input name="diachinhan" type="radio" value="Nhập địa chỉ mới"> Nhập địa chỉ mới :</h3>
-                            <div class="col-12">	
+                            <div class="col-12">
                                 {% csrf_token %}
                                 {% for field in form.visible_fields %}
                                     <div class="fieldWrapper">

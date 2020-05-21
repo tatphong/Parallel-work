@@ -9,5 +9,9 @@ urlpatterns = [
     path('terms-condition/', views.user_terms, name='terms'),
     path('verify/<str:code>', views.user_email_verify, name='verify'),
     path('', views.user_info, name='info'),
-    path('notification/', views.user_notification, name='notification')
+    path('notification/', views.user_notification, name='notification'),
+    path('address/', views.user_address, name='address'),
+    path('address/add', views.add_address, name='add_address'),
+    path('address/check_create', views.check_create_address, name='check_create_address'),
+    path('address/delete', views.delete_address, name='delete_address'),
 ]

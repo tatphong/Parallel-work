@@ -344,6 +344,12 @@
             }
         }
     });
+
+    function get_safe_simplestr(content){
+        content = String(content).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        return content.replace("\n", "<br/>");
+    }
+
     get_reviews(1)
 
     function get_stars(num_stars) {
@@ -388,7 +394,7 @@
                                 </div>
                                 <div class="review-comment">
                                     <p>
-                                        ${review['content']}
+                                        ${get_safe_simplestr(review['content'])}
                                     </p>
                                 </div>
                                 <a class="btn" data-toggle="collapse" href="#review_${review.id}" role="button" aria-expanded="false" aria-controls="review_${review.id}">
@@ -430,7 +436,7 @@
                                     </div>
                                     <div class="review-comment">
                                         <p>
-                                            ${reply['content']}
+                                            ${get_safe_simplestr(reply['content'])}
                                         </p>
                                     </div>
                                 </div>

@@ -161,3 +161,7 @@ EMAIL_USE_TLS = True
 EMAIL_USE_SSL = False
 
 MAX_NUM_OF_PRODUCT_IMAGE = 6
+MAX_NUM_OF_ADDRESS = 10
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')

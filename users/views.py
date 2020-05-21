@@ -1,12 +1,14 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 from common.utils import send_mail_verification_code, get_random_string
-from .models import EmailVerify
-from .forms import LoginForm, UpdateProfile, RegistrationForm, PasswordChangeForm
+from .models import EmailVerify, Address
+from .forms import LoginForm, UpdateProfile, RegistrationForm, PasswordChangeForm, AddressForm
 from notification.services import get_notifications, send_notification_by_system
+from .services import get_addresses, CITIES, get_addresses_without_pager
+from ecommerce_web.settings import MAX_NUM_OF_ADDRESS
 # Create your views here.
 def user_login(request):
     errors=[]
@@ -14,9 +16,10 @@ def user_login(request):
     if request.method == 'POST':
         form = LoginForm(request.POST)
         user = authenticate(request, username=request.POST['username'],password=request.POST['password'])
-        
         if user and user.is_accepted_login():
             login(request, user)
+            if request.GET.get('next'):
+                return HttpResponseRedirect(request.GET.get('next'))
             return redirect('home:index')
         else:
             errors = ['Đăng nhập thất bại. Hãy chắc chắn bạn nhập đúng email và mật khẩu.']
@@ -79,6 +82,35 @@ def user_notification(request):
     pager, page_navigator = get_notifications(request.user, page_number, page_size)
     return render(request, 'user/notification.html', {'pager':pager, 'page_navigator': page_navigator})
 
+@login_required
+def user_address(request):
+    addresses = get_addresses_without_pager(request.user)
+    return render(request, 'user/address.html', {'addresses':addresses, 'cities':CITIES, 'max_addresses':MAX_NUM_OF_ADDRESS})
+
+@login_required
+def add_address(request):
+    if request.method == 'POST':
+        if get_addresses_without_pager(request.user).count() < MAX_NUM_OF_ADDRESS:
+            form = AddressForm(request.POST, current_user=request.user)
+            if form.is_valid():
+                address = form.save(commit=False)
+                address.user = request.user
+                address.save()
+    return redirect('user:address')
+
+@login_required
+def check_create_address(request):
+    num_address = get_addresses_without_pager(request.user).count()
+    return JsonResponse({'data': {'is_accept': (num_address < MAX_NUM_OF_ADDRESS)} }, status=200)
+
+@login_required
+def delete_address(request):
+    address = get_addresses_without_pager(request.user).get(pk=request.POST.get('id_address'))
+    if not address:
+        return JsonResponse({}, status=400)
+    address.delete_date = timezone.now()
+    address.save()
+    return JsonResponse({}, status=200)
 
 def user_terms(request):
     return render(request, 'user/terms_condition.html')

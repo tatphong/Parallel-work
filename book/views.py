@@ -8,7 +8,7 @@ import json
 from store.models import Store 
 from report.services import get_sample_reports
 from django.core import serializers
-from users.services import CITIES
+from users.services import CITIES, get_addresses_without_pager
 # Create your views here.
 SORT_SQL = {
     'newest': '`activated_date` DESC',
@@ -125,7 +125,10 @@ def get_book(request, id):
 @login_required
 def add_book(request):
     if request.method == 'POST':
-        print('=> ',request.POST.get('product_description'))
+        print('=> ',request.POST)
+        print('=> ', request.POST.get('pro-condition'))
+        print('=> ', request.FILES)
+        print('=> ', request.FILES.get('pro-images'))
         return redirect('seller:add_book')
     book_categories = BookCategory.objects.filter(delete_date=None)
     book_categories_json = dict()
@@ -136,5 +139,6 @@ def add_book(request):
             'id_parent': category.parent_category.id if category.parent_category else None,
         }
     book_categories_json = json.dumps(book_categories_json, ensure_ascii=False)
-    return render(request, 'seller/add_book.html', {'book_categories':book_categories_json,'cities':CITIES})
+    addresses = get_addresses_without_pager(request.user)
+    return render(request, 'seller/add_book.html', {'book_categories':book_categories_json,'cities':CITIES, 'addresses':addresses})
     

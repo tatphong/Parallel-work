@@ -1,0 +1,262 @@
+{% extends 'user/user_base.html' %}
+{% load static %}
+{% load url_helper %}
+{% block content_user %}
+<div class="col-md-10 offset-md-1 col-lg-9 offset-lg-0">
+	<!-- Edit Profile Welcome Text -->
+	<div class="widget welcome-message">
+		<h2>Quản lý địa chỉ</h2>
+		<p></p>
+	</div>
+	<!-- Edit Personal Info -->
+	<div class="row">
+		<div class="col-lg-12 col-md-12">
+			<div class="widget dashboard-container my-adslist">
+				<div class="container widget-header">
+					<div class="row justify-content-between">
+						<div class="col-10">
+							<span class="align-middle">Địa chỉ ({{ addresses.count }}/{{ max_addresses }})</span>
+						</div>
+						<div class="col-1 action" data-title="Action">
+							<ul class="list-inline justify-content-center">
+								<li class="list-inline-item">
+									<a onclick="check_create_address()" data-placement="top" title="Thêm địa chỉ" class="edit_icon" data-toggle="modal"
+										data-target="#modal-add-address">
+										<i class="fas fa-plus-circle"></i>
+									</a>
+								</li>
+							</ul>
+						</div>
+					</div>
+				</div>
+
+				<table class="table">
+					<thead class="container">
+						<tr class="row">
+							<th class="col-2">Số nhà</th>
+							<th class="col-2">Đường</th>
+							<th class="col-1">Phường</th>
+							<th class="col-1">Quận</th>
+							<th class="col-2">Tỉnh thành</th>
+							<th class="col-3">Người liên lạc</th>
+							<!--<th class="col-2">Số điện thoại</th>-->
+							<th class="col-1"></th>
+						</tr>
+					</thead>
+					<tbody class="container">
+						{% for address in addresses %}
+						<tr class="row">
+							<td class="col-2">
+								{{ address.no }}
+							</td>
+							<td class="col-2">
+								{{ address.street }}
+							</td>
+							<td class="col-1">
+								{{ address.ward }}
+							</td>
+							<td class="col-1">
+								{{ address.district }}
+							</td>
+							<td class="col-2">
+								{{ address.city }}
+							</td>
+							<td class="col-3">
+								{{ address.owner }} ({{ address.phone_number }})
+							</td>
+							<!--<td class="col-2">
+									{{ address.phone_number }}
+								</td>-->
+							<td class="action col-1" data-title="Action">
+								<ul class="list-inline justify-content-center">
+									<li class="list-inline-item">
+										<a id="a-add-{{ address.id }}" data-toggle="tooltip" data-placement="top"
+											title="Xóa địa chỉ" class="delete_icon"
+											onclick="delete_address( {{ address.id }} )">
+											<i class="fa fa-trash"></i>
+										</a>
+									</li>
+								</ul>
+							</td>
+						</tr>
+						{% endfor %}
+					</tbody>
+				</table>
+				<!--
+					<div class="pagination justify-content-center">
+						<nav aria-label="Page navigation example">
+							<ul class="pagination">
+								{% with params=request.GET.urlencode %}           
+								{% if pager.has_previous %}
+								<li class="page-item">
+									<a class="page-link" href="{% query_url 'page' '1' params %}" aria-label="Previous">
+										<span aria-hidden="true">&laquo;</span>
+										<span class="sr-only">Previous</span>
+									</a>
+								</li>
+								{% endif %}
+								{% for page_index in page_navigator %}
+								{% ifequal page_index pager.number %}
+								<li class="page-item active">
+									<a class="page-link" href="{% query_url 'page' page_index params %}">{{page_index}}</a>
+								</li>
+								{% else %}
+								<li class="page-item">
+									<a class="page-link" href="{% query_url 'page' page_index params %}">{{page_index}}</a>
+								</li>
+								{% endifequal %}
+								{% endfor %}
+								{% if pager.has_next %}
+								<li class="page-item">
+									<a class="page-link" href="{% query_url 'page' pager.paginator.num_pages params %}" aria-label="Next">
+										<span aria-hidden="true">&raquo;</span>
+										<span class="sr-only">Next</span>
+									</a>
+								</li>
+								{% endif %}
+								{% endwith %}
+							</ul>
+						</nav>
+					</div>
+					-->
+				<div class="modal fade bd-example-modal-lg" id="modal-add-address" tabindex="-1" role="dialog"
+					aria-labelledby="exampleModalLabel" aria-hidden="true">
+					<div class="modal-dialog modal-lg" role="document">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title" id="exampleModalLabel">Thêm địa chỉ</h5>
+								<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+									<span aria-hidden="true">&times;</span>
+								</button>
+							</div>
+							<form method="POST" action="{% url 'user:add_address' %}">
+								{% csrf_token %}
+								<div class="modal-body">
+									
+										<table class="table table-add-products">
+											<tbody>
+												<tr class="form-group">
+													<td><label for="owner">Tên người liên lạc:</label> </td>
+													<td><input class="form-control" type="text" class="input-add-spec" id="owner" name="owner" maxlength="256" required></td>
+												</tr>
+												<tr class="form-group">
+													<td><label for="phone_number">Số điện thoại:</label> </td>
+													<td><input class="form-control" type="tel" class="input-add-spec" id="phone_number" name="phone_number" pattern="^\+?1?\d{9,15}$" required></td>
+												</tr>
+												<tr class="form-group">
+													<td><label for="no">Số nhà:</label> </td>
+													<td><input class="form-control" type="text" class="input-add-spec" id="no" name="no" maxlength="32" required></td>
+												</tr>
+												<tr class="form-group">
+													<td><label for="street">Đường:</label> </td>
+													<td><input class="form-control" type="text" class="input-add-spec" id="street" maxlength="64" name="street" required></td>
+												</tr>
+												<tr class="form-group">
+													<td><label for="ward">Phường:</label> </td>
+													<td><input class="form-control" type="text" class="input-add-spec" id="ward" name="ward" maxlength="64" required></td>
+												</tr>
+												<tr class="form-group">
+													<td><label for="district">Quận:</label> </td>
+													<td><input class="form-control" type="text" class="input-add-spec" id="district" name="district" maxlength="64" required></td>
+												</tr>
+												<tr class="form-group">
+													<td><label for="city">Thành phố/Tỉnh thành:</label> </td>
+													<td>
+														<select name="city" id="city" class="form-control full-size-select">
+															{% for city in cities %}
+															<option value="{{ city }}">{{ city }}</option>
+															{% endfor %}
+														</select>
+													</td>
+												</tr>
+											</tbody>
+										</table>
+								</div>
+								<div class="modal-footer">
+									<button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+									<button type="submit" class="btn btn-primary">Thêm địa chỉ</button>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+{% endblock %}
+{% block js %}
+<script>
+	$.ajaxSetup({
+		beforeSend: function (xhr, settings) {
+			function getCookie(name) {
+				var cookieValue = null;
+				if (document.cookie && document.cookie != '') {
+					var cookies = document.cookie.split(';');
+					for (var i = 0; i < cookies.length; i++) {
+						var cookie = jQuery.trim(cookies[i]);
+						// Does this cookie string begin with the name we want?
+						if (cookie.substring(0, name.length + 1) == (name + '=')) {
+							cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+							break;
+						}
+					}
+				}
+				return cookieValue;
+			}
+			if (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url))) {
+				// Only send the token to relative URLs i.e. locally.
+				xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+			}
+		}
+	});
+
+	function check_create_address() {
+		$.ajax({
+			type: "GET",
+			url: "{% url 'user:check_create_address' %}",
+			data: {},
+			success: function (response) {
+				if(!response['data']['is_accept']){
+					$.notify('Số lượng địa chỉ đã đạt giới hạn. Hãy xóa bớt để được tạo thêm.', "warn");
+				}
+			},
+			error: function (response) {
+				// alert the error if any error occured
+				// console.log(response["responseJSON"]["error"]);
+				switch (response.status) {
+					case 401:
+						alert("Xin hãy đăng nhập.");
+						break;
+					case 500:
+						alert("Đã có lỗi xảy ra, xin hãy thử lại sau.")
+						break;
+				}
+			}
+		});
+	}
+	
+	function delete_address(id_address){
+		$.ajax({
+			type: "POST",
+			url: "{% url 'user:delete_address' %}",
+			data: {'id_address':id_address},
+			success: function (response) {
+				location.reload();
+			},
+			error: function (response) {
+				// alert the error if any error occured
+				// console.log(response["responseJSON"]["error"]);
+				switch (response.status) {
+					case 401:
+						alert("Xin hãy đăng nhập.");
+						break;
+					case 500:
+						alert("Đã có lỗi xảy ra, xin hãy thử lại sau.")
+						break;
+				}
+			}
+		});
+	}
+</script>
+{% endblock %}

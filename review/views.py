@@ -26,7 +26,7 @@ def get_reviews(request):
                 reps.append({
                     'by': created_by,
                     'date': rep.created_date,
-                    'content': str_to_html(rep.content)
+                    'content': rep.content
                 })
             if review.created_by.id == merchandise.user.id:
                 created_by = review.created_by.store.name + ' <i class="fas fa-store" style="color:#080;"></i>'
@@ -37,7 +37,7 @@ def get_reviews(request):
                     'id' : review.id,
                     'by': created_by,
                     'date': review.created_date,
-                    'content': str_to_html(review.content),
+                    'content': review.content,
                     'star': review.star,
                     'replies':reps
                 }

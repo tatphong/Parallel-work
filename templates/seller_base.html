@@ -52,6 +52,12 @@
             color: rgb(207, 29, 29);
             font-size: 0.7em;
         }
+        .full-size-select{
+            width: 100%;
+        }
+        .full-size-select > .list{
+            width: 100%;
+        }
     </style>
 </head>
 
@@ -188,6 +194,8 @@
     </script>
     <script src="{% static 'plugins/google-map/gmap.js' %}"></script>
     <script src="{% static 'js/script.js' %}"></script>
+    <!-- Notification -->
+    <script src="{% static 'js/notify.js' %}"></script>
     {% block js %}
     {% endblock %}
 </body>

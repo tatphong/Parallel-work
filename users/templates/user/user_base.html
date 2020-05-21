@@ -22,7 +22,7 @@
 						<ul>
 							<li><a class="my-1 d-inline-block" href="{% url 'user:info' %}">Thông tin tài khoản</a></li>
 							<li><a class="my-1 d-inline-block" href="{% url 'user:notification' %}">Thông báo <span>({% get_number_unread_notifications user %})</span></a></li>
-							<li><a class="my-1 d-inline-block" href="">Favourite Stores <span>(3)</span></a></li>
+							<li><a class="my-1 d-inline-block" href="{% url 'user:address' %}">Quản lý địa chỉ</a></li>
 							<li><a class="my-1 d-inline-block" href="">Recommended</a></li>
 						</ul>
 					</div>

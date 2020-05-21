@@ -1,9 +1,9 @@
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm, AuthenticationForm
 from django import forms
-from .models import User
+from .models import User, Address
 import re 
 from django.utils.translation import gettext_lazy as _
-
+from .services import CITIES, CITIES_CHOICE_SET
 class CustomUserCreationForm(UserCreationForm):
 
     class Meta(UserCreationForm):
@@ -150,3 +150,29 @@ class PasswordChangeForm(forms.Form):
     def save(self):
         self.current_user.set_password(self.cleaned_data['new_password2'])
         self.current_user.save()
+
+
+class AddressForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        self.current_user = kwargs.pop('current_user')
+        super(AddressForm, self).__init__(*args, **kwargs)
+    owner = forms.CharField(label='Tên người liên lạc', max_length=256, widget=forms.TextInput())
+    phone_number = forms.CharField(label='Số điện thoại', max_length=15, widget=forms.TextInput())
+    no = forms.CharField(label='Số nhà', max_length=32, widget=forms.TextInput())
+    street = forms.CharField(label='Đường', max_length=64, widget=forms.TextInput())
+    ward = forms.CharField(label='Phường', max_length=64, widget=forms.TextInput())
+    district = forms.CharField(label='Quận', max_length=64, widget=forms.TextInput())
+    city = forms.ChoiceField(label='Thành phố', choices=CITIES_CHOICE_SET, widget=forms.Select())
+
+    class Meta:
+        model = Address
+        fields = ('owner', 'phone_number', 'no', 'street', 'ward', 'district', 'city')
+    
+    def clean_owner(self):
+        owner = self.cleaned_data['owner']
+        if owner:
+            return owner
+        raise forms.ValidationError('Tên người liên lạc không hợp lệ.', code='invalid_owner')
+
+    
+    

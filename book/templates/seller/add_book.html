@@ -14,9 +14,9 @@
                         {% csrf_token %}
                         <div class="form-group">
                             <label for="pro-name">1. Tên sản phẩm: </label>
-                            <input type="text" class="form-control" id="pro-name" required>
+                            <input type="text" class="form-control" id="pro-name" name="pro-name" required>
                         </div>
-                        
+
                         <div class="form-group">
                             <label>2. Hình đại diện: </label>
                             <a href="javascript:void(0)" onclick="$('#pro-avatar').click()"> + Chọn hình ảnh</a>
@@ -34,10 +34,10 @@
                         <div class="container">
                             <div class="row preview-images-zone" id="selected_images"></div>
                         </div>
-                        
+
                         <div class="form-group">
                             <label for="pro-portfolio">4. Loại sản phẩm: </label>
-                            <select id="pro-portfolio" class="form-control">
+                            <select id="pro-portfolio" class="form-control" required>
                                 <option selected>Sách</option>
                             </select>
                         </div>
@@ -48,34 +48,45 @@
                                     <tbody>
                                         <tr class="form-group">
                                             <td><label for="pro-publisher">Nhà xuất bản:</label> </td>
-                                            <td><input class="form-control" type="text" class="input-add-spec" id="pro-publisher" name="pro-publisher"></td>
+                                            <td><input class="form-control" type="text" class="input-add-spec"
+                                                    id="pro-publisher" name="pro-publisher" required></td>
                                         </tr>
                                         <tr class="form-group">
                                             <td><label for="pro-publicdate">Ngày xuất bản:</label> </td>
-                                            <td><input class="form-control" type="month" class="input-add-spec" id="pro-publicdate" name="pro-publicdate"></td>
+                                            <td><input class="form-control" type="month" class="input-add-spec"
+                                                    id="pro-publicdate" name="pro-publicdate" required></td>
                                         </tr>
                                         <tr class="form-group">
                                             <td><label for="pro-length">Kích thước:</label> </td>
                                             <td class="row">
                                                 <div class="col">
-                                                    <input class="form-control input-add-spec" type="number" placeholder="Dài (cm)" id="pro-length" name="pro-length">
+                                                    <input class="form-control input-add-spec" type="number"
+                                                        placeholder="Dài (cm)" id="pro-length" name="pro-length"
+                                                        required>
                                                 </div>
                                                 <div class="col">
-                                                    <input class="form-control input-add-spec" type="number" placeholder="Rộng (cm)" id="pro-width" name="pro-width">
+                                                    <input class="form-control input-add-spec" type="number"
+                                                        placeholder="Rộng (cm)" id="pro-width" name="pro-width"
+                                                        required>
                                                 </div>
                                                 <div class="col">
-                                                    <input class="form-control input-add-spec" type="number" placeholder="Cao (cm)" id="pro-height" name="pro-height">
+                                                    <input class="form-control input-add-spec" type="number"
+                                                        placeholder="Cao (cm)" id="pro-height" name="pro-height"
+                                                        required>
                                                 </div>
                                             </td>
                                         </tr>
                                         <tr class="form-group">
                                             <td><label for="pro-pagesnum">Số trang:</label> </td>
-                                            <td><input class="form-control" type="number" class="input-add-spec" id="pro-pagesnum" name="pro-pagesnum"></td>
+                                            <td><input class="form-control" type="number" class="input-add-spec"
+                                                    id="pro-pagesnum" name="pro-pagesnum" required></td>
                                         </tr>
                                         <tr class="form-group">
-                                            <td><label>Chọn thể loại:</label> </td>
-                                            <td><div class="list-group" id="category-selection">
-                                            </div></td>
+                                            <td><label id="label-category">Chọn thể loại:</label> </td>
+                                            <td>
+                                                <div class="list-group" id="category-selection">
+                                                </div>
+                                            </td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -83,19 +94,20 @@
                         </div>
                         <div class="form-group">
                             <label for="pro-quantity">6. Số lượng: </label>
-                            <input type="number" class="form-control" id="pro-quantity" name="pro-quantity">
+                            <input type="number" class="form-control" id="pro-quantity" name="pro-quantity" required>
                         </div>
                         <div class="form-group">
                             <label for="pro-price">7. Giá: </label>
-                            <input type="number" class="form-control" id="pro-price" name="pro-price">
+                            <input type="number" class="form-control" id="pro-price" name="pro-price" required>
                         </div>
                         <div class="form-group">
                             <label for="pro-originprice">8. Giá thị trường: </label>
-                            <input type="number" class="form-control" id="pro-originprice" name="pro-originprice">
+                            <input type="number" class="form-control" id="pro-originprice" name="pro-originprice"
+                                required>
                         </div>
                         <div class="form-group">
                             <label for="pro-condition">9. Tình trạng: </label>
-                            <select id="pro-condition" name="pro-condition" class="form-control">
+                            <select id="pro-condition" name="pro-condition" class="form-control" required>
                                 <option selected>Mới</option>
                                 <option>Cũ</option>
                             </select>
@@ -103,49 +115,43 @@
                         <div class="form-group">
                             <label>10. Phương thức giao hàng: </label>
                             <div class="form-check">
-                                <input class="pro-delivery form-check-input" type="checkbox" value="1" id="pro-delivery-1">
+                                <input class="form-check-input" type="checkbox" value="1" id="pro-delivery-1"
+                                    name="pro-delivery">
                                 <label class="form-check-label" for="pro-delivery-1">Nhà bán tự giao</label>
                             </div>
-                            
+
                         </div>
                         <div class="form-group">
                             <label for="name">11. Địa chỉ: </label>
+                            <a href="javascript:void(0)" onclick="" data-toggle="modal" data-target="#address-modal"> +
+                                Chọn địa chỉ</a>
                             <div class="col-md-12" style="padding-right:30px">
+                                <input type="text" name="pro-idaddress" id="pro-idaddress" value="" hidden>
                                 <table class="table table-add-products">
                                     <tbody>
                                         <tr class="form-group">
-                                            <td><label for="pro-owner">Tên người liên lạc:</label> </td>
-                                            <td><input class="form-control" type="text" class="input-add-spec" id="pro-owner" name="pro-owner"></td>
-                                        </tr>
-                                        <tr class="form-group">
-                                            <td><label for="pro-phone">Số điện thoại:</label> </td>
-                                            <td><input class="form-control" type="tel" class="input-add-spec" id="pro-phone" name="pro-phone"></td>
+                                            <td><label>Tên người liên lạc:</label> </td>
+                                            <td><span id="pro-owner"></span></td>
                                         </tr>
                                         <tr class="form-group">
                                             <td><label for="pro-no">Số nhà:</label> </td>
-                                            <td><input class="form-control" type="text" class="input-add-spec" id="pro-no" name="pro-no"></td>
+                                            <td><span id ="pro-no"></span></td>
                                         </tr>
                                         <tr class="form-group">
                                             <td><label for="pro-street">Đường:</label> </td>
-                                            <td><input class="form-control" type="text" class="input-add-spec" id="pro-street" name="pro-street"></td>
+                                            <td><span id ="pro-street"></span></td>
                                         </tr>
                                         <tr class="form-group">
                                             <td><label for="pro-ward">Phường:</label> </td>
-                                            <td><input class="form-control" type="text" class="input-add-spec" id="pro-ward" name="pro-ward"></td>
+                                            <td><span id ="pro-ward"></span></td>
                                         </tr>
                                         <tr class="form-group">
                                             <td><label for="pro-district">Quận:</label> </td>
-                                            <td><input class="form-control" type="text" class="input-add-spec" id="pro-district" name="pro-district"></td>
+                                            <td><span id ="pro-district"></span></td>
                                         </tr>
                                         <tr class="form-group">
-                                            <td><label for="pro-cities">Thành phố/Tỉnh thành:</label> </td>
-                                            <td>
-                                                <select name="pro-cities" id="pro-cities">
-                                                    {% for city in cities %}
-                                                    <option value="{{ city }}">{{ city }}</option>
-                                                    {% endfor %}
-                                                </select>
-                                            </td>
+                                            <td><label for="pro-city">Thành phố/Tỉnh thành:</label> </td>
+                                            <td> <span id ="pro-city"></span> </td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -153,14 +159,15 @@
                         </div>
                         <div class="form-group">
                             <label for="pro-description">12. Mô tả sản phẩm: </label>
-                            <textarea id="pro-description" name="pro-description" style="width: 100%;" class="input-add-prod" role="5"
+                            <textarea id="pro-description" style="width: 100%;" class="input-add-prod" role="5"
                                 placeholder="Thêm mô tả"></textarea>
                         </div>
                         <div class="text-right">
-                            <button onclick="submit_form();" type="button" class="btn btn-primary">Thêm sản phẩm</button>
+                            <button onclick="submit_form();" type="button" class="btn btn-primary">Thêm sản
+                                phẩm</button>
                         </div>
-                        
-                        
+
+
                     </form>
                 </div>
                 <p><br /><br /></p>
@@ -169,26 +176,111 @@
         <!-- Row End -->
     </div>
     <!-- Container End -->
-    
+    <div class="modal fade bd-example-modal-xl" id="address-modal" tabindex="-1" role="dialog" aria-labelledby="address-modal"
+        aria-hidden="true">
+        <div class="modal-dialog modal-xl" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Chọn địa chỉ</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <table class="table">
+                        <thead class="container">
+                            <tr class="row">
+                                <th class="col-1"></th>
+                                <th class="col-2">Số nhà</th>
+                                <th class="col-2">Đường</th>
+                                <th class="col-1">Phường</th>
+                                <th class="col-1">Quận</th>
+                                <th class="col-2">Tỉnh thành</th>
+                                <th class="col-3">Người liên lạc</th>
+                                <!--<th class="col-2">Số điện thoại</th>-->
+                            </tr>
+                        </thead>
+                        <tbody class="container">
+                            {% for address in addresses %}
+                            <tr class="row">
+                                <td class="col-1">
+                                    <div class="radio">
+                                    <input type="radio" name="pro-address" value="{{ address.id }}" onchange="select_address({{ address.id }});">
+                                    </div>
+                                </td>
+                                <td class="col-2" id="add-no-{{ address.id }}">
+                                    {{ address.no }}
+                                </td>
+                                <td class="col-2" id="add-street-{{ address.id }}">
+                                    {{ address.street }}
+                                </td>
+                                <td class="col-1" id="add-ward-{{ address.id }}">
+                                    {{ address.ward }}
+                                </td>
+                                <td class="col-1" id="add-district-{{ address.id }}">
+                                    {{ address.district }}
+                                </td>
+                                <td class="col-2" id="add-city-{{ address.id }}">
+                                    {{ address.city }}
+                                </td>
+                                <td class="col-3" id="add-owner-{{ address.id }}">
+                                    {{ address.owner }} - {{ address.phone_number }}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+                    <a href="{% url 'user:address' %}" type="button" class="btn" target="_blank"><i class="fas fa-plus-circle"></i> Tạo mới</a>
+                </div>
+            </div>
+        </div>
+    </div>
 </section>
 {% endblock %}
 {% block js %}
 <script src="http://js.nicedit.com/nicEdit-latest.js" type="text/javascript"></script>
 <script>
+    $.ajaxSetup({
+        beforeSend: function (xhr, settings) {
+            function getCookie(name) {
+                var cookieValue = null;
+                if (document.cookie && document.cookie != '') {
+                    var cookies = document.cookie.split(';');
+                    for (var i = 0; i < cookies.length; i++) {
+                        var cookie = jQuery.trim(cookies[i]);
+                        // Does this cookie string begin with the name we want?
+                        if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                            break;
+                        }
+                    }
+                }
+                return cookieValue;
+            }
+            if (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url))) {
+                // Only send the token to relative URLs i.e. locally.
+                xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+            }
+        }
+    });
+
     bkLib.onDomLoaded(nicEditors.allTextAreas);
     var book_categories = JSON.parse('{{ book_categories|escapejs }}');
 
-    var children_categories = {}
+    var children_categories = {};
     for (var key in book_categories) {
-        var value = book_categories[key]
+        var value = book_categories[key];
         if (!(value.id_parent in children_categories)) {
-            children_categories[value.id_parent] = []
+            children_categories[value.id_parent] = [];
         }
-        children_categories[value.id_parent].push(value)
+        children_categories[value.id_parent].push(value);
 
     }
 
-    render_categories()
+    render_categories();
 
     function render_categories(parent_category = null) {
         $("#category-selection").empty();
@@ -206,14 +298,14 @@
         for (const item of children_categories[parent_category]) {
             $("#category-selection").append(
                 `
-                <button onclick="select_category(this, ${item.id})" type="button" class="list-group-item list-group-item-action">
+                <button onclick="select_category(this, ${item.id})" value="${item.id}" type="button" class="list-group-item list-group-item-action">
                     ${item.name}
                 </button>
             `
             )
         }
     }
-    selected_category = null
+    selected_category = null;
 
     function back_category(id) {
         selected_category = null
@@ -233,14 +325,18 @@
     }
 
     function select_images(sender) {
-        $("#selected_images").empty()
+        $("#selected_images").empty();
         if (sender.files) {
+            if (sender.files.length > 6) {
+                sender.value = null;
+                alert("Số lượng hình sản phẩm không được lớn hơn 6");
+                return;
+            }
             for (var item of sender.files) {
-                console.log(item);
                 var reader = new FileReader();
                 reader.onload = function (e) {
                     $("#selected_images").append(
-                    `
+                        `
                         <div class="image-zone col-4"><img src="${e.target.result}" width="200" /></div>
                     `
                     )
@@ -251,10 +347,9 @@
     }
 
     function select_avatar(sender) {
-        $("#selected_avatar").empty()
+        $("#selected_avatar").empty();
         if (sender.files) {
             for (var item of sender.files) {
-                console.log(item);
                 var reader = new FileReader();
                 reader.onload = function (e) {
                     $("#selected_avatar").append(
@@ -268,14 +363,92 @@
         }
     }
 
-    function submit_form(){
-        console.log("Herer");
+    function validate_form() {
+        error_message = null;
         form_data = new FormData(document.getElementById("form-add-product"));
-        console.log(form_data);
-        for(var pair of form_data.entries()) {
-            console.log(pair[0]+ ', '+ pair[1]); 
+
+        if (!form_data.get("pro-name")) {
+            error_message = "Xin hãy nhập tên sản phẩm.";
+        } else if (!form_data.get("pro-avatar").name) {
+            error_message = "Xin hãy chọn hình đại diện của sản phẩm.";
+        } else if (!form_data.get("pro-publisher")) {
+            error_message = "Xin hãy nhập nhà xuất bản.";
+        } else if (!form_data.get("pro-publicdate")) {
+            error_message = "Xin hãy nhập ngày xuất bản.";
+        } else if (!form_data.get("pro-length") || !form_data.get("pro-width") || !form_data.get("pro-height")) {
+            error_message = "Xin hãy nhập đầy đủ kích thước sách.";
+        } else if (!form_data.get("pro-pagesnum")) {
+            error_message = "Xin hãy nhập số trang của sách.";
+        } else if (selected_category === null) {
+            error_message = "Xin hãy chọn thể loại sách.";
+        } else if (!form_data.get("pro-quantity")) {
+            error_message = "Xin hãy nhập số lượng sản phẩm.";
+        } else if (!form_data.get("pro-price")) {
+            error_message = "Xin hãy nhập giá bán của sản phẩm.";
+        } else if (!form_data.get("pro-originprice")) {
+            error_message = "Xin hãy nhập giá thị trường của sản phẩm.";
+        } else if (form_data.getAll("pro-delivery").length === 0) {
+            error_message = "Xin hãy chọn phương thức thanh toán.";
+        } else if (!form_data.get("pro-idaddress")){
+            error_message = "Xin hãy chọn địa chỉ";
+        } else if (!$("#form-add-product").find('.nicEdit-main').text()) {
+            error_message = "Xin hãy viết mô tả sản phẩm.";
         }
+        return error_message;
     }
 
+    function submit_form() {
+        // error_message = validate_form();
+
+        // if (error_message !== null) {
+        //     $.notify(error_message, "error");
+        //     return;
+        // }
+
+        form_data = new FormData(document.getElementById("form-add-product"));
+        // var pro_description = (new nicEditors.findEditor('pro-description')).getContent();
+        // var pro_category = selected_category.value;
+
+        // form_data.append('pro-description', pro_description);
+        // form_data.append('pro-category', pro_category);
+        // for(var pair of form_data.entries()) {
+        //     console.log(pair[0]+ ', '+ pair[1]); 
+        // }
+        $.ajax({
+            type: "POST",
+            url: "{% url 'seller:add_book' %}",
+            data: form_data,
+            processData: false,
+            contentType: false,
+            success: function (response) {
+                console.log("Done")
+            },
+            error: function (response) {
+                // alert the error if any error occured
+                // console.log(response["responseJSON"]["error"]);
+                switch (response.status) {
+                    case 401:
+                        alert("Xin hãy đăng nhập.");
+                        break;
+                    case 400:
+                        alert(response["responseJSON"]["error"]);
+                        break;
+                    case 500:
+                        alert("Đã có lỗi xảy ra, xin hãy thử lại sau.")
+                        break;
+                }
+            }
+        });
+    }
+
+    function select_address(id_address){
+        $("#pro-no").html($("#add-no-" + id_address).html());
+        $("#pro-street").html($("#add-street-" + id_address).html());
+        $("#pro-ward").html($("#add-ward-" + id_address).html());
+        $("#pro-district").html($("#add-district-" + id_address).html());
+        $("#pro-city").html($("#add-city-" + id_address).html());
+        $("#pro-owner").html($("#add-owner-" + id_address).html());
+        $("#pro-idaddress").val(id_address);
+    }
 </script>
 {% endblock %}
