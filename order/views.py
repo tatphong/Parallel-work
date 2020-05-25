@@ -19,6 +19,7 @@ def get_order(request):
             AND `h`.`id_order`=`tim_max_date`.`id_order` and `h`.`id_order_status` = `stt`.`id` and `h`.`created_date` = `tim_max_date`.`max`
             AND `order`.`id_user` = %s
         group by `order`.`id`
+        order by `created_date` desc
     ''', [str(request.user.id)])
     #print(order)
     paginator = Paginator(order, 5)
@@ -50,13 +51,17 @@ def order_detail(request, id_order):
 def check_out(request):
     #get cart item
     cart_items = Cart.objects.raw('''
-          select `cart`.`id`, `book`.`name`, `cart`.`quantity`, `m`.`id` `merchandise_id`, `m`.`price`, `image`.`url`
-          from `cart` join `merchandise` `m` join `book` join `merchandise_image` `m_img` join `image`
-          where `cart`.`id_merchandise` = `m`.`id` AND `m`.`id_product` = `book`.`id` AND `m_img`.`id_merchandise` = `m`.`id` 
-               AND `image`.`id`= `m_img`.`id_image`
-               AND `cart`.`id_user` = %s
-          group by `cart`.`id`;
-     ''',[str(request.user.id)])
+        select `cart`.`id`, `book`.`name`, `cart`.`quantity`, `m`.`id` `merchandise_id`, `m`.`price`, `image`.`url`
+        from `cart` join `merchandise` `m` join `book` join `merchandise_image` `m_img` join `image`
+        where `cart`.`id_merchandise` = `m`.`id` AND `m`.`id_product` = `book`.`id` AND `m_img`.`id_merchandise` = `m`.`id` 
+            AND `image`.`id`= `m_img`.`id_image`
+            AND `cart`.`id_user` = %s
+        group by `cart`.`id`;
+    ''',[str(request.user.id)])
+    print(len([cart_items]))
+    print(cart_items)
+    if [cart_items] == None:
+        return redirect('cart:get_cart')
 
     #subtotal
     sub_total = 0
@@ -65,16 +70,18 @@ def check_out(request):
 
     # form show
     form = NewAddressForm(current_user=request.user)
+
+    # check_out exceed
     if request.method == 'POST':
         #lưu form nhập thông tin địa chỉ giao hàng mới
-        if request.POST.get("diachinhan") == "Nhập địa chỉ mới":
-            form = NewAddressForm(request.POST, current_user=request.user)
-            if form.is_valid():
-                shipping_address_id = form.save()
-        else:
-            shipping_address_id = request.POST.get("diachinhan")
-
-        #tách và lưu đơn hàng
+            # if request.POST.get("diachinhan") == "Nhập địa chỉ mới":
+            #     form = NewAddressForm(request.POST, current_user=request.user)
+            #     if form.is_valid():
+            #         shipping_address_id = form.save()
+            # else:
+            #     shipping_address_id = request.POST.get("diachinhan")
+        shipping_address_id = request.POST.get("pro-idaddress")
+    # split order
         store_address = Cart.objects.raw('''
             select distinct c.id, m.id_address
             from merchandise as m join cart as c 
@@ -99,6 +106,9 @@ def check_out(request):
             HistoryOrderStatus.objects.create(order_id = new_order.pk, order_status_id = 1, created_date = timezone.now(), 
                                                     created_by = request.user)
         
+        # delete all cart objects after check_out
+        Cart.objects.filter(user = request.user.id).delete()
+
         return redirect('order:order')
 
     # get user address

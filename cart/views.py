@@ -22,6 +22,15 @@ def delete_expired_item(request):
           # delete
           Cart.objects.filter(pk = item.id).delete()
 
+def add_book_to_cart(request, merchandise, qty):
+     Cart.onjects.create(
+          user_id = request.user.id,
+          merchandise_id = merchandise,
+          quantity = qty,
+          created_date = timezone.now(),
+          expire_date = timezone.now()+datetime.timedelta(1*30)
+     )
+
 @login_required
 def get_cart(request):
      delete_expired_item(request)

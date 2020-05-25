@@ -28,7 +28,106 @@
             <div class="billing_details" id="billing">
                 <form class="row contact_form col-12" method="post" novalidate>
                     {% csrf_token %}
+                    <a href="javascript:void(0)" onclick="" data-toggle="modal" data-target="#address-modal"> + Chọn địa chỉ</a>
+                    <!--Modal address-->
                     <div class="row col-6">
+                        <div class="modal fade bd-example-modal-xl" id="address-modal" tabindex="-1" role="dialog" aria-labelledby="address-modal"
+                        aria-hidden="true">
+                        <div class="modal-dialog modal-xl" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="exampleModalLabel">Chọn địa chỉ</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <table class="table">
+                                        <thead class="container">
+                                            <tr class="row">
+                                                <th class="col-1"></th>
+                                                <th class="col-2">Số nhà</th>
+                                                <th class="col-2">Đường</th>
+                                                <th class="col-1">Phường</th>
+                                                <th class="col-1">Quận</th>
+                                                <th class="col-2">Tỉnh thành</th>
+                                                <th class="col-3">Người liên lạc</th>
+                                                <!--<th class="col-2">Số điện thoại</th>-->
+                                            </tr>
+                                        </thead>
+                                        <tbody class="container">
+                                            {% for item in address %}
+                                            <tr class="row">
+                                                <td class="col-1">
+                                                    <div class="radio">
+                                                    <input type="radio" name="pro-address" value="{{ item.id }}" onchange="select_address({{ item.id }});">
+                                                    </div>
+                                                </td>
+                                                <td class="col-2" id="add-no-{{ item.id }}">
+                                                    {{ item.no }}
+                                                </td>
+                                                <td class="col-2" id="add-street-{{ item.id }}">
+                                                    {{ item.street }}
+                                                </td>
+                                                <td class="col-1" id="add-ward-{{ item.id }}">
+                                                    {{ item.ward }}
+                                                </td>
+                                                <td class="col-1" id="add-district-{{ item.id }}">
+                                                    {{ item.district }}
+                                                </td>
+                                                <td class="col-2" id="add-city-{{ item.id }}">
+                                                    {{ item.city }}
+                                                </td>
+                                                <td class="col-3" id="add-owner-{{ item.id }}">
+                                                    {{ item.owner }} - {{ item.phone_number }}
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+                                    <a href="{% url 'user:address' %}" type="button" class="btn" target="_blank"><i class="fas fa-plus-circle"></i> Tạo mới</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!--End modal-->
+                    <!--address data get from modal-->
+                    <div class="col-lg-12" style="padding-right:30px">
+                        <input type="text" name="pro-idaddress" id="pro-idaddress" value="" hidden>
+                        <table class="table table-add-products">
+                            <tbody>
+                                <tr class="form-group">
+                                    <td><label>Tên người liên lạc:</label> </td>
+                                    <td><span id="pro-owner"></span></td>
+                                </tr>
+                                <tr class="form-group">
+                                    <td><label for="pro-no">Số nhà:</label> </td>
+                                    <td><span id ="pro-no"></span></td>
+                                </tr>
+                                <tr class="form-group">
+                                    <td><label for="pro-street">Đường:</label> </td>
+                                    <td><span id ="pro-street"></span></td>
+                                </tr>
+                                <tr class="form-group">
+                                    <td><label for="pro-ward">Phường:</label> </td>
+                                    <td><span id ="pro-ward"></span></td>
+                                </tr>
+                                <tr class="form-group">
+                                    <td><label for="pro-district">Quận:</label> </td>
+                                    <td><span id ="pro-district"></span></td>
+                                </tr>
+                                <tr class="form-group">
+                                    <td><label for="pro-city">Thành phố/Tỉnh thành:</label> </td>
+                                    <td> <span id ="pro-city"></span> </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <!---->
+                        <!--Old address form
                         {% for item in address %}
                         <div class="col-lg-12">
                         <h3 id="diachinhanmacdinh"> <input name="diachinhan" type="radio" checked="check" value="{{item.id}}"> Địa chỉ mặc định :</h3>
@@ -58,7 +157,7 @@
                             </div>
                             
                         </div>
-                    </div>
+                    </div>-->
                     <div class="col-6">
                         <div class="order_box">
                             <h2>Your Order</h2>
@@ -114,5 +213,15 @@
 {% endblock %}
 
 {% block js %}
-
+<script>
+    function select_address(id_address){
+        $("#pro-no").html($("#add-no-" + id_address).html());
+        $("#pro-street").html($("#add-street-" + id_address).html());
+        $("#pro-ward").html($("#add-ward-" + id_address).html());
+        $("#pro-district").html($("#add-district-" + id_address).html());
+        $("#pro-city").html($("#add-city-" + id_address).html());
+        $("#pro-owner").html($("#add-owner-" + id_address).html());
+        $("#pro-idaddress").val(id_address);
+    }
+</script>
 {% endblock %}
