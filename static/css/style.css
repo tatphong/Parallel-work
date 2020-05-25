@@ -13,8 +13,9 @@ body {
   text-align: right;
   padding: 0px;
 }
+
 .order_box{
-  padding: 50px 50px 100px 50px;
+  padding: 50px !important;
 }
 .quantity-order{
    align-items:center;

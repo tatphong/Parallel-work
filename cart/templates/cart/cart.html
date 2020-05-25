@@ -52,16 +52,19 @@
                                   </div>
                               </td>
                               <td>
-                                  <h5>{{ item.price|floatformat:0 }}</h5>
+                                  <h5>{{ item.price|floatformat:0|intcomma }}</h5>
                               </td>
                               <td>
                                   <div class="product_count">
-                                      <input type="text" name="qty" id="sst-{{item.id}}" maxlength="12" value="{{ item.quantity }}" title="Quantity:"
-                                          class="input-text qty" onchange="update_quantity(this.value, {{item.id}})">
-                                      <button onclick="var result = document.getElementById('sst-{{item.id}}'); var sst = result.value; if( !isNaN( sst )) update_quantity(++result.value,{{item.id}});return false;"
-                                          class="increase items-count" type="button"><i class="lnr lnr-chevron-up"></i></button>
-                                      <button onclick="var result = document.getElementById('sst-{{item.id}}'); var sst = result.value; if( !isNaN( sst ) &amp;&amp; sst > 1 ) update_quantity(--result.value,{{item.id}});return false;"
-                                          class="reduced items-count" type="button"><i class="lnr lnr-chevron-down"></i></button>
+                                        <form method="post" >
+                                        {% csrf_token %}
+                                            <input type="text" name="qty" id="sst-{{item.id}}" maxlength="12" value="{{ item.quantity }}" title="Quantity:"
+                                                class="input-text qty" onchange="update_quantity(this.value, {{item.id}})">
+                                            <button onclick="var result = document.getElementById('sst-{{item.id}}'); var sst = result.value; if( !isNaN( sst )) update_quantity(++result.value,{{item.id}});return false;"
+                                                class="increase items-count" type="submit"><i class="lnr lnr-chevron-up"></i></button>
+                                            <button name="decrease_qty" onclick="var result = document.getElementById('sst-{{item.id}}'); var sst = result.value; if( !isNaN( sst ) &amp;&amp; sst > 1 ) update_quantity(--result.value,{{item.id}});return false;"
+                                                class="reduced items-count" type="submit"><i class="lnr lnr-chevron-down"></i></button>
+                                          </form>
                                   </div>
                               </td>
                               <td>
@@ -95,7 +98,7 @@
                                   <!--Modal end-->
                               </td>
                               <td>
-                                  <h5>{% widthratio item.price 1 item.quantity %}</h5>
+                                  <h5>{{ item.total_price|floatformat:0|intcomma }}</h5>
                               </td>
                               <td>
                                   <div class="delete-cart-icon"> 
@@ -118,7 +121,7 @@
                                   <h5>Thành tiền</h5>
                               </td>
                               <td>
-                                  <h5>{{ sub_total|floatformat:0 }}</h5>
+                                  <h5>{{ sub_total|floatformat:0|intcomma }}</h5>
                               </td>
                           </tr>
                           <tr class="out_button_area">
@@ -133,8 +136,12 @@
                               </td>
                               <td>
                                   <div class="checkout_btn_inner d-flex align-items-center">
-                                      <a class="gray_btn" href="{% url 'home:index' %}">Tiếp tục mua sắm</a>
-                                      <a class="primary2-btn ml-2" href="{% url 'order:check_out' %}">Đặt hàng</a>
+                                        <a class="gray_btn" href="{% url 'home:index' %}">Tiếp tục mua sắm</a>
+                                        {% if cart_items %}
+                                            <a class="primary2-btn ml-2" href="{% url 'order:check_out' %}">Đặt hàng</a>
+                                        {% else %}
+                                            <a class="primary2-btn ml-2" onclick="$.notify('Giỏ hàng trống','warn');">Đặt hàng</a>
+                                        {%endif%}
                                   </div>
                               </td>
                           </tr>

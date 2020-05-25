@@ -4,32 +4,33 @@ from django.contrib.auth.decorators import login_required
 from .models import Cart
 from book.models import Merchandise
 from django.utils import timezone
+from django.http import JsonResponse
 
 # Create your views here.
 
 def delete_expired_item(request):
-     expired_item = Cart.objects.raw('''
-          select c.id
-          from cart c
-          where id_user = %s and expire_date <= %s;
-     ''',[str(request.user.id), str(timezone.now())])
-
+     expired_item = Cart.objects.filter(user=request.user, expire_date__lte=timezone.now())
      for item in expired_item:
-          # update merchandise quantity_exists
-          merchandise = Merchandise.objects.get(pk = item.merchandise_id)
-          new_quantity_exists = int(merchandise.quantity_exists)+int(item.quantity)
-          Merchandise.objects.filter(pk =  item.merchandise_id).update(quantity_exists = new_quantity_exists)
           # delete
           Cart.objects.filter(pk = item.id).delete()
 
-def add_book_to_cart(request, merchandise, qty):
-     Cart.onjects.create(
-          user_id = request.user.id,
-          merchandise_id = merchandise,
-          quantity = qty,
-          created_date = timezone.now(),
-          expire_date = timezone.now()+datetime.timedelta(1*30)
-     )
+@login_required
+def add_book_to_cart(request):
+     if request.method == "POST":
+          merchandise = Merchandise.objects.get(pk=request.POST.get("merchandise"))
+          cart = Cart.objects.filter(user=request.user, merchandise=merchandise).first()
+          if cart: 
+               cart.quantity += request.POST.get("quantity")
+               cart.save()
+          else:
+               Cart.objects.create(
+                    user = request.user,
+                    merchandise = merchandise,
+                    quantity = request.POST.get("quantity"),
+                    created_date = timezone.now(),
+                    expire_date = timezone.now()+datetime.timedelta(1*30)
+               )
+     return JsonResponse({},status=200) 
 
 @login_required
 def get_cart(request):
@@ -57,7 +58,7 @@ def secure_cart_request(request, id_cart):
      return 0
 
 @login_required
-def update_quantity(request, id_cart, qty):
+def update_quantity(request):
      if not secure_cart_request(request, id_cart):
           return HttpResponseNotFound()
      if int(qty)<1: qty=1

@@ -1,11 +1,13 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import Order, OrderStatus, DetailOrder, HistoryOrderStatus
 from cart.models import Cart
+from book.models import Merchandise
 from users.models import Address
 from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required
 from .forms import NewAddressForm
 from django.utils import timezone
+from django.db import transaction, DatabaseError
 
 # Create your views here.
 @login_required
@@ -50,17 +52,16 @@ def order_detail(request, id_order):
 @login_required
 def check_out(request):
     #get cart item
-    cart_items = Cart.objects.raw('''
+    cart_items = list(Cart.objects.raw('''
         select `cart`.`id`, `book`.`name`, `cart`.`quantity`, `m`.`id` `merchandise_id`, `m`.`price`, `image`.`url`
         from `cart` join `merchandise` `m` join `book` join `merchandise_image` `m_img` join `image`
         where `cart`.`id_merchandise` = `m`.`id` AND `m`.`id_product` = `book`.`id` AND `m_img`.`id_merchandise` = `m`.`id` 
             AND `image`.`id`= `m_img`.`id_image`
             AND `cart`.`id_user` = %s
         group by `cart`.`id`;
-    ''',[str(request.user.id)])
-    print(len([cart_items]))
-    print(cart_items)
-    if [cart_items] == None:
+    ''',[str(request.user.id)]))
+
+    if len(cart_items) == 0:
         return redirect('cart:get_cart')
 
     #subtotal
@@ -74,12 +75,7 @@ def check_out(request):
     # check_out exceed
     if request.method == 'POST':
         #lưu form nhập thông tin địa chỉ giao hàng mới
-            # if request.POST.get("diachinhan") == "Nhập địa chỉ mới":
-            #     form = NewAddressForm(request.POST, current_user=request.user)
-            #     if form.is_valid():
-            #         shipping_address_id = form.save()
-            # else:
-            #     shipping_address_id = request.POST.get("diachinhan")
+
         shipping_address_id = request.POST.get("pro-idaddress")
     # split order
         store_address = Cart.objects.raw('''
@@ -88,26 +84,38 @@ def check_out(request):
             where c.id_user = %s and m.id=c.id_merchandise
             group by m.id_address;
         ''', str(request.user.id))
-        # create order with each store_address
-        for i in store_address:
-            cart = Cart.objects.raw('''
-                select m.id, c.quantity, m.price
-                from cart as c join merchandise as m
-                where m.id = c.id_merchandise and
-                    m.id_address = %s and c.id_user = %s
-            ''', [str(i.id_address), str(request.user.id)])
-            new_order = Order.objects.create(user_id = request.user.id, address_id = shipping_address_id, payment_id = 1, delivery_id = 1, 
-                                            fee_delivery = 0, created_date = timezone.now())
-            # create Detail of each order
-            for item in cart:
-                DetailOrder.objects.create(order_id = new_order.pk, merchandise_id = item.id, promotion_id = 1, quantity = item.quantity,
-                                            total_price = item.price*item.quantity, total_price_after_discount = item.price*item.quantity)
-            # create history_status gor current order
-            HistoryOrderStatus.objects.create(order_id = new_order.pk, order_status_id = 1, created_date = timezone.now(), 
-                                                    created_by = request.user)
-        
-        # delete all cart objects after check_out
-        Cart.objects.filter(user = request.user.id).delete()
+
+        # transaction
+        try:
+            with transaction.atomic():
+                # create order with each store_address
+                for i in store_address:
+                    cart = Cart.objects.raw('''
+                        select m.id, c.quantity, m.price
+                        from cart as c join merchandise as m
+                        where m.id = c.id_merchandise and
+                            m.id_address = %s and c.id_user = %s
+                    ''', [str(i.id_address), str(request.user.id)])
+                    new_order = Order.objects.create(user_id = request.user.id, address_id = shipping_address_id, payment_id = 1, delivery_id = 1, 
+                                                    fee_delivery = 0, created_date = timezone.now())
+                    
+                    # create Detail of each order
+                    for item in cart:
+                        DetailOrder.objects.create(order_id = new_order.pk, merchandise_id = item.id, quantity = item.quantity,
+                                                    total_price = item.price*item.quantity, total_price_after_discount = item.price*item.quantity)
+                        # udate quantity_exists
+                        merchandise = Merchandise.objects.get(pk = item.id)
+                        merchandise.quantity_exists -= item.quantity
+                        merchandise.save()
+
+                    # create history_status gor current order
+                    HistoryOrderStatus.objects.create(order_id = new_order.pk, order_status_id = 1, created_date = timezone.now(), 
+                                                            created_by = request.user)
+                
+                # delete all cart objects after check_out
+                Cart.objects.filter(user = request.user.id).delete()
+        except DatabaseError as error:
+            print(error)
 
         return redirect('order:order')
 
