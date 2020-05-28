@@ -14,4 +14,6 @@ urlpatterns = [
     path('address/add', views.add_address, name='add_address'),
     path('address/check_create', views.check_create_address, name='check_create_address'),
     path('address/delete', views.delete_address, name='delete_address'),
+    path('store/', views.store_info, name='store_info'),
+    path('resendemailtoken/', views.resend_email_token, name='resend_email_token'),
 ]

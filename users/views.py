@@ -3,12 +3,16 @@ from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
-from common.utils import send_mail_verification_code, get_random_string
+from common.utils import send_mail_verification_code, get_random_string, get_object_or_none
 from .models import EmailVerify, Address
 from .forms import LoginForm, UpdateProfile, RegistrationForm, PasswordChangeForm, AddressForm
 from notification.services import get_notifications, send_notification_by_system
 from .services import get_addresses, CITIES, get_addresses_without_pager
 from ecommerce_web.settings import MAX_NUM_OF_ADDRESS
+from store.models import Store
+from store.forms import StoreForm
+from book.services import save_image
+import os
 # Create your views here.
 def user_login(request):
     errors=[]
@@ -114,3 +118,50 @@ def delete_address(request):
 
 def user_terms(request):
     return render(request, 'user/terms_condition.html')
+
+@login_required
+def store_info(request):
+    store = get_object_or_none(Store, pk=request.user)
+    form = StoreForm(instance=store)
+    if store:
+        avatar_url = store.avatar_url
+    else:
+        avatar_url = None
+    avatar_error = None
+
+    if request.method == 'POST':
+        if not request.user.emailverify.was_verified_email():
+            return redirect('user:info')
+        form = StoreForm(request.POST, instance=store)
+        avatar = request.FILES.get('avatar')
+        if form.is_valid():
+            if not avatar_url and not avatar:
+                avatar_error = 'Xin hãy chọn ảnh đại diện cho cửa hàng của bạn.'
+            elif avatar:
+                print(avatar_url, os.path.isfile(avatar_url))
+                path_in_disk = avatar_url[1:] if avatar_url[0] == '/' else avatar_url
+                if path_in_disk and os.path.isfile(path_in_disk):
+                    os.remove(path_in_disk)
+                image_path = save_image(request.user, avatar, 'store/avatar_store')
+            else:
+                image_path = avatar_url
+            if not avatar_error and form.is_valid():
+                store = form.save(commit=False)
+                store.avatar_url = image_path
+                store.user = request.user
+                store.save()
+                return redirect('user:store_info')
+    return render(request, 'seller/store.html', {'form':form, 'avatar_url':avatar_url, 'avatar_error':avatar_error})
+
+@login_required
+def resend_email_token(request):
+    email_verify = get_object_or_none(EmailVerify, pk=request.user)
+    if email_verify:
+        if email_verify.was_verified_email():
+            return redirect('user:info')
+        email_token = email_verify.token
+    else:
+        email_token = get_random_string(32)
+        EmailVerify(user = request.user, token = email_token).save()
+    send_mail_verification_code(request.user.email, email_token)
+    return redirect('user:info')

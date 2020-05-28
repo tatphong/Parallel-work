@@ -4,7 +4,8 @@ import string
 import random 
 from functools import wraps
 from django.http import JsonResponse
-
+import re 
+from django.shortcuts import redirect
 def send_mail(send_to, subject, message):
     django_send_mail(subject, message, EMAIL_HOST_USER, [send_to], fail_silently=False)
 
@@ -26,6 +27,36 @@ def ajax_login_required(view_func):
             return view_func(request, *args, **kwargs)
         return JsonResponse({'error':'Login required.'}, status=401)
     return wrapper
+
+
+def no_accent_vietnamese(s):
+    s = re.sub(r'[àáạảãâầấậẩẫăằắặẳẵ]', 'a', s)
+    s = re.sub(r'[ÀÁẠẢÃĂẰẮẶẲẴÂẦẤẬẨẪ]', 'A', s)
+    s = re.sub(r'[èéẹẻẽêềếệểễ]', 'e', s)
+    s = re.sub(r'[ÈÉẸẺẼÊỀẾỆỂỄ]', 'E', s)
+    s = re.sub(r'[òóọỏõôồốộổỗơờớợởỡ]', 'o', s)
+    s = re.sub(r'[ÒÓỌỎÕÔỒỐỘỔỖƠỜỚỢỞỠ]', 'O', s)
+    s = re.sub(r'[ìíịỉĩ]', 'i', s)
+    s = re.sub(r'[ÌÍỊỈĨ]', 'I', s)
+    s = re.sub(r'[ùúụủũưừứựửữ]', 'u', s)
+    s = re.sub(r'[ƯỪỨỰỬỮÙÚỤỦŨ]', 'U', s)
+    s = re.sub(r'[ỳýỵỷỹ]', 'y', s)
+    s = re.sub(r'[ỲÝỴỶỸ]', 'Y', s)
+    s = re.sub(r'[Đ]', 'D', s)
+    s = re.sub(r'[đ]', 'd', s)
+    return s
+def to_link(name):
+    return re.sub(r'[^A-Za-z0-9]+', '-',no_accent_vietnamese(name.strip()).replace(' ','-'))
+
+def is_image_file(content_type):
+    return 'image' in content_type
+
+def get_object_or_none(model, pk):
+    try:
+        record = model.objects.get(pk=pk)
+    except model.DoesNotExist:
+        record = None
+    return record
 
 class SQLUtils:
     def __init__(self):

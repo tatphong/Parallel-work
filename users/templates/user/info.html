@@ -27,17 +27,9 @@
 					</div>
 					<div class="form-group">
 						{{ info_form.email.label_tag }}
-						<div
-							{% if user.emailverify.was_verified_email %}
-							class="border border-success"
-							title="Đã xác thực"
-							{% else %}
-							class="border border-danger"
-							title="Chưa xác thực"
-							{% endif %}
-							data-toggle="tooltip" 
-							data-placement="right" 
-						>{{ info_form.email }}</div>
+						<div {% if user.emailverify.was_verified_email %} class="border border-success"
+							title="Đã xác thực" {% else %} class="border border-danger" title="Chưa xác thực"
+							{% endif %} data-toggle="tooltip" data-placement="right">{{ info_form.email }}</div>
 						{{ info_form.email.errors }}
 					</div>
 					<div class="form-group">
@@ -52,20 +44,29 @@
 		</div>
 		<div class="col-lg-6 col-md-6">
 			<!-- Change Password -->
-		<div class="widget change-password">
-			<h3 class="widget-header user">Đổi mật khẩu</h3>
-			<form method="POST">
-				{% csrf_token %}
-				{% for field in password_change_form.visible_fields %}
+			<div class="widget change-password">
+				<h3 class="widget-header user">Đổi mật khẩu</h3>
+				<form method="POST">
+					{% csrf_token %}
+					{% for field in password_change_form.visible_fields %}
 					<div class="form-group">
 						{{ field.label_tag }} {{ field }}
 						{{ field.errors }}
 					</div>
-				{% endfor %}
-				<!-- Submit Button -->
-				<button class="btn btn-transparent" type="submit" name="submit_password_change_form">Đổi mật khẩu</button>
-			</form>
-		</div>
+					{% endfor %}
+					<!-- Submit Button -->
+					<button class="btn btn-transparent" type="submit" name="submit_password_change_form">Đổi mật
+						khẩu</button>
+				</form>
+			</div>
+			<div class="widget change-password">
+				<h3 class="widget-header user">Xác thực Email</h3>
+				<form action="{% url 'user:resend_email_token' %}">
+					<button type="submit" class="btn btn-outline-secondary btn-lg btn-block"
+					{% if user.emailverify.was_verified_email %} disabled {% endif %}>Gửi lại mã xác
+					thực</button>
+				</form>
+			</div>
 		</div>
 	</div>
 </div>

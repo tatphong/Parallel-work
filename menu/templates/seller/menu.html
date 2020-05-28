@@ -1,4 +1,5 @@
 {% load static %}
+{% load url_helper %}
 <section>
     <div class="container">
         <div class="row">
@@ -47,6 +48,8 @@
                                 <div class="dropdown-menu">
                                     <a class="dropdown-item" href="{% url 'user:info' %}"><i class="fas fa-address-card"></i> Thông tin cá nhân</a>
                                     <a class="dropdown-item" href="{% url 'cart:get_cart' %}"><i class="fas fa-shopping-cart"></i> Giỏ hàng của tôi</a>
+                                    <a class="dropdown-item" href="{% url 'user:notification' %}"><i class="fas fa-comment"></i> Thông báo ({% get_number_unread_notifications user %})</a>
+                                    <a class="dropdown-item" href="{% url 'seller:dashboard' %}"><i class="fas fa-store"></i> Trang người bán</a>
                                     <hr/>
                                     <form action="{% url 'user:logout' %}" method="POST">
                                         {% csrf_token %}

@@ -5,8 +5,32 @@ from .models import Cart
 from book.models import Merchandise
 from django.utils import timezone
 from django.http import JsonResponse
-
+from common.utils import ajax_login_required
 # Create your views here.
+
+@ajax_login_required
+def add_book_to_cart(request):
+     if request.method == "POST":
+          merchandise = Merchandise.objects.get(pk=request.POST.get("merchandise"))
+          quantity = int(request.POST.get("quantity"))
+          if quantity <= 0:
+               return JsonResponse({'error':'Số lượng sản phẩm được chọn phải lớn hơn 0.'})
+          if not merchandise.is_selling():
+               return JsonResponse({'error': 'Sản phẩm hiện không còn bán.'},status=400) 
+          cart = Cart.objects.filter(user=request.user, merchandise=merchandise).first()
+          if cart: 
+               cart.quantity += quantity
+               cart.save()
+          else:
+               Cart.objects.create(
+                    user = request.user,
+                    merchandise = merchandise,
+                    quantity = quantity,
+                    created_date = timezone.now(),
+                    expire_date = timezone.now()+timezone.timedelta(1*30)
+               )
+          return JsonResponse({}, status=200) 
+     return JsonResponse({},status=400) 
 
 def delete_expired_item(request):
      expired_item = Cart.objects.filter(user=request.user, expire_date__lte=timezone.now())
@@ -15,26 +39,14 @@ def delete_expired_item(request):
           Cart.objects.filter(pk = item.id).delete()
 
 @login_required
-def add_book_to_cart(request):
-     if request.method == "POST":
-          merchandise = Merchandise.objects.get(pk=request.POST.get("merchandise"))
-          cart = Cart.objects.filter(user=request.user, merchandise=merchandise).first()
-          if cart: 
-               cart.quantity += request.POST.get("quantity")
-               cart.save()
-          else:
-               Cart.objects.create(
-                    user = request.user,
-                    merchandise = merchandise,
-                    quantity = request.POST.get("quantity"),
-                    created_date = timezone.now(),
-                    expire_date = timezone.now()+datetime.timedelta(1*30)
-               )
-     return JsonResponse({},status=200) 
-
-@login_required
 def get_cart(request):
      delete_expired_item(request)
+
+     # update quantity
+     if request.method == "POST":
+          update_quantity(request)
+
+     # get cart
      cart_items = Cart.objects.raw('''
           select `cart`.`id`, `book`.`name`, `cart`.`quantity`, `m`.`id` `merchandise_id`, `m`.`price`, `image`.`url`
           from `cart` join `merchandise` `m` join `book` join `merchandise_image` `m_img` join `image`
@@ -48,40 +60,29 @@ def get_cart(request):
      sub_total = 0
      for i in cart_items:
           sub_total += i.price * i.quantity
-     
-     return render(request, 'cart/cart.html', {'cart_items':cart_items, 'sub_total':sub_total})
 
-def secure_cart_request(request, id_cart):
-     cart_owner = Cart.objects.get(pk=id_cart)
-     if cart_owner.user_id == request.user.id:
-          return 1
-     return 0
+     return render(request, 'cart/cart.html', {'cart_items':cart_items, 'sub_total':sub_total})
 
 @login_required
 def update_quantity(request):
-     if not secure_cart_request(request, id_cart):
-          return HttpResponseNotFound()
-     if int(qty)<1: qty=1
-     
-     cart = Cart.objects.get(pk=id_cart)
-     merchandise = Merchandise.objects.get(pk = cart.merchandise_id)
-     # update quantity_exists in merchandise
-     new_quantity_exists = int(merchandise.quantity_exists) + int(cart.quantity) - int(qty)
-     Merchandise.objects.filter(pk = cart.merchandise_id).update(quantity_exists = new_quantity_exists)
+     id_cart = request.POST.get("id_cart")
+     qty = int(request.POST.get("qty"))
+     if qty<1: qty=1
+
      # update cart quantity
      Cart.objects.filter(pk=id_cart).update(quantity=qty)
-     return get_cart(request)
+     # return get_cart(request)
+
+def secure_cart_request(request, id_cart):
+     cart_owner = Cart.objects.get(pk=id_cart)
+     if cart_owner.user == request.user:
+          return 1
+     return 0
 
 @login_required
 def delete_cart(request, id_cart):
      if not secure_cart_request(request, id_cart):
           return HttpResponseNotFound()
-     
-     cart = Cart.objects.get(pk=id_cart)
-     merchandise = Merchandise.objects.get(pk = cart.merchandise_id)
-
-     new_quantity_exists = int(merchandise.quantity_exists) + int(cart.quantity)
-     Merchandise.objects.filter(pk =  cart.merchandise_id).update(quantity_exists = new_quantity_exists)
      Cart.objects.filter(pk=id_cart).delete()
      return get_cart(request)
      

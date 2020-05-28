@@ -37,7 +37,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         db_table = 'user'
 
 class EmailVerify(models.Model):
-    user = models.OneToOneField('User', models.DO_NOTHING, db_column='id_user', primary_key=True)
+    user = models.OneToOneField(User, models.DO_NOTHING, db_column='id_user', primary_key=True)
     token = models.CharField(max_length=32)
     verify_date = models.DateTimeField(blank=True, null=True)
 

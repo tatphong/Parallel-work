@@ -10,17 +10,17 @@
                 <!-- Recently Favorited -->
                 <div class="widget dashboard-container my-adslist">
                     <h3 class="widget-header">THÊM SẢN PHẨM MỚI</h3>
-                    <form method="POST" id="form-add-product">
+                    <form method="POST" id="form-add-product" enctype="multipart/form-data">
                         {% csrf_token %}
                         <div class="form-group">
                             <label for="pro-name">1. Tên sản phẩm: </label>
-                            <input type="text" class="form-control" id="pro-name" name="pro-name" required>
+                            <input type="text" class="form-control" id="pro-name" name="name" required>
                         </div>
 
                         <div class="form-group">
                             <label>2. Hình đại diện: </label>
                             <a href="javascript:void(0)" onclick="$('#pro-avatar').click()"> + Chọn hình ảnh</a>
-                            <input onchange="select_avatar(this);" type="file" id="pro-avatar" name="pro-avatar" hidden
+                            <input onchange="select_avatar(this);" type="file" id="pro-avatar" name="avatar" hidden
                                 class="form-control" accept="image/*">
                         </div>
                         <div id="selected_avatar"></div>
@@ -28,7 +28,7 @@
                         <div class="form-group">
                             <label>3. Hình ảnh sản phẩm: </label>
                             <a href="javascript:void(0)" onclick="$('#pro-images').click()"> + Thêm hình ảnh</a>
-                            <input onchange="select_images(this);" type="file" id="pro-images" name="pro-images" hidden
+                            <input onchange="select_images(this);" type="file" id="pro-images" name="images" hidden
                                 class="form-control" accept="image/*" multiple>
                         </div>
                         <div class="container">
@@ -37,8 +37,10 @@
 
                         <div class="form-group">
                             <label for="pro-portfolio">4. Loại sản phẩm: </label>
-                            <select id="pro-portfolio" class="form-control" required>
-                                <option selected>Sách</option>
+                            <select id="pro-portfolio" name="id_portfolio" class="form-control" required>
+                                {% for item in portfolios %}
+                                <option value="{{ item.id }}">{{ item.name }}</option>
+                                {% endfor %}
                             </select>
                         </div>
                         <div class="form-group">
@@ -49,37 +51,37 @@
                                         <tr class="form-group">
                                             <td><label for="pro-publisher">Nhà xuất bản:</label> </td>
                                             <td><input class="form-control" type="text" class="input-add-spec"
-                                                    id="pro-publisher" name="pro-publisher" required></td>
+                                                    id="pro-publisher" name="publisher" required></td>
                                         </tr>
                                         <tr class="form-group">
                                             <td><label for="pro-publicdate">Ngày xuất bản:</label> </td>
                                             <td><input class="form-control" type="month" class="input-add-spec"
-                                                    id="pro-publicdate" name="pro-publicdate" required></td>
+                                                    id="pro-publicdate" name="publicdate" required></td>
                                         </tr>
                                         <tr class="form-group">
                                             <td><label for="pro-length">Kích thước:</label> </td>
                                             <td class="row">
                                                 <div class="col">
                                                     <input class="form-control input-add-spec" type="number"
-                                                        placeholder="Dài (cm)" id="pro-length" name="pro-length"
-                                                        required>
+                                                        placeholder="Dài (cm)" id="pro-length" name="length"
+                                                        min="0" required>
                                                 </div>
                                                 <div class="col">
                                                     <input class="form-control input-add-spec" type="number"
-                                                        placeholder="Rộng (cm)" id="pro-width" name="pro-width"
-                                                        required>
+                                                        placeholder="Rộng (cm)" id="pro-width" name="width"
+                                                        min="0" required>
                                                 </div>
                                                 <div class="col">
                                                     <input class="form-control input-add-spec" type="number"
-                                                        placeholder="Cao (cm)" id="pro-height" name="pro-height"
-                                                        required>
+                                                        placeholder="Cao (cm)" id="pro-height" name="height"
+                                                        min="0" required>
                                                 </div>
                                             </td>
                                         </tr>
                                         <tr class="form-group">
                                             <td><label for="pro-pagesnum">Số trang:</label> </td>
                                             <td><input class="form-control" type="number" class="input-add-spec"
-                                                    id="pro-pagesnum" name="pro-pagesnum" required></td>
+                                                    id="pro-pagesnum" name="pagesnum" min="0" required></td>
                                         </tr>
                                         <tr class="form-group">
                                             <td><label id="label-category">Chọn thể loại:</label> </td>
@@ -94,30 +96,33 @@
                         </div>
                         <div class="form-group">
                             <label for="pro-quantity">6. Số lượng: </label>
-                            <input type="number" class="form-control" id="pro-quantity" name="pro-quantity" required>
+                            <input type="number" class="form-control" id="pro-quantity" name="quantity" min="0" required>
                         </div>
                         <div class="form-group">
-                            <label for="pro-price">7. Giá: </label>
-                            <input type="number" class="form-control" id="pro-price" name="pro-price" required>
+                            <label for="pro-price">7. Giá (đồng): </label>
+                            <input type="number" class="form-control" id="pro-price" name="price" min="0" required>
                         </div>
                         <div class="form-group">
-                            <label for="pro-originprice">8. Giá thị trường: </label>
-                            <input type="number" class="form-control" id="pro-originprice" name="pro-originprice"
+                            <label for="pro-originprice">8. Giá thị trường (đồng): </label>
+                            <input type="number" class="form-control" id="pro-originprice" min="0" name="originprice"
                                 required>
                         </div>
                         <div class="form-group">
                             <label for="pro-condition">9. Tình trạng: </label>
-                            <select id="pro-condition" name="pro-condition" class="form-control" required>
-                                <option selected>Mới</option>
-                                <option>Cũ</option>
+                            <select id="pro-condition" name="id_condition" class="form-control" required>
+                                {% for item in conditions %}
+                                <option value="{{ item.id }}">{{ item.name }}</option>
+                                {% endfor %}
                             </select>
                         </div>
                         <div class="form-group">
                             <label>10. Phương thức giao hàng: </label>
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="1" id="pro-delivery-1"
-                                    name="pro-delivery">
-                                <label class="form-check-label" for="pro-delivery-1">Nhà bán tự giao</label>
+                                {% for item in deliveries %}
+                                <input class="form-check-input" type="checkbox" value="{{ item.id }}" id="pro-delivery-{{ item.id }}"
+                                    name="id_delivery">
+                                <label class="form-check-label" for="pro-delivery-{{ item.id }}">{{ item.name }}</label>
+                                {% endfor %}
                             </div>
 
                         </div>
@@ -126,7 +131,7 @@
                             <a href="javascript:void(0)" onclick="" data-toggle="modal" data-target="#address-modal"> +
                                 Chọn địa chỉ</a>
                             <div class="col-md-12" style="padding-right:30px">
-                                <input type="text" name="pro-idaddress" id="pro-idaddress" value="" hidden>
+                                <input type="text" name="id_address" id="pro-idaddress" value="" hidden>
                                 <table class="table table-add-products">
                                     <tbody>
                                         <tr class="form-group">
@@ -205,7 +210,7 @@
                             <tr class="row">
                                 <td class="col-1">
                                     <div class="radio">
-                                    <input type="radio" name="pro-address" value="{{ address.id }}" onchange="select_address({{ address.id }});">
+                                    <input type="radio" name="address" value="{{ address.id }}" onchange="select_address({{ address.id }});">
                                     </div>
                                 </td>
                                 <td class="col-2" id="add-no-{{ address.id }}">
@@ -239,6 +244,7 @@
         </div>
     </div>
 </section>
+
 {% endblock %}
 {% block js %}
 <script src="http://js.nicedit.com/nicEdit-latest.js" type="text/javascript"></script>
@@ -353,7 +359,7 @@
                 var reader = new FileReader();
                 reader.onload = function (e) {
                     $("#selected_avatar").append(
-                        `
+                    `
                         <div class="image-zone"><img src="${e.target.result}" width="200" /></div>
                     `
                     )
@@ -367,29 +373,29 @@
         error_message = null;
         form_data = new FormData(document.getElementById("form-add-product"));
 
-        if (!form_data.get("pro-name")) {
+        if (!form_data.get("name")) {
             error_message = "Xin hãy nhập tên sản phẩm.";
-        } else if (!form_data.get("pro-avatar").name) {
+        } else if (!form_data.get("avatar").name) {
             error_message = "Xin hãy chọn hình đại diện của sản phẩm.";
-        } else if (!form_data.get("pro-publisher")) {
+        } else if (!form_data.get("publisher")) {
             error_message = "Xin hãy nhập nhà xuất bản.";
-        } else if (!form_data.get("pro-publicdate")) {
+        } else if (!form_data.get("publicdate")) {
             error_message = "Xin hãy nhập ngày xuất bản.";
-        } else if (!form_data.get("pro-length") || !form_data.get("pro-width") || !form_data.get("pro-height")) {
+        } else if (!form_data.get("length") || !form_data.get("width") || !form_data.get("height")) {
             error_message = "Xin hãy nhập đầy đủ kích thước sách.";
-        } else if (!form_data.get("pro-pagesnum")) {
+        } else if (!form_data.get("pagesnum")) {
             error_message = "Xin hãy nhập số trang của sách.";
         } else if (selected_category === null) {
             error_message = "Xin hãy chọn thể loại sách.";
-        } else if (!form_data.get("pro-quantity")) {
+        } else if (!form_data.get("quantity")) {
             error_message = "Xin hãy nhập số lượng sản phẩm.";
-        } else if (!form_data.get("pro-price")) {
+        } else if (!form_data.get("price")) {
             error_message = "Xin hãy nhập giá bán của sản phẩm.";
-        } else if (!form_data.get("pro-originprice")) {
+        } else if (!form_data.get("originprice")) {
             error_message = "Xin hãy nhập giá thị trường của sản phẩm.";
-        } else if (form_data.getAll("pro-delivery").length === 0) {
-            error_message = "Xin hãy chọn phương thức thanh toán.";
-        } else if (!form_data.get("pro-idaddress")){
+        } else if (form_data.getAll("id_delivery").length === 0) {
+            error_message = "Xin hãy chọn phương thức giao hàng.";
+        } else if (!form_data.get("id_address")){
             error_message = "Xin hãy chọn địa chỉ";
         } else if (!$("#form-add-product").find('.nicEdit-main').text()) {
             error_message = "Xin hãy viết mô tả sản phẩm.";
@@ -398,19 +404,19 @@
     }
 
     function submit_form() {
-        // error_message = validate_form();
+        error_message = validate_form();
 
-        // if (error_message !== null) {
-        //     $.notify(error_message, "error");
-        //     return;
-        // }
+        if (error_message !== null) {
+            $.notify(error_message, "error");
+            return;
+        }
 
         form_data = new FormData(document.getElementById("form-add-product"));
-        // var pro_description = (new nicEditors.findEditor('pro-description')).getContent();
-        // var pro_category = selected_category.value;
+        var pro_description = (new nicEditors.findEditor('pro-description')).getContent();
+        var pro_category = selected_category.value;
 
-        // form_data.append('pro-description', pro_description);
-        // form_data.append('pro-category', pro_category);
+        form_data.append('description', pro_description);
+        form_data.append('id_category', pro_category);
         // for(var pair of form_data.entries()) {
         //     console.log(pair[0]+ ', '+ pair[1]); 
         // }
@@ -421,20 +427,23 @@
             processData: false,
             contentType: false,
             success: function (response) {
-                console.log("Done")
+                $.notify("Đã đăng sản phẩm thành công, sản phẩm đang được kiểm duyệt.", "success");
             },
             error: function (response) {
                 // alert the error if any error occured
                 // console.log(response["responseJSON"]["error"]);
                 switch (response.status) {
                     case 401:
-                        alert("Xin hãy đăng nhập.");
+                        //alert("Xin hãy đăng nhập.");
+                        $.notify("Xin hãy đăng nhập.", "error");
                         break;
                     case 400:
-                        alert(response["responseJSON"]["error"]);
+                        //alert(response["responseJSON"]["error"]);
+                        $.notify(response["responseJSON"]["error"], "error");
                         break;
                     case 500:
-                        alert("Đã có lỗi xảy ra, xin hãy thử lại sau.")
+                        //alert("Đã có lỗi xảy ra, xin hãy thử lại sau.")
+                        $.notify("Đã có lỗi xảy ra, xin hãy thử lại sau.", "error");
                         break;
                 }
             }

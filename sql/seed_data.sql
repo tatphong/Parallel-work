@@ -54,8 +54,12 @@ VALUES(8, 1, "Giới thiệu sản phẩm phản cảm, bất hợp pháp", 4, "
 INSERT INTO `sample_report`(`id`, `id_report_target`, `sample_content`, `negative_point`, `created_date`, `created_by`, `delete_date`)
 VALUES(9, 1, "Sản phẩm chứa hàng cấm, bất hợp pháp", 8, "2020-04-28 03:04:27", 1, null);
 INSERT INTO `sample_report`(`id`, `id_report_target`, `sample_content`, `negative_point`, `created_date`, `created_by`, `delete_date`)
-VALUES(10, 1, "Sản phẩm là hàng giả, hàng nhái", 1, "2020-04-28 03:04:27", 5, null);
+VALUES(10, 1, "Sản phẩm là hàng giả, hàng nhái", 1, "2020-04-28 03:04:27", 1, null);
 INSERT INTO `sample_report`(`id`, `id_report_target`, `sample_content`, `negative_point`, `created_date`, `created_by`, `delete_date`)
 VALUES(11, 1, "Sản phẩm có chất lượng kém", 5, "2020-04-28 03:04:27", 1, null);
 INSERT INTO `sample_report`(`id`, `id_report_target`, `sample_content`, `negative_point`, `created_date`, `created_by`, `delete_date`)
 VALUES(12, 1, "Khác", 1, "2020-04-28 03:04:27", 1, null);
+
+#Delivery
+INSERT INTO `delivery`(`id`, `name`, `fee`, `created_date`, `created_by`, `delete_date`)
+VALUES(1, "Nhà bán tự giao", 0, "2020-04-28 03:04:27", 1, null);

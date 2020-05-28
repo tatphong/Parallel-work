@@ -1,14 +1,19 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.core.paginator import Paginator
-from .models import Book, BookCategory, BookCategoryDetail, Merchandise
+from .models import Book, BookCategory, BookCategoryDetail, Merchandise, MerchandisePortfolio, Delivery, MerchandiseCondition
 from django.contrib.auth.decorators import login_required
 from django.db.models import Count, Q, F
-from common.utils import SQLUtils
+from common.utils import SQLUtils, is_image_file, get_object_or_none
 import json
 from store.models import Store 
 from report.services import get_sample_reports
 from django.core import serializers
 from users.services import CITIES, get_addresses_without_pager
+from .forms import BookForm
+from .services import save_image, get_avaiable_merchandises
+from django.http import JsonResponse
+import os
+import datetime
 # Create your views here.
 SORT_SQL = {
     'newest': '`activated_date` DESC',
@@ -97,7 +102,6 @@ def get_books(request, url_category):
         base_sql.format(select=products_select_clause, where=sqlutils.get_where_clause(), 
                         group=' GROUP BY `merchandise`.`id` ', order=sqlutils.get_order_clause()),
         sqlutils.get_params())
-
     paginator = Paginator(merchandises, 9)
     page_number = request.GET.get('page')
     pager = paginator.get_page(page_number)
@@ -124,12 +128,22 @@ def get_book(request, id):
 
 @login_required
 def add_book(request):
+    store = get_object_or_none(Store, pk=request.user)
+    
     if request.method == 'POST':
-        print('=> ',request.POST)
-        print('=> ', request.POST.get('pro-condition'))
-        print('=> ', request.FILES)
-        print('=> ', request.FILES.get('pro-images'))
-        return redirect('seller:add_book')
+        if not store:
+            return redirect('user:store_info')
+        if get_avaiable_merchandises(request.user).count() < 3:
+            book_form = BookForm(request.POST, current_user = request.user)
+            if book_form.is_valid():
+                image_paths = []
+                image_paths.append(save_image(request.user, request.FILES.get('avatar'), 'merchandise/avatar_book'))
+                for image in request.FILES.getlist('images'):
+                    image_paths.append(save_image(request.user, image, 'merchandise/book'))
+                book_form.save(image_paths=image_paths)
+            return JsonResponse({}, status=200)
+        else:
+            return JsonResponse({'error':'Số sản phẩm đang bán đã đạt giới hạn. Hãy nâng cấp tài khoản để bán được nhiều sản phẩm hơn.'}, status=400)
     book_categories = BookCategory.objects.filter(delete_date=None)
     book_categories_json = dict()
     for category in book_categories:
@@ -140,5 +154,10 @@ def add_book(request):
         }
     book_categories_json = json.dumps(book_categories_json, ensure_ascii=False)
     addresses = get_addresses_without_pager(request.user)
-    return render(request, 'seller/add_book.html', {'book_categories':book_categories_json,'cities':CITIES, 'addresses':addresses})
+    merchandise_portfolios = MerchandisePortfolio.objects.filter(delete_date = None)
+    deliveries = Delivery.objects.filter(delete_date = None)
+    conditions = MerchandiseCondition.objects.filter(delete_date = None)
+    return render(request, 'seller/add_book.html', 
+        {'book_categories':book_categories_json,'cities':CITIES, 'addresses':addresses, 'store':store,
+        'portfolios':merchandise_portfolios, 'deliveries': deliveries, 'conditions': conditions})
     

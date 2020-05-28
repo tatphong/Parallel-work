@@ -1,0 +1,213 @@
+{% extends 'seller_base.html' %}
+{% load static %}
+{% load humanize %}
+{% block content %}
+<section class="dashboard section">
+	<!-- Container Start -->
+	<div class="container">
+		<!-- Row Start -->
+		<div class="row">
+            <!--Filter-->
+            <div class="col=10">
+                <div class="widget price-range w-100">
+                    <h4 class="widget-header">Ngày</h4>
+                    <div class="block text-center">
+                        <input type="date" class="form-control" name="date_begin" id="date_begin" value="{{request.GET.date_begin}}" min=0 placeholder="Ngày bắt đầu">
+                        <input type="date" class="form-control" name="date_end" id="date_end" value="{{request.GET.date_end}}" min=0 placeholder="Ngày kết thúc">
+                        <button onclick="date_filter()" class="btn btn-contact d-inline-block btn-primary px-lg-5 my-1 px-md-3">Áp dụng</button>
+                    </div>
+                </div>
+            </div>
+            <div class="col=10">
+                <div class="widget price-range w-100">
+                    <h4 class="widget-header">Trạng thái</h4>
+                    <div class="block text-center">
+                        <select id="select_status" name="status" value="" onchange="status_filter()">
+                            <option value="">Chọn</option>
+                            {%for i in all_status %}
+                            <option value="{{i.code}}">{{i.name}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="col=10">
+                <div class="widget price-range w-100">
+                    <h4 class="widget-header">Tìm theo mã đơn hàng</h4>
+                    <div class="block text-center">
+                        <input id="search_order" type="text" name="search_order" onfocusout="search_order()">
+                    </div>
+                </div>
+            </div>
+            <div class="col=10">
+                <button class="btn btn-contact d-inline-block btn-primary px-lg-5 my-1 px-md-3" onclick="reset_filter()" >Xóa bộ lọc</button>
+            </div>
+            <!--Đơn hàng-->
+			<div class="col-md-12">
+				<div class="widget dashboard-container my-adslist">
+					<h3 class="widget-header">DANH SÁCH ĐƠN HÀNG</h3>
+					<table class="table  product-dashboard-table">
+						<thead>
+							<tr>
+                                <th scope="col">Mã đơn hàng</th>
+                                <th scope="col">Ngày mua</th>
+                                <th scope="col">Sản phẩm</th>
+                                <th scope="col">Tổng tiền</th>
+                                <th scope="col">Trạng thái</th>
+                                
+							</tr>
+						</thead>
+						<tbody>
+                            {% for item in pager %}
+							<tr>
+                                <!--Mã đơn hàng-->
+								<td class="product-thumb">
+									<form method="POST">
+										{% csrf_token %}
+										<input name="id_order" type="text" value="{{item.id}}" hidden>
+										<input name="function" type="text" value="order_detail" hidden>
+										<button type="submit">{{item.id}}</button>
+									</form>
+                                </td>
+                                <!--Ngày mua-->
+								<td>
+									<p class="title">{{item.created_date}}</p>
+								</td>
+                                <!--Sản phẩm-->
+								<td class="product-details">
+                                    <h3 class="title">{{item.name}}</h3>
+                                </td>
+                                <!--Giá tiền-->
+								<td >
+									<p class="price-order">{{item.price|floatformat:0}} VNĐ</p>
+								</td>
+                                <!--Trạng thái-->
+                                <td class="status-order">
+                                    <form method="post">
+										{% csrf_token %}
+                                        <!--Nếu trạng thái là hủy hoặc giao thành công thì 0 cho đổi nữa-->
+                                        {% ifequal item.status_code "4" %}
+                                            <p align="center">{{item.status}}</p>
+                                        {% else %}
+                                            {% ifequal item.status_code "3" %}
+                                                <p align="center">{{item.status}}</p>
+                                            {% else %}
+                                        <!--Nếu trạng thái là 3 cái còn lại thì đc phép đổi-->
+                                            <input name="id_order" value="{{item.id}}" hidden/>
+                                            <select id="{{item.id}}" name="change_status_{{item.id}}" onchange="change_status(this, {{item.id}}, {{item.status_code}})">
+                                                {% for i in all_status %}
+                                                    <option value="{{i.code}}"
+                                                        {% ifequal i.code item.status_code %} selected="selected" {% endifequal %} 
+                                                    >{{i.name}}</option>
+                                                {% endfor %}
+                                            </select>
+                                            <button id="submit_status_{{item.id}}" type="submit" hidden></button>
+                                            {% endifequal %}
+                                        {% endifequal %}
+                                    </form>
+                                </td>
+							</tr>
+							{% endfor %}
+						</tbody>
+					</table>
+
+				</div>
+
+				<!-- pagination -->
+				<div class="pagination justify-content-center">
+					<nav aria-label="Page navigation example">
+						<ul class="pagination">
+							{% if pager.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{pager.number|add:-1}}" aria-label="Previous">
+                                    <span aria-hidden="true">&laquo;</span>
+                                    <span class="sr-only">Previous</span>
+                                </a>
+                            </li>
+                            {% endif %}
+							{% for page_index in page_navigator %}
+								{% ifequal page_index pager.number %}
+                                	<li class="page-item active"><a class="page-link" href="?page={{ page_index }}">{{page_index}}</a></li>
+                                {% else %}
+                                	<li class="page-item"><a class="page-link" href="?page={{ page_index }}">{{page_index}}</a></li>
+                                {% endifequal %}
+							{% endfor %}
+							{% if pager.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{pager.number|add:1}}" aria-label="Next">
+                                    <span aria-hidden="true">&raquo;</span>
+                                    <span class="sr-only">Next</span>
+                                </a>
+                            </li>
+                            {% endif %}
+						</ul>
+					</nav>
+				</div>
+				<!-- pagination -->
+
+			</div>
+		</div>
+		<!-- Row End -->
+	</div>
+	<!-- Container End -->
+</section>
+{% endblock %}
+
+{% block js %}
+<script>
+    function date_filter(){
+        date_begin = document.getElementById("date_begin").value
+        date_end = document.getElementById("date_end").value
+        var urlParams = new URLSearchParams(window.location.search);
+        //urlParams.append('low_price', low_price)
+        if(urlParams.has("date_begin") === true){
+            urlParams.set("date_begin", date_begin)
+        } else {
+            urlParams.append("date_begin", date_begin)
+        }
+        if(urlParams.has("date_end") === true){
+            urlParams.set("date_end", date_end)
+        } else {
+            urlParams.append("date_end", date_end)
+        }
+        location.href = "?"+urlParams.toString()
+    }
+
+    function status_filter(){
+        status = document.getElementById("select_status").value
+        var urlParams = new URLSearchParams(window.location.search);
+        //urlParams.append('low_price', low_price)
+        if(urlParams.has("status") === true){
+            urlParams.set("status", status)
+        } else {
+            urlParams.append("status", status)
+        }
+        location.href = "?"+urlParams.toString()
+    }
+
+    function search_order(){
+        order = document.getElementById("search_order").value
+        var urlParams = new URLSearchParams(window.location.search);
+        //urlParams.append('low_price', low_price)
+        if(urlParams.has("order") === true){
+            urlParams.set("order", order)
+        } else {
+            urlParams.append("order", order)
+        }
+        location.href = "?"+urlParams.toString()
+    }
+
+    function reset_filter(){
+        window.location.href=window.location.href.split('?')[0]
+    }
+
+    function change_status(e, id_order, status_code){
+        console.log("change_status running")
+        if (confirm('Xác nhận thay đổi trạng thái đơn hàng: '+id_order))
+            document.getElementById("submit_status_"+id_order).click()
+        else {
+            document.getElementById(id_order).selectedIndex = status_code-1
+        }
+    }
+</script>
+{% endblock %}

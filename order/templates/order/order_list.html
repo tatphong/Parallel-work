@@ -28,7 +28,12 @@
 							<tr>
                                 <!--Mã đơn hàng-->
 								<td class="product-thumb">
-								<a href="{% url 'order:order_detail' item.id %}">{{item.id}}</a>
+									<form method="POST">
+										{% csrf_token %}
+										<input name="id_order" type="text" value="{{item.id}}" hidden>
+										<input name="function" type="text" value="order_detail" hidden>
+										<button type="submit">{{item.id}}</button>
+									</form>
                                 </td>
                                 <!--Ngày mua-->
 								<td>
@@ -49,9 +54,14 @@
 								<!--Hủy đơn hàng-->
 								{% ifequal item.status_code '1' %}
 								<td>                                   
-                                    <div class="checkout_btn_inner d-flex align-items-center">
-                                        <a class="cancel-order-btn ml-2" href="{% url 'order:cancel_order' item.id %}">Hủy đơn</a>
-                                    </div>
+                                    <form method="post">
+										{% csrf_token %}
+										<div class="checkout_btn_inner d-flex align-items-center">
+											<input name="id_order" type="text" value="{{item.id}}" hidden>
+											<input name="function" type="text" value="cancel_order" hidden>
+											<button class="cancel-order-btn ml-2" type="submit">Hủy đơn</button>
+										</div>
+									</form>
                                 </td>
 								{% endifequal %}
 							</tr>

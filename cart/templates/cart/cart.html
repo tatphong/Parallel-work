@@ -58,12 +58,29 @@
                                   <div class="product_count">
                                         <form method="post" >
                                         {% csrf_token %}
+                                            <input type="text" name="id_cart" value="{{item.id}}" hidden>
                                             <input type="text" name="qty" id="sst-{{item.id}}" maxlength="12" value="{{ item.quantity }}" title="Quantity:"
-                                                class="input-text qty" onchange="update_quantity(this.value, {{item.id}})">
-                                            <button onclick="var result = document.getElementById('sst-{{item.id}}'); var sst = result.value; if( !isNaN( sst )) update_quantity(++result.value,{{item.id}});return false;"
-                                                class="increase items-count" type="submit"><i class="lnr lnr-chevron-up"></i></button>
-                                            <button name="decrease_qty" onclick="var result = document.getElementById('sst-{{item.id}}'); var sst = result.value; if( !isNaN( sst ) &amp;&amp; sst > 1 ) update_quantity(--result.value,{{item.id}});return false;"
-                                                class="reduced items-count" type="submit"><i class="lnr lnr-chevron-down"></i></button>
+                                                class="input-text qty" onchange="update_quantity({{item.id}})">
+                                            <button name="increase_qty" onclick="
+                                                                var result = document.getElementById('sst-{{item.id}}'); 
+                                                                var sst = result.value; 
+                                                                if( !isNaN( sst )) {
+                                                                    result.value++;
+                                                                    update_quantity({{item.id}})
+                                                                }
+                                                                return false;"
+                                                class="increase items-count" type="button"><i class="lnr lnr-chevron-up"></i></button>
+                                            <button name="decrease_qty" onclick="
+                                                                var result = document.getElementById('sst-{{item.id}}'); 
+                                                                var sst = result.value; 
+                                                                if( !isNaN( sst ) &amp;&amp; sst > 0 ) {
+                                                                    result.value--; 
+                                                                    update_quantity({{item.id}})
+                                                                }
+                                                                return false;"
+                                                class="reduced items-count" type="button"><i class="lnr lnr-chevron-down"></i></button>
+                                            <button name="submit" type="submit" id="submit_{{item.id}}"></button>
+
                                           </form>
                                   </div>
                               </td>
@@ -156,19 +173,9 @@
 
 {% block js %}
 <script>
-    function update_quantity(quantity, cart_id){
+    function update_quantity(cart_id){
         console.log("running update_quantity()");
-        /*$.ajax({
-            'url': '', 
-            'type': 'GET',
-            'dataType': 'json', 
-            'data': {cart_id:cart_id, quantity:quantity}, 
-            'success': function(data) {
-                console.log("Ajax success");
-            },
-            'error': function(data) {console.log("Ajax error");}
-        });*/
-        window.location = window.location.href.split("cart/",1) + "cart/cart_id=" + cart_id + "&quantity=" + quantity;
+        document.getElementById("submit_"+cart_id).click()
     }
 </script>
 {% endblock %}

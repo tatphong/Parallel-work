@@ -1,5 +1,6 @@
 from django.db import models
 from users.models import User, Address
+from django.utils import timezone
 # Create your models here.
 
 class Book(models.Model):
@@ -36,7 +37,7 @@ class BookCategory(models.Model):
     name = models.CharField(unique=True, max_length=255)
     parent_category = models.ForeignKey('self', models.DO_NOTHING, db_column='id_parent', blank=True, null=True)
     created_by = models.ForeignKey(User, models.DO_NOTHING, db_column='created_by')
-    created_date = models.DateTimeField()
+    created_date = models.DateTimeField(default=timezone.now)
     delete_date = models.DateTimeField(blank=True, null=True)
 
     class Meta:
@@ -61,7 +62,7 @@ class BookCategoryDetail(models.Model):
 class MerchandisePortfolio(models.Model):
     code = models.CharField(unique=True, max_length=64)
     name = models.CharField(max_length=256)
-    created_date = models.DateTimeField()
+    created_date = models.DateTimeField(default=timezone.now)
     created_by = models.ForeignKey(User, models.DO_NOTHING, db_column='created_by')
     delete_date = models.DateTimeField(blank=True, null=True)
 
@@ -71,7 +72,7 @@ class MerchandisePortfolio(models.Model):
 class MerchandiseCondition(models.Model):
     code = models.CharField(unique=True, max_length=64)
     name = models.CharField(max_length=256)
-    created_date = models.DateTimeField()
+    created_date = models.DateTimeField(default=timezone.now)
     created_by = models.ForeignKey(User, models.DO_NOTHING, db_column='created_by')
     delete_date = models.DateTimeField(blank=True, null=True)
 
@@ -82,7 +83,7 @@ class MerchandiseCondition(models.Model):
 class Delivery(models.Model):
     name = models.CharField(max_length=256)
     fee = models.DecimalField(max_digits=13, decimal_places=4)
-    created_date = models.DateTimeField()
+    created_date = models.DateTimeField(default=timezone.now)
     created_by = models.ForeignKey(User, models.DO_NOTHING, db_column='created_by')
     delete_date = models.DateTimeField(blank=True, null=True)
 
@@ -92,7 +93,7 @@ class Delivery(models.Model):
 
 class Image(models.Model):
     url = models.CharField(max_length=2083)
-    created_date = models.DateTimeField()
+    created_date = models.DateTimeField(default=timezone.now)
     delete_date = models.DateTimeField(blank=True, null=True)
 
     class Meta:
@@ -116,7 +117,7 @@ class Merchandise(models.Model):
     times_rated = models.IntegerField(blank=True, null=True)
     stopped_date = models.DateTimeField(blank=True, null=True)
     blocked_date = models.DateTimeField(blank=True, null=True)
-    created_date = models.DateTimeField()
+    created_date = models.DateTimeField(default=timezone.now)
     activated_date = models.DateTimeField(blank=True, null=True)
     activated_by = models.ForeignKey(User, models.DO_NOTHING, db_column='activated_by', blank=True, null=True, related_name='activated_merchandise_set')
     class Meta:

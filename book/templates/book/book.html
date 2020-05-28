@@ -123,7 +123,7 @@
                             <div class="tab-pane fade show active" id="pills-home" role="tabpanel"
                                 aria-labelledby="pills-home-tab">
                                 <h3 class="tab-title">Giới thiệu sách</h3>
-                                {{ merchandise.description }}
+                                {{ merchandise.description|safe }}
 
                             </div>
                             <div class="tab-pane fade" id="pills-profile" role="tabpanel"
@@ -218,7 +218,7 @@
                                     max=30>
                             </div>
                         </div>
-                        <a href="" class="btn btn-contact d-inline-block btn-primary px-lg-5 my-1 px-md-3">Chọn mua</a>
+                        <button onclick="add_cart();" class="btn btn-contact d-inline-block btn-primary px-lg-5 my-1 px-md-3">Chọn mua</button>
                     </div>
                     <!-- User Profile widget -->
                     <div class="widget user text-center">
@@ -573,6 +573,35 @@
             }
         });
 
+    }
+    function add_cart(){
+        quantity = $("#quantity").val()
+        $.ajax({
+            type: "POST",
+            url: "{% url 'cart:add_cart' %}",
+            data: {
+                "merchandise": "{{ merchandise.id }}",
+                "quantity": quantity
+            },
+            success: function (response) {
+                $.notify("Đã thêm vào giỏ hàng", "success");
+            },
+            error: function (response) {
+                // alert the error if any error occured
+                // console.log(response["responseJSON"]["error"]);
+                switch (response.status) {
+                    case 401:
+                        $.notify("Xin hãy đăng nhập", "warn");
+                        break;
+                    case 400:
+                        $.notify(response["responseJSON"]["error"], "error");
+                        break;
+                    case 500:
+                        $.notify("Đã có lỗi xảy ra, xin hãy thử lại sau.", "error")
+                        break;
+                }
+            }
+        });
     }
 </script>
 {% endblock %}

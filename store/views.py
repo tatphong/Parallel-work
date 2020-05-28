@@ -87,3 +87,6 @@ def get_store(request, id):
     
     return render(request, 'store/store.html', {
         'pager':pager, 'page_navigator': page_navigator, 'cities':cities, 'conditions':conditions, 'store':store})
+
+def get_packages(request):
+    return render(request, 'store/package.html')
