@@ -8,45 +8,51 @@
 		<!-- Row Start -->
 		<div class="row">
             <!--Filter-->
-            <div class="col=10">
-                <div class="widget price-range w-100">
-                    <h4 class="widget-header">Ngày</h4>
-                    <div class="block text-center">
-                        <input type="date" class="form-control" name="date_begin" id="date_begin" value="{{request.GET.date_begin}}" min=0 placeholder="Ngày bắt đầu">
-                        <input type="date" class="form-control" name="date_end" id="date_end" value="{{request.GET.date_end}}" min=0 placeholder="Ngày kết thúc">
-                        <button onclick="date_filter()" class="btn btn-contact d-inline-block btn-primary px-lg-5 my-1 px-md-3">Áp dụng</button>
+            <div class="row">
+                <div class="col-md-12 box-seller-order">
+                    <div>
+                        <div class="block text-center  seller-order">
+                            <div class="col-md-3">
+                                <input type="date" class="form-control" name="date_begin" id="date_begin" value="{{request.GET.date_begin}}" min=0 placeholder="Ngày bắt đầu">
+                            </div>
+                            <div class="col-md-3">
+                                <input type="date" class="form-control" name="date_end" id="date_end" value="{{request.GET.date_end}}" min=0 placeholder="Ngày kết thúc">
+                            </div>
+                            <div class="col-md-3">
+                                        <select id="select_status" name="status" value="" onchange="status_filter()" class="full-size-select box-select-seller">
+                                            <option value="">Trạng thái</option>
+                                            {%for i in all_status %}
+                                            <option value="{{i.code}}"
+                                                {% if request.GET.select_status %}
+                                                    {% ifequal request.GET.select_status i.code %}
+                                                        selected="selected"
+                                                    {% endifequal %}
+                                                {% endif %}
+                                            >{{i.name}}</option>
+                                            {% endfor %}
+                                        </select> 
+                            </div>
+                            <div class="col-md-2 delete-filter">
+                                <button onclick="date_filter()" class="btn btn-seller-order-check">Áp dụng</button>
+                            </div>
+                            <div class="col-md-2 delete-filter">
+                                <button class="btn btn-seller-order-check" onclick="reset_filter()" >Làm mới</button>
+                            </div>
+                        </div><br>                            
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="col=10">
-                <div class="widget price-range w-100">
-                    <h4 class="widget-header">Trạng thái</h4>
-                    <div class="block text-center">
-                        <select id="select_status" name="status" value="" onchange="status_filter()">
-                            <option value="">Chọn</option>
-                            {%for i in all_status %}
-                            <option value="{{i.code}}">{{i.name}}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                </div>
-            </div>
-            <div class="col=10">
-                <div class="widget price-range w-100">
-                    <h4 class="widget-header">Tìm theo mã đơn hàng</h4>
-                    <div class="block text-center">
-                        <input id="search_order" type="text" name="search_order" onfocusout="search_order()">
-                    </div>
-                </div>
-            </div>
-            <div class="col=10">
-                <button class="btn btn-contact d-inline-block btn-primary px-lg-5 my-1 px-md-3" onclick="reset_filter()" >Xóa bộ lọc</button>
-            </div>
+                
+                
+            </div><br>
             <!--Đơn hàng-->
 			<div class="col-md-12">
 				<div class="widget dashboard-container my-adslist">
-					<h3 class="widget-header">DANH SÁCH ĐƠN HÀNG</h3>
-					<table class="table  product-dashboard-table">
+                    <div class="seller-order">
+                        <h3 class="widget-header">DANH SÁCH ĐƠN HÀNG</h3>
+                        <input id="search_order" class="search-seller" type="text" name="search_order" placeholder="Tìm theo mã" onfocusout="search_order()">
+                    </div>
+                    <table class="table  product-dashboard-table">
 						<thead>
 							<tr>
                                 <th scope="col">Mã đơn hàng</th>
@@ -66,16 +72,16 @@
 										{% csrf_token %}
 										<input name="id_order" type="text" value="{{item.id}}" hidden>
 										<input name="function" type="text" value="order_detail" hidden>
-										<button type="submit">{{item.id}}</button>
+										<button class="btn-submit-code-order" type="submit"><strong>{{item.id}}</strong></button>
 									</form>
                                 </td>
                                 <!--Ngày mua-->
 								<td>
-									<p class="title">{{item.created_date}}</p>
+									<p class="title price-order">{{item.created_date}}</p>
 								</td>
                                 <!--Sản phẩm-->
-								<td class="product-details">
-                                    <h3 class="title">{{item.name}}</h3>
+								<td class=" product-collum-order ">
+                                    <p class="price-order"><strong>{{item.name}}</strong></p>
                                 </td>
                                 <!--Giá tiền-->
 								<td >

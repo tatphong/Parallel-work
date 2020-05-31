@@ -4,6 +4,18 @@ body {
   line-height: 1.5;
   font-family: "Muli", sans-serif;
 }
+.search-seller{
+  height: 30px;
+  border: 1px solid #000;
+  padding: 5px;
+  margin-left: 600px;
+  margin-bottom: 10px;
+  
+  float: right !important;
+}
+.search-seller:hover{
+  border: 1px solid #c77000;
+}
 .check-pro-cl1{
   max-width: 250px;
   height: auto;
@@ -13,7 +25,19 @@ body {
   text-align: right;
   padding: 0px;
 }
-
+.box-select-seller{
+  height: 50px;
+  padding-top: 5px;
+}
+.btn-submit-code-order{
+  border: none;
+  margin-left: 10px;
+  background-color: #fff;
+  font-size: 16px;
+}
+.btn-submit-code-order:hover{
+  color: #c77000;
+}
 .order_box{
   padding: 50px !important;
 }
@@ -37,6 +61,28 @@ body {
     margin-left:5px;
     margin-top:15px;
 }
+.seller-order{
+  display: flex;
+}
+.select-status-box{
+  
+}
+.btn-seller-order-check{
+  text-align: center;
+  height: 50px;
+  margin-left: 10px;
+  text-transform: capitalize;
+  background: #C77000;
+  border-radius: 30px;
+  color: #fff;
+  text-align: center;
+  font-weight: 500;
+}
+.btn-seller-order-check:hover{
+  background: #f1f6f7;
+    color: #C77000;
+    transition: all ease .5s;
+}
 .primary2-btn{
     height: 40px;
     padding: 0px 44px;
@@ -54,17 +100,22 @@ body {
 }
 .cancel-order-btn{
     height: 40px;
-    padding: 0px 44px;
-    line-height: 38px;
-    text-transform: capitalize;
+    width: auto;
+    padding: 10px;
+    text-align: center;
     background: #C77000;
+    border-color: none;
     border-radius: 5px;
+    border: 1px solid #c77000;
     color: #fff;
-    
-    font-weight: 500;
+}
+.product-collum-order{
+  max-width: 150px;
+  padding: 10px;
+  font-size: 20px !important;
 }
 .cancel-order-btn:hover{
-    background: #f1f6f7;
+    background: #fff;
     color: #C77000;
     transition: all ease .5s;
 }
@@ -322,7 +373,9 @@ a:focus, a:hover {
   outline: 0;
   color: #C77000;
 }
-
+.select-status-box{
+  margin-bottom: 0px;
+}
 .form-control {
   border-radius: 2px;
   height: 50px;
@@ -331,7 +384,14 @@ a:focus, a:hover {
   box-shadow: none;
   font-size: 15px;
 }
-
+.delete-filter{
+  margin-left: 15px;
+}
+.box-seller-order{
+  width: 100%;
+  padding: 20px !important;
+  margin-left: 20px;
+}
 .form-control:focus {
   color: #666;
   box-shadow: none;
@@ -2804,3 +2864,8 @@ form textarea {
 }
 
 /*# sourceMappingURL=maps/style.css.map */
+
+.select-city .nice-select.open .list {
+  height: 200px;
+  overflow: auto;
+}

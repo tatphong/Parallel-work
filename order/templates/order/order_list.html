@@ -17,7 +17,7 @@
 							<tr>
                                 <th scope="col">Mã đơn hàng</th>
                                 <th scope="col">Ngày mua</th>
-                                <th scope="col">Sản phẩm</th>
+                                <th scope="col">Địa chỉ</th>
                                 <th scope="col">Tổng tiền</th>
                                 <th scope="col">Trạng thái</th>
                                 
@@ -32,16 +32,16 @@
 										{% csrf_token %}
 										<input name="id_order" type="text" value="{{item.id}}" hidden>
 										<input name="function" type="text" value="order_detail" hidden>
-										<button type="submit">{{item.id}}</button>
+										<button class="btn-submit-code-order" type="submit"><strong>{{item.id}}</strong></button>
 									</form>
                                 </td>
                                 <!--Ngày mua-->
 								<td>
-									<p class="title">{{item.created_date}}</p>
+									<p class="price-order">{{item.created_date}}</p>
 								</td>
-                                <!--Sản phẩm-->
-								<td class="product-details">
-                                    <h3 class="title">{{item.name}}</h3>
+                                <!--Địa chỉ-->
+								<td class=" product-collum-order">
+                                    <p class="price-order"><strong>{{item.name}}</strong></p>
                                 </td>
                                 <!--Giá tiền-->
 								<td >
@@ -49,7 +49,7 @@
 								</td>
                                 <!--Trạng thái-->
                                 <td class="status-order">
-                                    <p align="center">{{item.status}}</p>
+                                    <p class="price-order">{{item.status}}</p>
                                 </td>
 								<!--Hủy đơn hàng-->
 								{% ifequal item.status_code '1' %}
@@ -59,7 +59,7 @@
 										<div class="checkout_btn_inner d-flex align-items-center">
 											<input name="id_order" type="text" value="{{item.id}}" hidden>
 											<input name="function" type="text" value="cancel_order" hidden>
-											<button class="cancel-order-btn ml-2" type="submit">Hủy đơn</button>
+											<button class="cancel-order-btn" type="submit">Hủy đơn</button>
 										</div>
 									</form>
                                 </td>

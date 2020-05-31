@@ -135,7 +135,13 @@ def check_out(request):
 
 
 def seller_get_order(request):
+    post_param = {}
     if request.method == "POST":
+        post_param = {
+        'selected_status':request.POST.get("selected_status"),
+        'search_order':request.POST.get("search_order")
+        }
+        print(post_param)
         id_order = request.POST.get("id_order")
         if request.POST.get("change_status_"+id_order):
             HistoryOrderStatus.objects.create(
@@ -210,4 +216,4 @@ def seller_get_order(request):
     #get all status
     order_status = OrderStatus.objects.all()
 
-    return render(request, 'seller/order_list.html', {'pager':pager, 'page_navigator': page_navigator, 'all_status':order_status})
+    return render(request, 'seller/order_list.html', {'pager':pager, 'page_navigator': page_navigator, 'all_status':order_status, 'post_value':post_param})
