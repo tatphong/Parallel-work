@@ -48,7 +48,7 @@ def get_cart(request):
 
      # get cart
      cart_items = Cart.objects.raw('''
-          select `cart`.`id`, `book`.`name`, `cart`.`quantity`, `m`.`id` `merchandise_id`, `m`.`price`, `image`.`url`
+          select `cart`.`id`, `book`.`name`, `cart`.`quantity`, `m`.`id` `merchandise_id`, `m`.`price`, `image`.`url`, `m`.`quantity_exists`
           from `cart` join `merchandise` `m` join `book` join `merchandise_image` `m_img` join `image`
           where `cart`.`id_merchandise` = `m`.`id` AND `m`.`id_product` = `book`.`id` AND `m_img`.`id_merchandise` = `m`.`id` 
                AND `image`.`id`= `m_img`.`id_image`
@@ -68,7 +68,9 @@ def update_quantity(request):
      id_cart = request.POST.get("id_cart")
      qty = int(request.POST.get("qty"))
      if qty<1: qty=1
-
+     cart = Cart.objects.get(pk=id_cart)
+     merchandise = Merchandise.objects.get(pk=cart.merchandise_id)
+     qty = min(merchandise.quantity_exists, qty)
      # update cart quantity
      Cart.objects.filter(pk=id_cart).update(quantity=qty)
      # return get_cart(request)

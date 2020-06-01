@@ -56,6 +56,11 @@
                               </td>
                               <td>
                                   <div class="product_count">
+                                    {% ifequal item.quantity_exists 0 %}
+                                        <!--Out of stock-->
+                                        <p> Hết hàng </p>
+                                    {% else %}
+                                        <!--Select quantity-->
                                         <form method="post" >
                                         {% csrf_token %}
                                             <input type="text" name="id_cart" value="{{item.id}}" hidden>
@@ -82,6 +87,7 @@
                                             <button name="submit" type="submit" id="submit_{{item.id}}"></button>
 
                                           </form>
+                                    {%endifequal%}
                                   </div>
                               </td>
                               <td>

@@ -19,18 +19,14 @@
                                 <input type="date" class="form-control" name="date_end" id="date_end" value="{{request.GET.date_end}}" min=0 placeholder="Ngày kết thúc">
                             </div>
                             <div class="col-md-3">
-                                        <select id="select_status" name="status" value="" onchange="status_filter()" class="full-size-select box-select-seller">
-                                            <option value="">Trạng thái</option>
-                                            {%for i in all_status %}
-                                            <option value="{{i.code}}"
-                                                {% if request.GET.select_status %}
-                                                    {% ifequal request.GET.select_status i.code %}
-                                                        selected="selected"
-                                                    {% endifequal %}
-                                                {% endif %}
-                                            >{{i.name}}</option>
-                                            {% endfor %}
-                                        </select> 
+                                {% with selected_status=request.GET.select_status %}
+                                <select id="select_status" name="status" value="" onchange="status_filter()" class="full-size-select box-select-seller">
+                                    <option value="">Trạng thái</option>
+                                    {%for i in all_status %}
+                                    <option value="{{i.code}}" {% if selected_status == i.code %} selected="true" {% endif %}>{{i.name}}</option>
+                                    {% endfor %}
+                                </select> 
+                                {% endwith %}
                             </div>
                             <div class="col-md-2 delete-filter">
                                 <button onclick="date_filter()" class="btn btn-seller-order-check">Áp dụng</button>
@@ -50,7 +46,9 @@
 				<div class="widget dashboard-container my-adslist">
                     <div class="seller-order">
                         <h3 class="widget-header">DANH SÁCH ĐƠN HÀNG</h3>
-                        <input id="search_order" class="search-seller" type="text" name="search_order" placeholder="Tìm theo mã" onfocusout="search_order()">
+                        <!--search order with id-->
+                        <input id="search_order" class="search-seller" type="text" name="search_order" placeholder="Tìm theo mã" 
+                            value="{{request.GET.order}}" onkeypress="search_order(event)">
                     </div>
                     <table class="table  product-dashboard-table">
 						<thead>
@@ -191,16 +189,19 @@
         location.href = "?"+urlParams.toString()
     }
 
-    function search_order(){
-        order = document.getElementById("search_order").value
-        var urlParams = new URLSearchParams(window.location.search);
-        //urlParams.append('low_price', low_price)
-        if(urlParams.has("order") === true){
-            urlParams.set("order", order)
-        } else {
-            urlParams.append("order", order)
+    function search_order(e){
+        if (e.keyCode == 13){
+            console.log("pressed enter");   
+            order = document.getElementById("search_order").value
+            var urlParams = new URLSearchParams(window.location.search);
+            //urlParams.append('low_price', low_price)
+            if(urlParams.has("order") === true){
+                urlParams.set("order", order)
+            } else {
+                urlParams.append("order", order)
+            }
+            location.href = "?"+urlParams.toString()
         }
-        location.href = "?"+urlParams.toString()
     }
 
     function reset_filter(){
