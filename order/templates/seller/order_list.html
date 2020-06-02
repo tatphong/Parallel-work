@@ -20,10 +20,10 @@
                             </div>
                             <div class="col-md-3">
                                 {% with selected_status=request.GET.select_status %}
-                                <select id="select_status" name="status" value="" onchange="status_filter()" class="full-size-select box-select-seller">
+                                <select id="select_status" name="status" onchange="status_filter()" class="full-size-select box-select-seller">
                                     <option value="">Trạng thái</option>
                                     {%for i in all_status %}
-                                    <option value="{{i.code}}" {% if selected_status == i.code %} selected="true" {% endif %}>{{i.name}}</option>
+                                    <option value="{{i.code}}" {% ifequal selected_status i.code %}selected{% endifequal %}>{{i.name}}</option>
                                     {% endfor %}
                                 </select> 
                                 {% endwith %}
