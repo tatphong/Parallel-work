@@ -1,5 +1,6 @@
 {% extends 'seller_base.html' %}
 {% load static %}
+{% load url_helper %}
 {% load humanize %}
 {% block content %}
 <section class="dashboard section">
@@ -23,7 +24,7 @@
                                 <select id="select_status" name="status" onchange="status_filter()" class="full-size-select box-select-seller">
                                     <option value="">Trạng thái</option>
                                     {%for i in all_status %}
-                                    <option value="{{i.code}}" {% ifequal selected_status i.code %}selected{% endifequal %}>{{i.name}}</option>
+                                    <option value="{{i.code}}" {% ifequal selected_status i.code %}selected{%endifequal%}>{{i.name}}</option>
                                     {% endfor %}
                                 </select> 
                                 {% endwith %}
@@ -46,6 +47,12 @@
 				<div class="widget dashboard-container my-adslist">
                     <div class="seller-order">
                         <h3 class="widget-header">DANH SÁCH ĐƠN HÀNG</h3>
+                        <!--sort order with date-->
+                        <select id="sort_date" name="sort" onchange="sort_date()" class="full-size-select box-select-seller">
+                            <option value="">Sắp xếp</option>
+                            <option value="asc" {% if request.sort == 'asc' %}selected{% endif %}>Tăng dần theo ngày</option>
+                            <option value="desc"  {% if request.sort == 'desc' %}selected{% endif %}>Giảm dần theo ngày</option>
+                        </select>
                         <!--search order with id-->
                         <input id="search_order" class="search-seller" type="text" name="search_order" placeholder="Tìm theo mã" 
                             value="{{request.GET.order}}" onkeypress="search_order(event)">
@@ -121,29 +128,35 @@
 				<div class="pagination justify-content-center">
 					<nav aria-label="Page navigation example">
 						<ul class="pagination">
-							{% if pager.has_previous %}
+							{% with params=request.GET.urlencode %}           
+                            {% if pager.has_previous %}
                             <li class="page-item">
-                                <a class="page-link" href="?page={{pager.number|add:-1}}" aria-label="Previous">
+                                <a class="page-link" href="{% query_url 'page' '1' params %}" aria-label="Previous">
                                     <span aria-hidden="true">&laquo;</span>
                                     <span class="sr-only">Previous</span>
                                 </a>
                             </li>
                             {% endif %}
-							{% for page_index in page_navigator %}
+                            {% for page_index in page_navigator %}
 								{% ifequal page_index pager.number %}
-                                	<li class="page-item active"><a class="page-link" href="?page={{ page_index }}">{{page_index}}</a></li>
-                                {% else %}
-                                	<li class="page-item"><a class="page-link" href="?page={{ page_index }}">{{page_index}}</a></li>
-                                {% endifequal %}
-							{% endfor %}
-							{% if pager.has_next %}
+									<li class="page-item active">
+										<a class="page-link" href="{% query_url 'page' page_index params %}">{{page_index}}</a>
+									</li>
+								{% else %}
+									<li class="page-item">
+										<a class="page-link" href="{% query_url 'page' page_index params %}">{{page_index}}</a>
+									</li>
+								{% endifequal %}
+                            {% endfor %}
+                            {% if pager.has_next %}
                             <li class="page-item">
-                                <a class="page-link" href="?page={{pager.number|add:1}}" aria-label="Next">
+                                <a class="page-link" href="{% query_url 'page' pager.paginator.num_pages params %}" aria-label="Next">
                                     <span aria-hidden="true">&raquo;</span>
                                     <span class="sr-only">Next</span>
                                 </a>
                             </li>
                             {% endif %}
+                            {% endwith %}
 						</ul>
 					</nav>
 				</div>
@@ -163,7 +176,6 @@
         date_begin = document.getElementById("date_begin").value
         date_end = document.getElementById("date_end").value
         var urlParams = new URLSearchParams(window.location.search);
-        //urlParams.append('low_price', low_price)
         if(urlParams.has("date_begin") === true){
             urlParams.set("date_begin", date_begin)
         } else {
@@ -180,7 +192,6 @@
     function status_filter(){
         status = document.getElementById("select_status").value
         var urlParams = new URLSearchParams(window.location.search);
-        //urlParams.append('low_price', low_price)
         if(urlParams.has("status") === true){
             urlParams.set("status", status)
         } else {
@@ -194,7 +205,6 @@
             console.log("pressed enter");   
             order = document.getElementById("search_order").value
             var urlParams = new URLSearchParams(window.location.search);
-            //urlParams.append('low_price', low_price)
             if(urlParams.has("order") === true){
                 urlParams.set("order", order)
             } else {
@@ -202,6 +212,17 @@
             }
             location.href = "?"+urlParams.toString()
         }
+    }
+
+    function sort_date(){
+        sort = document.getElementById("sort_date").value
+        var urlParams = new URLSearchParams(window.location.search);
+        if(urlParams.has("sort") === true){
+            urlParams.set("sort", sort)
+        } else {
+            urlParams.append("sort", sort)
+        }
+        location.href = "?"+urlParams.toString()
     }
 
     function reset_filter(){

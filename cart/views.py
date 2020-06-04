@@ -38,9 +38,21 @@ def delete_expired_item(request):
           # delete
           Cart.objects.filter(pk = item.id).delete()
 
+def update_stopped_selling_quantity_to_zero(request):
+     stopped_selling = False
+     cart = Cart.objects.filter(user = request.user)
+     for item in cart:
+          merchandise = Merchandise.objects.get(pk = item.merchandise_id)
+          if not merchandise.is_selling():
+               item.quantity = 0
+               item.save()
+               stopped_selling = True
+     return stopped_selling
+
 @login_required
 def get_cart(request):
      delete_expired_item(request)
+     stopped_selling = update_stopped_selling_quantity_to_zero(request)
 
      # update quantity
      if request.method == "POST":
@@ -48,7 +60,8 @@ def get_cart(request):
 
      # get cart
      cart_items = Cart.objects.raw('''
-          select `cart`.`id`, `book`.`name`, `cart`.`quantity`, `m`.`id` `merchandise_id`, `m`.`price`, `image`.`url`, `m`.`quantity_exists`
+          select `cart`.`id`, `book`.`name`, `cart`.`quantity`, `m`.`id` `merchandise_id`, `m`.`price`, `image`.`url`, `m`.`quantity_exists`,
+               `m`.`blocked_date`, `m`.`stopped_date`, `m`.`activated_date`
           from `cart` join `merchandise` `m` join `book` join `merchandise_image` `m_img` join `image`
           where `cart`.`id_merchandise` = `m`.`id` AND `m`.`id_product` = `book`.`id` AND `m_img`.`id_merchandise` = `m`.`id` 
                AND `image`.`id`= `m_img`.`id_image`
@@ -56,17 +69,18 @@ def get_cart(request):
           group by `cart`.`id`;
      ''',[str(request.user.id)])
 
-     #tính thành tiền
+     # subtotal
      sub_total = 0
      for i in cart_items:
-          sub_total += i.price * i.quantity
+          sub_total += i.quantity * i.merchandise.price
 
-     return render(request, 'cart/cart.html', {'cart_items':cart_items, 'sub_total':sub_total})
+     return render(request, 'cart/cart.html', {'cart_items':cart_items, 'sub_total':sub_total, 'stopped_selling':stopped_selling})
 
 @login_required
 def update_quantity(request):
      id_cart = request.POST.get("id_cart")
      qty = int(request.POST.get("qty"))
+     # check qty valid
      if qty<1: qty=1
      cart = Cart.objects.get(pk=id_cart)
      merchandise = Merchandise.objects.get(pk=cart.merchandise_id)

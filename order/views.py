@@ -3,6 +3,7 @@ from .models import Order, OrderStatus, DetailOrder, HistoryOrderStatus
 from cart.models import Cart
 from book.models import Merchandise
 from users.models import Address
+from review.models import AllowedReviewTimes
 from common.utils import SQLUtils, get_object_or_none
 from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required
@@ -32,6 +33,11 @@ def get_order(request):
             return render (request, 'order/order_detail.html', {'order':order, 'details':details, 'address':address})
 
     # get order
+    # get sort
+    sort = 'desc'
+    if request.GET.get("sort"):
+        sort = request.GET.get("sort")
+        
     order = Order.objects.raw('''
         select `order`.`id`, `order`.`created_date`, `book`.`name`, sum(`dt_o`.`total_price_after_discount`) `price`
             , `stt`.`name` `status`, `stt`.`code` `status_code`
@@ -41,10 +47,10 @@ def get_order(request):
             AND `h`.`id_order`=`tim_max_date`.`id_order` and `h`.`id_order_status` = `stt`.`id` and `h`.`created_date` = `tim_max_date`.`max`
             AND `order`.`id_user` = %s
         group by `order`.`id`
-        order by `created_date` desc
-    ''', [str(request.user.id)])
-    #print(order)
-    paginator = Paginator(order, 5)
+        order by `order`.`created_date` 
+    ''' + sort, [str(request.user.id)])
+
+    paginator = Paginator(order, 7)
     page_number = request.GET.get('page')
     pager = paginator.get_page(page_number)
     page_navigator = []
@@ -109,6 +115,7 @@ def check_out(request):
                     new_order = Order.objects.create(user_id = request.user.id, address_id = shipping_address_id, payment_id = 1, delivery_id = 1, 
                                                     fee_delivery = 0, created_date = timezone.now())
                     
+                    print(new_order)
                     # create Detail of each order
                     for item in cart:
                         DetailOrder.objects.create(order_id = new_order.pk, merchandise_id = item.id, quantity = item.quantity,
@@ -117,6 +124,15 @@ def check_out(request):
                         merchandise = Merchandise.objects.get(pk = item.id)
                         merchandise.quantity_exists -= item.quantity
                         merchandise.save()
+
+                        # increase review times
+                        try:
+                            allow_rv = AllowedReviewTimes.objects.get(user_id = request.user.id, merchandise_id = item.id)
+                            allow_rv.times += 1
+                            allow_rv.save()
+                            pass    
+                        except:
+                            AllowedReviewTimes.objects.create(user_id = request.user.id, merchandise_id = item.id, times = 1) 
 
                     # create history_status gor current order
                     HistoryOrderStatus.objects.create(order_id = new_order.pk, order_status_id = 1, created_date = timezone.now(), 
@@ -179,7 +195,6 @@ def seller_get_order(request):
     sqlutils = SQLUtils()
     sqlutils.add_where('`m`.`id_user` = %s', str(request.user.id))
     sqlutils.add_where('`h`.`created_date` = `latest_status`.`max`')
-    sqlutils.add_order('`order`.`created_date` desc')
 
     # filter date
     if request.GET.get('date_begin'):
@@ -192,6 +207,9 @@ def seller_get_order(request):
     # search order
     if request.GET.get('order'):
         sqlutils.add_where('`order`.`id` = %s', request.GET.get('order'))
+    # sort order
+    if request.GET.get('sort'):
+        sqlutils.add_order('`order`.`created_date` '+ request.GET.get('sort'))
 
     order_select_clause = '''
         select `order`.`id`, `order`.`created_date`, `book`.`name`, sum(`d_o`.`total_price_after_discount`) `price`
@@ -201,6 +219,7 @@ def seller_get_order(request):
         base_sql.format(select=order_select_clause, where=sqlutils.get_where_clause(), 
                         group=' group by `order`.`id` ', order=sqlutils.get_order_clause()),
         sqlutils.get_params())
+    print(order)
 
     # paginator
     paginator = Paginator(order, 5)

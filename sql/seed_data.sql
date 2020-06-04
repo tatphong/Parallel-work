@@ -63,3 +63,14 @@ VALUES(12, 1, "Khác", 1, "2020-04-28 03:04:27", 1, null);
 #Delivery
 INSERT INTO `delivery`(`id`, `name`, `fee`, `created_date`, `created_by`, `delete_date`)
 VALUES(1, "Nhà bán tự giao", 0, "2020-04-28 03:04:27", 1, null);
+
+#payment
+INSERT INTO `payment`(`id`, `method`, `fee`, `created_by`, `created_date`)
+VALUES(1, "Thanh toán khi nhận hàng", 0, 1, "2020-06-02 08:54:22");
+
+#Order_status
+INSERT INTO `ecommercedb`.`order_status` (`id`, `code`, `name`) VALUES ('1', '1', 'Đang xử lý');
+INSERT INTO `ecommercedb`.`order_status` (`id`, `code`, `name`) VALUES ('2', '2', 'Bị hoãn');
+INSERT INTO `ecommercedb`.`order_status` (`id`, `code`, `name`) VALUES ('3', '3', 'Giao hàng thành công');
+INSERT INTO `ecommercedb`.`order_status` (`id`, `code`, `name`) VALUES ('4', '4', 'Đã hủy');
+INSERT INTO `ecommercedb`.`order_status` (`id`, `code`) VALUES ('5', '5', 'Đang giao hàng');

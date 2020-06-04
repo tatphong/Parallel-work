@@ -74,7 +74,7 @@ def get_store(request, id):
         base_sql.format(select=products_select_clause, where=sqlutils.get_where_clause(), 
                         group=' GROUP BY `merchandise`.`id` ', order=sqlutils.get_order_clause()),
         sqlutils.get_params())
-    print(merchandises)
+    #print(merchandises)
     paginator = Paginator(merchandises, 9)
     page_number = request.GET.get('page')
     pager = paginator.get_page(page_number)

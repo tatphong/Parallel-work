@@ -7,6 +7,7 @@ from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required
 from common.utils import ajax_login_required, str_to_html
 from django.db import transaction, DatabaseError
+from store.models import Store
 def get_reviews(request):
     if request.is_ajax():
         merchandise = Merchandise.objects.get(pk=request.GET.get('id_merchandise'))
@@ -63,6 +64,7 @@ def post_review(request):
         if not content:
             return JsonResponse({'error':'Xin hãy nhập nội dung.'}, status=400)
         merchandise = Merchandise.objects.get(pk=id_merchandise)
+        store = Store.objects.get(pk=merchandise.user)
         allowedtimes = AllowedReviewTimes.objects.filter(user=request.user, merchandise=merchandise).first()
         if allowedtimes== None or allowedtimes.times == 0:
             return JsonResponse({'error':'Bạn không thể đánh giá sản phẩm này. Hãy đặt hàng để được đánh giá.'}, status=400)
@@ -74,8 +76,17 @@ def post_review(request):
                     content = content,
                     created_by = request.user)
                 allowedtimes.times -= 1
+
+                merchandise.total_star += star
+                merchandise.times_rated += 1
+
+                store.total_star += star
+                store.times_rated += 1
+
                 review.save()
                 allowedtimes.save()
+                merchandise.save()
+                store.save()
         except DatabaseError as error:
             print(error)
             return JsonResponse({}, status=500)

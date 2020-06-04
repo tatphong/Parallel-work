@@ -48,7 +48,7 @@
                                 </li>
                                 {% endwith %}
                                 <li class="list-inline-item">
-                                    <i class="fa fa-location-arrow"></i> Đánh giá: {{merchandise.get_rate_point}}
+                                    <i class="fa fa-location-arrow"></i> Đánh giá: {{merchandise.get_rate_point|floatformat:1}}
                                     ({{ merchandise.times_rated }} lượt)
                                 </li>
                             </ul>
@@ -56,7 +56,7 @@
 
                         <div class="ratings">
                             <ul class="list-inline">
-                                {% with t_star=book.rate_point|floatformat:0 %}
+                                {% with t_star=merchandise.get_rate_point|floatformat:0 %}
                                 {% for i in "12345" %}
                                 {% if i <= t_star %}
                                 <li class="list-inline-item"><i class="fa fa-star"></i></li>
@@ -485,6 +485,8 @@
                 "content": review_content
             },
             success: function (response) {
+                document.getElementById("review").value = ""
+                document.getElementById("review_star").innerHTML = '<i class="fa-star-o fa"></i>'.repeat(5)
                 get_reviews(1)
             },
             error: function (response) {

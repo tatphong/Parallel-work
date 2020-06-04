@@ -55,8 +55,11 @@
                                   <h5>{{ item.price|floatformat:0|intcomma }}</h5>
                               </td>
                               <td>
-                                  <div class="product_count">
-                                    {% ifequal item.quantity_exists 0 %}
+                                  <div class="product_count" id="product_count">
+                                    {% if item.blocked_date or item.stopped_date or not item.activated_date %}
+                                        <!--Stop selling-->
+                                        <p> Ngừng kinh doanh </p>
+                                    {% elif item.quantity_exists == 0 %}
                                         <!--Out of stock-->
                                         <p> Hết hàng </p>
                                     {% else %}
@@ -87,7 +90,7 @@
                                             <button name="submit" type="submit" id="submit_{{item.id}}"></button>
 
                                           </form>
-                                    {%endifequal%}
+                                    {%endif%}
                                   </div>
                               </td>
                               <td>
@@ -160,7 +163,9 @@
                               <td>
                                   <div class="checkout_btn_inner d-flex align-items-center">
                                         <a class="gray_btn" href="{% url 'home:index' %}">Tiếp tục mua sắm</a>
-                                        {% if cart_items %}
+                                        {% if stopped_selling %}
+                                            <a class="primary2-btn ml-2" onclick="$.notify('Xóa các sản phẩm ngừng kinh doanh hoặc hết hàng để tiếp tục','error');">Đặt hàng</a>
+                                        {% elif cart_items %}
                                             <a class="primary2-btn ml-2" href="{% url 'order:check_out' %}">Đặt hàng</a>
                                         {% else %}
                                             <a class="primary2-btn ml-2" onclick="$.notify('Giỏ hàng trống','warn');">Đặt hàng</a>

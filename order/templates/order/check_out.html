@@ -96,34 +96,34 @@
                     </div>
                     </div>
                     <!--End modal-->
+
                     <!--address data get from modal-->
-                   
-                        <input type="text" name="pro-idaddress" id="pro-idaddress" value="" hidden>
+                        <input type="text" name="pro-idaddress" id="pro-idaddress" value="{{address.first.id}}" hidden>
                         <table class="table table-add-products">
                             <tbody>
                                 <tr class="form-group">
                                     <td><label>Tên người liên lạc:</label> </td>
-                                    <td><span id="pro-owner"></span></td>
+                                    <td><span id="pro-owner">{{address.first.owner}} - {{address.first.phone_number}}</span></td>
                                 </tr>
                                 <tr class="form-group">
                                     <td><label for="pro-no">Số nhà:</label> </td>
-                                    <td><span id ="pro-no"></span></td>
+                                    <td><span id ="pro-no">{{address.first.no}}</span></td>
                                 </tr>
                                 <tr class="form-group">
                                     <td><label for="pro-street">Đường:</label> </td>
-                                    <td><span id ="pro-street"></span></td>
+                                    <td><span id ="pro-street">{{address.first.street}}</span></td>
                                 </tr>
                                 <tr class="form-group">
                                     <td><label for="pro-ward">Phường:</label> </td>
-                                    <td><span id ="pro-ward"></span></td>
+                                    <td><span id ="pro-ward">{{address.first.ward}}</span></td>
                                 </tr>
                                 <tr class="form-group">
                                     <td><label for="pro-district">Quận:</label> </td>
-                                    <td><span id ="pro-district"></span></td>
+                                    <td><span id ="pro-district">{{address.first.district}}</span></td>
                                 </tr>
                                 <tr class="form-group">
                                     <td><label for="pro-city">Thành phố/Tỉnh thành:</label> </td>
-                                    <td> <span id ="pro-city"></span> </td>
+                                    <td> <span id ="pro-city">{{address.first.city}}</span> </td>
                                 </tr>
                             </tbody>
                         </table>
