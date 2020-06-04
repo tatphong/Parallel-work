@@ -1,5 +1,5 @@
 /*=== MEDIA QUERY ===*/
-@import url("https://fonts.googleapis.com/css?family=Muli:300,400,600,700,800,900");
+@import url("https://fonts.googleapis.com/css?family=NunitoSans:300,400,600,700,800,900");
 body {
   line-height: 1.5;
   font-family: "Muli", sans-serif;
@@ -8,13 +8,13 @@ body {
   height: 30px;
   border: 1px solid #000;
   padding: 5px;
-  margin-left: 600px;
   margin-bottom: 10px;
-  
-  float: right !important;
 }
 .search-seller:hover{
   border: 1px solid #c77000;
+}
+.trangthaicol{
+  text-align: center;
 }
 .check-pro-cl1{
   max-width: 250px;
@@ -25,9 +25,22 @@ body {
   text-align: right;
   padding: 0px;
 }
+.adlistedit{
+  padding-top: 0px !important;
+}
 .box-select-seller{
   height: 50px;
   padding-top: 5px;
+}
+.sortdate{
+  height: 35px !important;
+  padding-top: 0px !important;
+  margin: 0px;
+  margin-left: 10px;
+}
+.heightsort{
+  height: 32px !important; 
+  padding-top: 0px !important;
 }
 .btn-submit-code-order{
   border: none;

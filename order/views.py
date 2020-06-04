@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from .models import Order, OrderStatus, DetailOrder, HistoryOrderStatus
+from .models import Order, OrderStatus, DetailOrder, HistoryOrderStatus, Payment, Delivery
 from cart.models import Cart
 from book.models import Merchandise
 from users.models import Address
@@ -60,7 +60,7 @@ def get_order(request):
     for i in range(pager.number + 1, min(pager.number + 2, pager.paginator.num_pages) + 1):
         page_navigator.append(i)
 
-    return render(request, 'order/order_list.html', {'pager':pager, 'page_navigator': page_navigator})
+    return render(request, 'user/order.html', {'pager':pager, 'page_navigator': page_navigator})
 
 def cancel_order(request):
     HistoryOrderStatus.objects.filter(order=request.POST.get("id_order")).update(order_status=4)
@@ -83,15 +83,18 @@ def check_out(request):
     #subtotal
     sub_total = 0
     for i in cart_items:
+        if not Merchandise.objects.get(pk = i.merchandise_id).is_selling():
+            return redirect_404
         sub_total += i.price * i.quantity
 
-    # form show
-    form = NewAddressForm(current_user=request.user)
+    # get payment method
+    payment = Payment.objects.all()
+    # get delivery method
+    delivery = Delivery.objects.all()
 
     # check_out exceed
     if request.method == 'POST':
-        #lưu form nhập thông tin địa chỉ giao hàng mới
-
+        #lấy địa chỉ giao hàng
         shipping_address_id = request.POST.get("pro-idaddress")
     # split order
         store_address = Cart.objects.raw('''
@@ -143,11 +146,11 @@ def check_out(request):
         except DatabaseError as error:
             print(error)
 
-        return redirect('order:order')
+        return redirect('user:order')
 
     # get user address
     address = Address.objects.filter(user_id=request.user.id, delete_date=None)
-    return render (request, 'order/check_out.html', {'form':form, 'cart':cart_items, 'sub_total':sub_total, 'address':address})
+    return render (request, 'order/check_out.html', {'cart':cart_items, 'sub_total':sub_total, 'payment':payment, 'delivery':delivery, 'address':address})
 
 
 def seller_get_order(request):

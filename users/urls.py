@@ -1,5 +1,6 @@
 from django.urls import path
 from . import views
+from order import views as order_views
 
 app_name = 'user'
 urlpatterns = [
@@ -16,4 +17,5 @@ urlpatterns = [
     path('address/delete', views.delete_address, name='delete_address'),
     path('store/', views.store_info, name='store_info'),
     path('resendemailtoken/', views.resend_email_token, name='resend_email_token'),
+    path('order/', order_views.get_order, name='order'),
 ]

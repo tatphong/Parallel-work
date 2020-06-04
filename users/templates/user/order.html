@@ -1,9 +1,15 @@
-{% extends 'customer_base.html' %}
+{% extends 'user/user_base.html' %}
 {% load static %}
 {% load url_helper %}
-{% load humanize %}
-{% block content %}
-<section class="dashboard section">
+{% block content_user %}
+	<div class="col-md-10 offset-md-1 col-lg-9 offset-lg-0">
+		<!-- Edit Profile Welcome Text -->
+		<div class="widget welcome-message">
+			<h2>Thông báo</h2>
+			<p></p>
+		</div>
+		<!-- Edit Personal Info -->
+		<section class="dashboard section">
 	<!-- Container Start -->
 	<div class="container">
 		<!-- Row Start -->
@@ -13,9 +19,9 @@
 				<!-- Recently Favorited -->
 				<div class="widget dashboard-container my-adslist">
 					<div class="seller-order col-12">
-					<h3 class="widget-header col-10">ĐƠN HÀNG CỦA TÔI</h3>
+					<h3 class="widget-header col-9">ĐƠN HÀNG CỦA TÔI</h3>
 					<!--sort order with date-->
-					<select id="sort_date" name="sort" onchange="sort_date()" class="sortdate box-select-seller col-2">
+					<select id="sort_date" name="sort" onchange="sort_date()" class="sortdate box-select-seller col-3 full-size-select">
 						<option value="">Sắp xếp</option>
 						<option value="asc" {% if request.sort == 'asc' %}selected{% endif %}>Tăng dần theo ngày</option>
 						<option value="desc"  {% if request.sort == 'desc' %}selected{% endif %}>Giảm dần theo ngày</option>
@@ -125,10 +131,57 @@
 	</div>
 	<!-- Container End -->
 </section>
+	</div>
 {% endblock %}
-
 {% block js %}
 <script>
+	$.ajaxSetup({ 
+        beforeSend: function(xhr, settings) {
+            function getCookie(name) {
+                var cookieValue = null;
+                if (document.cookie && document.cookie != '') {
+                    var cookies = document.cookie.split(';');
+                    for (var i = 0; i < cookies.length; i++) {
+                        var cookie = jQuery.trim(cookies[i]);
+                        // Does this cookie string begin with the name we want?
+                        if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                            break;
+                        }
+                    }
+                }
+                return cookieValue;
+            }
+            if (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url))) {
+                // Only send the token to relative URLs i.e. locally.
+                xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+            }
+        } 
+    });
+	function read(id_notification){
+		console.log(id_notification)
+        $.ajax({
+            type: "POST",
+            url: "{% url 'notification:read' %}",
+            data: {"id_notification": id_notification},
+            success: function (response) {
+                document.getElementById("tr-noti-" + id_notification).classList.add("already-read")
+				document.getElementById("a-noti-" + id_notification).hidden = true
+            },
+            error: function (response) {
+                // alert the error if any error occured
+                // console.log(response["responseJSON"]["error"]);
+                switch(response.status){
+                    case 401:
+                        alert("Xin hãy đăng nhập.");
+                        break;
+                    case 500:
+                        alert("Đã có lỗi xảy ra, xin hãy thử lại sau.")
+                        break;
+                }
+            }
+        });
+	}
 	function sort_date(){
 		sort = document.getElementById("sort_date").value
 		var urlParams = new URLSearchParams(window.location.search);

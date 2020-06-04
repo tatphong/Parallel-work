@@ -125,6 +125,26 @@
                                     <td><label for="pro-city">Thành phố/Tỉnh thành:</label> </td>
                                     <td> <span id ="pro-city">{{address.first.city}}</span> </td>
                                 </tr>
+                                <tr class="form-group">
+                                    <td><label for="pro-city">Phương thức thanh toán:</label> </td>
+                                    <td> 
+                                        <select name="payment" class="full-size-select">
+                                            {% for p in payment %}
+                                            <option value="{{p.id}}">{{p.method}}</option>
+                                            {% endfor %}
+                                        </select>
+                                     </td>
+                                </tr>
+                                <tr class="form-group">
+                                    <td><label for="pro-city">Phương thức giao hàng:</label> </td>
+                                    <td> 
+                                        <select name="delivery" class="full-size-select" onchange="get_shipping_fee(this.value)">
+                                            {% for d in delivery %}
+                                            <option value="{{d.id}}">{{d.name}}</option>
+                                            {% endfor %}
+                                        </select>
+                                     </td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
@@ -177,7 +197,7 @@
                             </ul>
                             <ul class="list list_2">
                                 <li><a href="#">Tạm tính <span>{{sub_total|floatformat:0|intcomma}}đ</span></a></li>
-                                <li><a href="#">Phí giao hàng <span>0đ</span></a></li>
+                                <li><a href="#">Phí giao hàng <span id="delivery_fee">{{delivery.first.fee}}</span></a></li>
                                 <li><a href="#">Tổng cộng <span>{{sub_total|floatformat:0|intcomma}}đ</span></a></li>
                             </ul>
                             <br>
@@ -201,6 +221,17 @@
         $("#pro-city").html($("#add-city-" + id_address).html());
         $("#pro-owner").html($("#add-owner-" + id_address).html());
         $("#pro-idaddress").val(id_address);
+    }
+    function get_shipping_fee(delivery_id){
+        delivery_fee = document.getElementById('delivery_fee')
+        switch (delivery_id){
+            {% for d in delivery %}
+            case {{d.id}}:
+                delivery_fee.innerText = {{d.fee|floatformat:0|intcomma}}+"đ"
+            {% endfor %}
+            default:
+                delivery_fee.innerText = "0đ"
+        }
     }
 </script>
 {% endblock %}
