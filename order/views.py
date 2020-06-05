@@ -5,9 +5,10 @@ from book.models import Merchandise
 from users.models import Address
 from review.models import AllowedReviewTimes
 from common.utils import SQLUtils, get_object_or_none
+from notification.services import send_notification_by_system
+from .forms import NewAddressForm
 from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required
-from .forms import NewAddressForm
 from django.utils import timezone
 from django.db import transaction, DatabaseError
 
@@ -115,8 +116,8 @@ def check_out(request):
                         where m.id = c.id_merchandise and
                             m.id_address = %s and c.id_user = %s
                     ''', [str(i.id_address), str(request.user.id)])
-                    new_order = Order.objects.create(user_id = request.user.id, address_id = shipping_address_id, payment_id = 1, delivery_id = 1, 
-                                                    fee_delivery = 0, created_date = timezone.now())
+                    new_order = Order.objects.create(user_id = request.user.id, address_id = shipping_address_id, payment_id = request.POST.get("payment"),
+                                                    delivery_id = request.POST.get("delivery"), fee_delivery = 0, created_date = timezone.now())
                     
                     print(new_order)
                     # create Detail of each order
@@ -143,6 +144,8 @@ def check_out(request):
                 
                 # delete all cart objects after check_out
                 Cart.objects.filter(user = request.user.id).delete()
+                
+                send_notification_by_system(request.user, 'Cảm ơn bạn đã đặt hàng.')
         except DatabaseError as error:
             print(error)
 
@@ -209,7 +212,8 @@ def seller_get_order(request):
         sqlutils.add_where('`stt`.`code` = %s', request.GET.get('status'))
     # search order
     if request.GET.get('order'):
-        sqlutils.add_where('`order`.`id` = %s', request.GET.get('order'))
+        # order_target = request.GET.get('order').split("-")[2]
+        sqlutils.add_where('cast(`order`.`id` as char(10)) LIKE "%%%s%%"', request.GET.get('order')) #còn lỗi
     # sort order
     if request.GET.get('sort'):
         sqlutils.add_order('`order`.`created_date` '+ request.GET.get('sort'))

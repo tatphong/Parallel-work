@@ -28,6 +28,10 @@ class Order(models.Model):
     class Meta:
         managed = False
         db_table = 'order'
+    
+    def fake_id(self):
+        fake = "HD-" + self.created_date.strftime("%d%m%y") + "-" + str(self.id)
+        return fake
 
 class DetailOrder(models.Model):
     order = models.ForeignKey(Order, models.DO_NOTHING, db_column='id_order')

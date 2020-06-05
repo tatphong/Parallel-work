@@ -232,12 +232,22 @@
     }
 
     function change_status(e, id_order, status_code){
-        console.log("change_status running")
-        if (confirm('Xác nhận thay đổi trạng thái đơn hàng: '+id_order))
-            document.getElementById("submit_status_"+id_order).click()
-        else {
-            document.getElementById(id_order).selectedIndex = status_code-1
+        console.log("change_Status running ")
+        if (document.getElementById(id_order).value == 4){
+            note = prompt("Hãy nêu lý do bạn hủy đơn")
+            if (note != null) {
+                document.getElementById("submit_status_"+id_order).click()
+            }
+            else {
+                document.getElementById(id_order).selectedIndex = status_code-1
+            }
         }
+        else
+            if (confirm('Xác nhận thay đổi trạng thái đơn hàng: '+id_order))
+                document.getElementById("submit_status_"+id_order).click()
+            else {
+                document.getElementById(id_order).selectedIndex = status_code-1
+            }
     }
 </script>
 {% endblock %}
