@@ -2890,3 +2890,7 @@ form textarea {
   height: 200px;
   overflow: auto;
 }
+
+span.light {
+  font-weight: lighter;
+}

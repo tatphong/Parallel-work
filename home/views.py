@@ -6,6 +6,7 @@ from store.models import Store
 from common.utils import SQLUtils
 from book.views import SORT_SQL
 from book.services import MerchandiseRepo
+from order.services import count_status_order, get_product_income_rank
 # Create your views here.
 def index(request):
     base_sql = '''
@@ -73,4 +74,8 @@ def seller_dashboard(request):
         total_merchandise += merchandise_counter[key]
     merchandise_counter['all']= total_merchandise
     
-    return render(request, 'seller/dashboard.html', {'merchandise_counter':merchandise_counter})
+    # count status
+    count_status = count_status_order(request.user.id)
+    income_rank_list = get_product_income_rank(request.user.id)
+
+    return render(request, 'seller/dashboard.html', {'merchandise_counter':merchandise_counter, 'count_status':count_status, 'income_rank_list':income_rank_list})

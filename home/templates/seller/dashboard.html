@@ -1,5 +1,6 @@
 {% extends 'seller_base.html' %}
 {% load static %}
+{% load humanize %}
 {% block content %}
 <section class="dashboard section">
     <!-- Container Start -->
@@ -40,23 +41,27 @@
                 </div>
                 <div class="widget text-center">
                     <h5 class="widget-header title-text-color">Hiệu quả hoạt động</h5>
-                    <a href="">
-                        <p class="title-text-color">0</p>
-                        <p>Chờ Lấy Hàng</p>
-                    </a>
-                    <a href="">
-                        <p class="title-text-color">0</p>
-                        <p>Chờ Xác Nhận</p>
-                    </a>
-                    <a href="">
-                        <p class="title-text-color">0</p>
-                        <p>Đơn Hủy</p>
-                    </a>
-                    <a href="">
-                        <p class="title-text-color">0</p>
-                        <p>Sản phẩm hết hàng</p>
-                    </a>
 
+                    <a href="">
+                        <p class="title-text-color">{{count_status.order_status_1}}</p>
+                        <p>Đang xử lý</p>
+                    </a>
+                    <a href="">
+                        <p class="title-text-color">{{count_status.order_status_2}}</p>
+                        <p>Đã dời lại</p>
+                    </a>
+                    <a href="">
+                        <p class="title-text-color">{{count_status.order_status_3}}</p>
+                        <p>Giao hàng thành công</p>
+                    </a>
+                    <a href="">
+                        <p class="title-text-color">{{count_status.order_status_4}}</p>
+                        <p>Đã hủy</p>
+                    </a>
+                    <a href="">
+                        <p class="title-text-color">{{count_status.order_status_5}}</p>
+                        <p>Đang giao hàng</p>
+                    </a>
                 </div>
                 <div class="widget dashboard-container my-adslist">
 
@@ -153,23 +158,23 @@
                             </tr>
                         </thead>
                         <tbody>
+                            {% for item in income_rank_list %}
                             <tr>
-
                                 <td class="product-thumb">
-                                    <img width="80px" height="auto" src="{% static 'images/products/products-1.jpg' %}"
+                                    <img width="80px" height="auto" src="{{item.url}}"
                                         alt="image description">
                                 </td>
                                 <td class="product-details">
-                                    <h3 class="title">Macbook Pro 15inch</h3>
+                                    <h3 class="title">{{item.name}}</h3>
                                 </td>
                                 <td class="action" data-title="Action">
-                                    <p>1000</p>
+                                    <p>{{item.count}}</p>
                                 </td>
                                 <td class="action" data-title="Action">
-                                    <p>1000000 VNĐ</p>
+                                    <p>{{item.income|floatformat:0|intcomma}} VNĐ</p>
                                 </td>
                             </tr>
-
+                            {% endfor %}
                         </tbody>
                     </table>
 
