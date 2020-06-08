@@ -83,12 +83,12 @@
 										{% csrf_token %}
 										<input name="id_order" type="text" value="{{item.id}}" hidden>
 										<input name="function" type="text" value="order_detail" hidden>
-										<button class="btn-submit-code-order" type="submit"><strong>{{item.id}}</strong></button>
+										<button class="btn-submit-code-order" type="submit"><strong>{{item.fake_id}}</strong></button>
 									</form>
                                 </td>
                                 <!--Ngày mua-->
 								<td>
-									<p class="title price-order">{{item.created_date}}</p>
+									<p class="title price-order">{{item.created_date|date:"d/m/Y G:i"}}</p>
 								</td>
                                 <!--Sản phẩm-->
 								<td class=" product-collum-order ">
@@ -96,7 +96,7 @@
                                 </td>
                                 <!--Giá tiền-->
 								<td >
-									<p class="price-order">{{item.price|floatformat:0}} VNĐ</p>
+									<p class="price-order">{{item.price|floatformat:0|intcomma}} VNĐ</p>
 								</td>
                                 <!--Trạng thái-->
                                 <td class="status-order">

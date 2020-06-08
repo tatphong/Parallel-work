@@ -1,5 +1,6 @@
 {% extends 'user/user_base.html' %}
 {% load static %}
+{% load humanize %}
 {% load url_helper %}
 {% block content_user %}
 	<div class="col-md-10 offset-md-1 col-lg-9 offset-lg-0">
@@ -32,7 +33,6 @@
 							<tr>
                                 <th scope="col" >Mã đơn hàng</th>
                                 <th scope="col">Ngày mua</th>
-                                <th scope="col">Địa chỉ</th>
                                 <th scope="col">Tổng tiền</th>
                                 <th scope="col" class="trangthaicol">Trạng thái</th>
                                 
@@ -42,7 +42,7 @@
                             {% for item in pager %}
 							<tr>
                                 <!--Mã đơn hàng-->
-								<td class="product-thumb">
+								<td class="price-order">
 									<form method="POST">
 										{% csrf_token %}
 										<input name="id_order" type="text" value="{{item.id}}" hidden>
@@ -52,15 +52,11 @@
                                 </td>
                                 <!--Ngày mua-->
 								<td>
-									<p class="price-order">{{item.created_date}}</p>
+									<p class="price-order">{{item.created_date|date:"d/m/Y G:i"}}</p>
 								</td>
-                                <!--Địa chỉ-->
-								<td class=" product-collum-order">
-                                    <p class="price-order"><strong>{{item.name}}</strong></p>
-                                </td>
                                 <!--Giá tiền-->
 								<td >
-									<p class="price-order">{{item.price|floatformat:0}} VNĐ</p>
+									<p class="price-order">{{item.price|floatformat:0|intcomma}} VNĐ</p>
 								</td>
                                 <!--Trạng thái-->
                                 <td class="status-order">

@@ -127,8 +127,8 @@
                                         <div class="price">
                                             <h5>{{ book.price|floatformat:0|intcomma }} đ</h5>
                                             {% if book.origin_price != book.price %}
-                                            <p><strike>{{ book.origin_price|floatformat:0|intcomma }} đ</strike>
-                                                {{ book.get_saving_rate|floatformat:0 }}%</p>
+                                            <p><strike>{{ book.origin_price|floatformat:0|intcomma }} đ</strike>&nbsp;
+                                                <font color="red" size="4px"><b>{{ book.get_saving_rate|floatformat:0 }}%</b>&nbsp;&nbsp;<i class="fas fa-bookmark"></i></font></p>
                                             {% endif %}
                                         </div>
                                         <p class="card-text">{{ book.description|truncatechars:100 }}</p>

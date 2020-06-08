@@ -232,8 +232,9 @@ def seller_get_order(request):
         sqlutils.add_where('`stt`.`code` = %s', request.GET.get('status'))
     # search order
     if request.GET.get('search_order'):
+        search_order_id = request.GET.get('search_order').split("-")[-1]
         # order_target = request.GET.get('order').split("-")[2]
-        sqlutils.add_where('cast(`order`.`id` as char(10)) LIKE "%%%s%%"', request.GET.get('search_order')) #còn lỗi
+        sqlutils.add_where('`order`.`id` = %s', search_order_id)
     # sort order
     if request.GET.get('sort'):
         sqlutils.add_order('`order`.`created_date` '+ request.GET.get('sort'))
@@ -246,7 +247,7 @@ def seller_get_order(request):
         base_sql.format(select=order_select_clause, where=sqlutils.get_where_clause(),
                         group=' group by `order`.`id` ', order=sqlutils.get_order_clause()),
         sqlutils.get_params())
-    print(order)
+    print([i for i in order])
 
     # paginator
     paginator = Paginator(order, 7)
@@ -262,8 +263,8 @@ def seller_get_order(request):
     #get all status
     order_status = OrderStatus.objects.all()
 
-    for item in order:
-        for i in range(item.status_code, len(order_status)):
-            print(i.code)
+    # for item in order:
+    #     for i in range(item.status_code, len(order_status)):
+    #         print(i.code)
 
     return render(request, 'seller/order_list.html', {'pager':pager, 'page_navigator': page_navigator, 'all_status':order_status, 'post_value':post_param})

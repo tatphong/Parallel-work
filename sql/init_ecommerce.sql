@@ -351,7 +351,6 @@ CREATE TABLE `history_order_status` (
     `created_date` DATETIME NOT NULL,
     `created_by` INT NOT NULL,
     PRIMARY KEY (`id`),
-    UNIQUE (`id_order` , `id_order_status`),
     CONSTRAINT `fk_historyorderstatus_order` FOREIGN KEY (`id_order`) REFERENCES `order` (`id`),
     CONSTRAINT `fk_historyorderstatus_orderstatus` FOREIGN KEY (`id_order_status`) REFERENCES `order_status` (`id`),
     CONSTRAINT `fk_crehistoryorderstatus` FOREIGN KEY (`created_by`) REFERENCES `user` (`id`)
