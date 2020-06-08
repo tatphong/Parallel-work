@@ -20,12 +20,17 @@
                                 <input type="date" class="form-control" name="date_end" id="date_end" value="{{request.GET.date_end}}" min=0 placeholder="Ngày kết thúc">
                             </div>
                             <div class="col-md-3">
-                                {% with selected_status=request.GET.select_status %}
+                                {% with selected_status=request.GET.status %}
                                 <select id="select_status" name="status" onchange="status_filter()" class="full-size-select box-select-seller">
+                                {% if selected_status %}
+                                    <option value="">Tất cả</option>
+                                {% else %}
                                     <option value="">Trạng thái</option>
-                                    {%for i in all_status %}
+                                {% endif %}
+                                    
+                                {%for i in all_status %}
                                     <option value="{{i.code}}" {% ifequal selected_status i.code %}selected{%endifequal%}>{{i.name}}</option>
-                                    {% endfor %}
+                                {% endfor %}
                                 </select> 
                                 {% endwith %}
                             </div>
@@ -50,14 +55,13 @@
                         <div class="seller-order col-5">
                         <!--sort order with date-->
                             <select id="sort_date" name="sort" onchange="sort_date()" class="heightsort full-size-select box-select-seller col-6">
-                                <option value="">Sắp xếp</option>
-                                <option value="asc" {% if request.sort == 'asc' %}selected{% endif %}>Tăng dần theo ngày</option>
-                                <option value="desc"  {% if request.sort == 'desc' %}selected{% endif %}>Giảm dần theo ngày</option>
+                                <option value="desc"  {% if request.GET.sort == 'desc' %}selected{% endif %}>Giảm dần theo ngày</option>
+                                <option value="asc" {% if request.GET.sort == 'asc' %}selected{% endif %}>Tăng dần theo ngày</option>
                             </select>
                             &nbsp; &nbsp;&nbsp;
                             <!--search order with id-->
                             <input id="search_order" class="search-seller col-6" type="text" name="search_order" placeholder="Tìm theo mã" 
-                                value="{{request.GET.order}}" onkeypress="search_order(event)">
+                                value="{{request.GET.search_order}}" onkeypress="search_order(event)">
                         </div>
                     </div>
                     <table class="table product-dashboard-table col-12">
@@ -99,14 +103,15 @@
                                     <form method="post">
 										{% csrf_token %}
                                         <!--Nếu trạng thái là hủy hoặc giao thành công thì 0 cho đổi nữa-->
-                                        {% ifequal item.status_code "4" %}
-                                            <p align="center">{{item.status}}</p>
+                                        {% ifequal item.status_code "3" %}
+                                                <p align="center">{{item.status}}</p>
                                         {% else %}
-                                            {% ifequal item.status_code "3" %}
+                                            {% ifequal item.status_code "4" %}
                                                 <p align="center">{{item.status}}</p>
                                             {% else %}
                                         <!--Nếu trạng thái là 3 cái còn lại thì đc phép đổi-->
                                             <input name="id_order" value="{{item.id}}" hidden/>
+                                            <input type="text" name="order_note" id="order_note" value="" hidden/>
                                             <select id="{{item.id}}" name="change_status_{{item.id}}" onchange="change_status(this, {{item.id}}, {{item.status_code}})">
                                                 {% for i in all_status %}
                                                     <option value="{{i.code}}"
@@ -205,12 +210,12 @@
     function search_order(e){
         if (e.keyCode == 13){
             console.log("pressed enter");   
-            order = document.getElementById("search_order").value
+            search_order = document.getElementById("search_order").value
             var urlParams = new URLSearchParams(window.location.search);
-            if(urlParams.has("order") === true){
-                urlParams.set("order", order)
+            if(urlParams.has("search_order") === true){
+                urlParams.set("search_order", search_order)
             } else {
-                urlParams.append("order", order)
+                urlParams.append("search_order", search_order)
             }
             location.href = "?"+urlParams.toString()
         }
@@ -236,6 +241,7 @@
         if (document.getElementById(id_order).value == 4){
             note = prompt("Hãy nêu lý do bạn hủy đơn")
             if (note != null) {
+                document.getElementById("order_note").value = note
                 document.getElementById("submit_status_"+id_order).click()
             }
             else {

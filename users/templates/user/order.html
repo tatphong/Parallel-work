@@ -22,9 +22,8 @@
 					<h3 class="widget-header col-9">ĐƠN HÀNG CỦA TÔI</h3>
 					<!--sort order with date-->
 					<select id="sort_date" name="sort" onchange="sort_date()" class="sortdate box-select-seller col-3 full-size-select">
-						<option value="">Sắp xếp</option>
-						<option value="asc" {% if request.sort == 'asc' %}selected{% endif %}>Tăng dần theo ngày</option>
-						<option value="desc"  {% if request.sort == 'desc' %}selected{% endif %}>Giảm dần theo ngày</option>
+						<option value="desc"  {% if request.GET.sort == 'desc' %}selected{% endif %}>Giảm dần theo ngày</option>
+						<option value="asc" {% if request.GET.sort == 'asc' %}selected{% endif %}>Tăng dần theo ngày</option>
 					</select>
 					</div>
 					<br>

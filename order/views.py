@@ -119,7 +119,6 @@ def check_out(request):
                     new_order = Order.objects.create(user_id = request.user.id, address_id = shipping_address_id, payment_id = request.POST.get("payment"),
                                                     delivery_id = request.POST.get("delivery"), fee_delivery = 0, created_date = timezone.now())
                     
-                    print(new_order)
                     # create Detail of each order
                     for item in cart:
                         DetailOrder.objects.create(order_id = new_order.pk, merchandise_id = item.id, quantity = item.quantity,
@@ -155,6 +154,33 @@ def check_out(request):
     address = Address.objects.filter(user_id=request.user.id, delete_date=None)
     return render (request, 'order/check_out.html', {'cart':cart_items, 'sub_total':sub_total, 'payment':payment, 'delivery':delivery, 'address':address})
 
+def change_status(request):
+    id_order = request.POST.get("id_order")
+    if request.POST.get("order_note") != "" :
+        note = request.POST.get("order_note")
+    else:
+        note = None
+    
+    id_status = int(request.POST.get("change_status_"+id_order))
+    HistoryOrderStatus.objects.create(
+        order_id = id_order, 
+        order_status_id = id_status,
+        created_date = timezone.now(),
+        created_by = request.user,
+        note = note
+    )
+    if id_status == 4:
+        # gửi thông báo hủy kèm lý do
+        send_notification_by_system(request.user, "Đơn hàng của bạn đã bị hủy với lý do "+note)
+    elif id_status == 3:
+        # giảm số lượng trong merchandise và kiểm tra còn hàng 0 sau khi giao thành công
+        detail_order = DetailOrder.objects.filter(order_id = id_order)
+        for item in detail_order:
+            merchandise = Merchandise.objects.get(pk = item.merchandise_id)
+            merchandise.quantity -= item.quantity
+            if merchandise.quantity == 0:
+                merchandise.stopped_date = timezone.now()
+            merchandise.save()
 
 def seller_get_order(request):
     post_param = {}
@@ -163,15 +189,9 @@ def seller_get_order(request):
         'selected_status':request.POST.get("selected_status"),
         'search_order':request.POST.get("search_order")
         }
-        print(post_param)
         id_order = request.POST.get("id_order")
         if request.POST.get("change_status_"+id_order):
-            HistoryOrderStatus.objects.create(
-                order_id = id_order, 
-                order_status_id = request.POST.get("change_status_"+id_order),
-                created_date = timezone.now(),
-                created_by = request.user
-            )
+            change_status(request)
         else: # show_details
             order = get_object_or_404(Order, pk=id_order)
             details = DetailOrder.objects.raw('''
@@ -211,9 +231,9 @@ def seller_get_order(request):
     if request.GET.get('status'):
         sqlutils.add_where('`stt`.`code` = %s', request.GET.get('status'))
     # search order
-    if request.GET.get('order'):
+    if request.GET.get('search_order'):
         # order_target = request.GET.get('order').split("-")[2]
-        sqlutils.add_where('cast(`order`.`id` as char(10)) LIKE "%%%s%%"', request.GET.get('order')) #còn lỗi
+        sqlutils.add_where('cast(`order`.`id` as char(10)) LIKE "%%%s%%"', request.GET.get('search_order')) #còn lỗi
     # sort order
     if request.GET.get('sort'):
         sqlutils.add_order('`order`.`created_date` '+ request.GET.get('sort'))
@@ -223,13 +243,13 @@ def seller_get_order(request):
             , `stt`.`name` `status`, `stt`.`code` `status_code` '''
 
     order = Order.objects.raw(
-        base_sql.format(select=order_select_clause, where=sqlutils.get_where_clause(), 
+        base_sql.format(select=order_select_clause, where=sqlutils.get_where_clause(),
                         group=' group by `order`.`id` ', order=sqlutils.get_order_clause()),
         sqlutils.get_params())
     print(order)
 
     # paginator
-    paginator = Paginator(order, 5)
+    paginator = Paginator(order, 7)
     page_number = request.GET.get('page')
     pager = paginator.get_page(page_number)
     page_navigator = []
@@ -241,5 +261,9 @@ def seller_get_order(request):
 
     #get all status
     order_status = OrderStatus.objects.all()
+
+    for item in order:
+        for i in range(item.status_code, len(order_status)):
+            print(i.code)
 
     return render(request, 'seller/order_list.html', {'pager':pager, 'page_navigator': page_navigator, 'all_status':order_status, 'post_value':post_param})
