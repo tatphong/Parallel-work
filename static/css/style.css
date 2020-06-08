@@ -1335,6 +1335,14 @@ ul.pagination .active a {
   color: #fff;
 }
 
+.dashboard-container .action a:hover.edit {
+  background: #C77000;
+}
+
+.dashboard-container .action a:hover.view {
+  background: #C77000;
+}
+
 .dashboard-container .action a:hover.delete {
   background: #ff5252;
 }

@@ -5,6 +5,7 @@ from book.models import Merchandise
 from store.models import Store
 from common.utils import SQLUtils
 from book.views import SORT_SQL
+from book.services import MerchandiseRepo
 # Create your views here.
 def index(request):
     base_sql = '''
@@ -60,4 +61,16 @@ def index(request):
     return render(request, 'home/index.html', {'hotest_merchandises':hotest_merchandises, 'newest_merchandises':newest_merchandises})
 
 def seller_dashboard(request):
-    return render(request, 'seller/dashboard.html')
+    merchandise_counter = dict({'rejected': 0, 'pending': 0, 'blocked': 0, 'sold_out': 0, 'stopping': 0, 'selling': 0})
+    total_merchandise = 0
+    for key, val in merchandise_counter.items():
+        merchandise_repo = MerchandiseRepo(
+            is_book=True, merchandise_status=key, is_opening_store=True,
+            category=request.GET.get('category'), author=request.GET.get('author'), location=request.GET.get('location'),
+            condition=request.GET.get('condition'), low_price=request.GET.get('low_price'),
+            high_price=request.GET.get('high_price'), sort=request.GET.get('sort'), owner=request.user.pk)
+        merchandise_counter[key] = len(list(merchandise_repo.get_merchandises()))
+        total_merchandise += merchandise_counter[key]
+    merchandise_counter['all']= total_merchandise
+    
+    return render(request, 'seller/dashboard.html', {'merchandise_counter':merchandise_counter})

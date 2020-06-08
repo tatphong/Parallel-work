@@ -39,12 +39,10 @@
                     <div class="d-flex justify-content-between" style="padding-bottom: 1em;">
                         <div class="product-meta">
                             <ul class="list-inline">
-                                <!--
-                                    <li class="list-inline-item"><i class="fa fa-user-o"></i> By <a href="">Andrew</a></li>
-                                -->
+                                <li class="list-inline-item"><i class="far fa-user"></i> Tác giả <a href="{% url 'book:get_books' %}?author={{ book.author }}">{{ book.author }}</a></li>
                                 {% with categories=book.get_order_categories %}
                                 <li class="list-inline-item"><i class="fas fa-book"></i> <a
-                                        href="{% url 'book:get_books' categories.0.url_name %}">{{ categories.0.name }}</a>
+                                        href="{% url 'book:get_books' %}?category={{ categories.0.url_name }}">{{ categories.0.name }}</a>
                                 </li>
                                 {% endwith %}
                                 <li class="list-inline-item">

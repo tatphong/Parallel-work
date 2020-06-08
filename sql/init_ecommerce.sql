@@ -78,6 +78,7 @@ CREATE TABLE `book` (
     `id` INT AUTO_INCREMENT,
     #`id_category` INT NOT NULL,
     `name` VARCHAR(256) NOT NULL,
+    `author` VARCHAR(256),
     `publisher` VARCHAR(256) NOT NULL,
     `publication_date` DATE NOT NULL,
     `width` SMALLINT NOT NULL,
@@ -85,6 +86,7 @@ CREATE TABLE `book` (
     `length` SMALLINT NOT NULL,
     `pages_num` SMALLINT NOT NULL,
     PRIMARY KEY(`id`),
+    KEY (`author`),
     #KEY(`id_category`),
     #CONSTRAINT `fk_book_bookcategory` FOREIGN KEY (`id_category`) REFERENCES `book_category` (`id`),
     CHECK (`width` > 0 AND `height` > 0 AND `length` > 0 AND `pages_num` > 0) 

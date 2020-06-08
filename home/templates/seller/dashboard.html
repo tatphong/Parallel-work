@@ -7,43 +7,54 @@
         <!-- Row Start -->
         <div class="row">
             <div class="col-md-3 offset-md-1 col-lg-4 offset-lg-0">
-                <div class="to-do-box">
-                    <p data-v-d2fe469e="" class="item-title">Danh sách cần làm</p>
-                    <a data-v-d2fe469e="" href="#" class="item" data-v-4bab03f0="">
-                        <p data-v-d2fe469e="" class="item-title">0</p>
-                        <p data-v-d2fe469e="" class="item-desc">Chờ Lấy Hàng</p>
+                <div class="widget text-center">
+                    <h5 class="widget-header title-text-color">Sản phẩm đã đăng</h5>
+                    <a>
+                        <p class="title-text-color">{{ merchandise_counter.all }}</p>
+                        <p>Tất cả</p>
                     </a>
-                    <a data-v-d2fe469e="" href="#" class="item" data-v-4bab03f0="">
-                        <p data-v-d2fe469e="" class="item-title">0</p>
-                        <p data-v-d2fe469e="" class="item-desc">Chờ Xác Nhận</p>
+                    <a href="{% url 'seller:get_merchandises' %}?status=selling">
+                        <p class="title-text-color">{{ merchandise_counter.selling }}</p>
+                        <p>Đang bán</p>
                     </a>
-                    <a data-v-d2fe469e="" href="#" class="item" data-v-4bab03f0="">
-                        <p data-v-d2fe469e="" class="item-title">0</p>
-                        <p data-v-d2fe469e="" class="item-desc">Đơn Hủy</p>
+                    <a href="{% url 'seller:get_merchandises' %}?status=sold_out">
+                        <p class="title-text-color">{{ merchandise_counter.sold_out }}</p>
+                        <p>Đã bán hết</p>
                     </a>
-                    <a data-v-d2fe469e="" href="#" class="item" data-v-4bab03f0="">
-                        <p data-v-d2fe469e="" class="item-title">0</p>
-                        <p data-v-d2fe469e="" class="item-desc">Sản phẩm hết hàng</p>
+                    <a href="{% url 'seller:get_merchandises' %}?status=pending">
+                        <p class="title-text-color">{{ merchandise_counter.pending }}</p>
+                        <p>Đang chờ kiểm duyệt</p>
                     </a>
-
+                    <a href="{% url 'seller:get_merchandises' %}?status=stopping">
+                        <p class="title-text-color">{{ merchandise_counter.stopping }}</p>
+                        <p>Đang dừng bán</p>
+                    </a>
+                    <a href="{% url 'seller:get_merchandises' %}?status=blocked">
+                        <p class="title-text-color">{{ merchandise_counter.blocked }}</p>
+                        <p>Bị khóa</p>
+                    </a>
+                    <a href="{% url 'seller:get_merchandises' %}?status=rejected">
+                        <p class="title-text-color">{{ merchandise_counter.rejected }}</p>
+                        <p>Bị từ chối</p>
+                    </a>
                 </div>
-                <div class="to-do-box">
-                    <p data-v-d2fe469e="" class="item-title">Hiệu quả hoạt động</p>
-                    <a data-v-d2fe469e="" href="#" class="item" data-v-4bab03f0="">
-                        <p data-v-d2fe469e="" class="item-title">0</p>
-                        <p data-v-d2fe469e="" class="item-desc">Chờ Lấy Hàng</p>
+                <div class="widget text-center">
+                    <h5 class="widget-header title-text-color">Hiệu quả hoạt động</h5>
+                    <a href="">
+                        <p class="title-text-color">0</p>
+                        <p>Chờ Lấy Hàng</p>
                     </a>
-                    <a data-v-d2fe469e="" href="#" class="item" data-v-4bab03f0="">
-                        <p data-v-d2fe469e="" class="item-title">0</p>
-                        <p data-v-d2fe469e="" class="item-desc">Chờ Xác Nhận</p>
+                    <a href="">
+                        <p class="title-text-color">0</p>
+                        <p>Chờ Xác Nhận</p>
                     </a>
-                    <a data-v-d2fe469e="" href="#" class="item" data-v-4bab03f0="">
-                        <p data-v-d2fe469e="" class="item-title">0</p>
-                        <p data-v-d2fe469e="" class="item-desc">Đơn Hủy</p>
+                    <a href="">
+                        <p class="title-text-color">0</p>
+                        <p>Đơn Hủy</p>
                     </a>
-                    <a data-v-d2fe469e="" href="#" class="item" data-v-4bab03f0="">
-                        <p data-v-d2fe469e="" class="item-title">0</p>
-                        <p data-v-d2fe469e="" class="item-desc">Sản phẩm hết hàng</p>
+                    <a href="">
+                        <p class="title-text-color">0</p>
+                        <p>Sản phẩm hết hàng</p>
                     </a>
 
                 </div>
@@ -103,30 +114,26 @@
             </div>
 
             <div class="col-md-10 offset-md-1 col-lg-8 offset-lg-0">
-                <div class="col-md-12 box-anal">
+                <div class="col-md-12 box-analysic">
                     <div class="container">
-                        <img width="670px" height="auto" src="{% static 'images/blog/post-1.jpg' %}" alt="" />
-
+                        <h3 class="title-text-color">Thống kê doanh thu</h3>
+                        <canvas id="profit-chart" width="800" height="450"></canvas>
+                        <br>
+                        <div class="row">
+                            <div class="col-sm">
+                                <label for="profit-from-date">Từ: &nbsp;&nbsp;&nbsp;</label>
+                                <input type="date" id="profit-from-date">
+                            </div>
+                            <div class="col-sm">
+                                <label for="profit-to-date">Đến: &nbsp;&nbsp;&nbsp;</label>
+                                <input type="date" id="profit-to-date">
+                            </div>
+                        </div>       
                     </div>
-
-                    <div id="loc">
-                        <p>
-                            <strong>THỐNG KÊ DOANH
-                                THU</strong><br/><br/>
-                            TỪ: &nbsp;&nbsp;<input type="date"
-                                value=" dd/mm/yyyy">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                            ĐẾN: &nbsp;&nbsp;<input type="date" value=" dd/mm/yyyy">&nbsp;
-                            <a>
-                                <i class="fa fa-search fa-2x delete-cart-icon" style="margin-top:-5px;"></i>
-                            </a>
-                        </p>
-                    </div>
-
-
                 </div>
                 <!-- Recently Favorited -->
 
-                <div class="widget dashboard-container my-adslist box-anal">
+                <div class="widget dashboard-container my-adslist box-analysic">
                     <h3 class="widget-header">
                         SẢN PHẨM BÁN CHẠY NHẤT
                     </h3>
@@ -198,4 +205,57 @@
     </div>
     <!-- Container End -->
 </section>
+{% endblock %}
+
+{% block js %}
+<script>
+    data = [{
+        x: new Date("5/1/2020"),
+        y: 1
+    }, {
+        t: new Date("5/2/2020"),
+        y: 10
+    }, {
+        x: new Date("5/3/2020"),
+        y: 4
+    }, {
+        x: new Date("6/1/2020"),
+        y: 5
+    }, {
+        x: new Date("6/2/2020"),
+        y: 9
+    }, {
+        x: new Date("8/25/2020"),
+        y: 16
+    }];
+    console.log(data)
+    var ctx = document.getElementById('profit-chart').getContext('2d');
+    var chart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+
+            datasets: [{
+                data: data,
+                fill: false,
+                borderColor: 'green'
+            }]
+        },
+        options: {
+            scales: {
+                xAxes: [{
+                    type: 'time',
+                    time: {
+                        parser: 'MM/DD/YYYY HH:mm',
+                        tooltipFormat: 'll HH:mm',
+                        unit: 'month',
+                        unitStepSize: 1,
+                        displayFormats: {
+                            'month': 'MM YYYY'
+                        }
+                    },
+                }],
+            }
+        }
+    });
+</script>
 {% endblock %}

@@ -73,4 +73,4 @@ INSERT INTO `ecommercedb`.`order_status` (`id`, `code`, `name`) VALUES ('1', '1'
 INSERT INTO `ecommercedb`.`order_status` (`id`, `code`, `name`) VALUES ('2', '2', 'Bị hoãn');
 INSERT INTO `ecommercedb`.`order_status` (`id`, `code`, `name`) VALUES ('3', '3', 'Giao hàng thành công');
 INSERT INTO `ecommercedb`.`order_status` (`id`, `code`, `name`) VALUES ('4', '4', 'Đã hủy');
-INSERT INTO `ecommercedb`.`order_status` (`id`, `code`) VALUES ('5', '5', 'Đang giao hàng');
+INSERT INTO `ecommercedb`.`order_status` (`id`, `code`, `name`) VALUES ('5', '5', 'Đang giao hàng');

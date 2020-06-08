@@ -13,10 +13,12 @@ def add_book_to_cart(request):
      if request.method == "POST":
           merchandise = Merchandise.objects.get(pk=request.POST.get("merchandise"))
           quantity = int(request.POST.get("quantity"))
-          if quantity <= 0:
-               return JsonResponse({'error':'Số lượng sản phẩm được chọn phải lớn hơn 0.'})
           if not merchandise.is_selling():
-               return JsonResponse({'error': 'Sản phẩm hiện không còn bán.'},status=400) 
+               return JsonResponse({'error': 'Sản phẩm hiện không còn bán.'},status=400)
+          if quantity <= 0:
+               return JsonResponse({'error':'Số lượng sản phẩm được chọn phải lớn hơn 0.'},status=400)
+          if quantity > merchandise.quantity_exists:
+               return JsonResponse({'error':'Số lượng sản phẩm vượt quá mức cho phép.'},status=400)
           cart = Cart.objects.filter(user=request.user, merchandise=merchandise).first()
           if cart: 
                cart.quantity += quantity

@@ -1,19 +1,22 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.core.paginator import Paginator
 from .models import Book, BookCategory, BookCategoryDetail, Merchandise, MerchandisePortfolio, Delivery, MerchandiseCondition
+from .models import MerchandiseImage
 from django.contrib.auth.decorators import login_required
 from django.db.models import Count, Q, F
-from common.utils import SQLUtils, is_image_file, get_object_or_none
+from common.utils import SQLUtils, is_image_file, get_object_or_none, Map, ajax_login_required
 import json
 from store.models import Store 
 from report.services import get_sample_reports
 from django.core import serializers
 from users.services import CITIES, get_addresses_without_pager
-from .forms import BookForm
-from .services import save_image, get_avaiable_merchandises
+from .forms import BookForm, UpdateBookForm
+from .services import save_image, get_avaiable_merchandises, get_avaiable_authors, MerchandiseRepo
 from django.http import JsonResponse
 import os
-import datetime
+from django.utils import timezone
+from django.http import JsonResponse
+from django.http import HttpResponseForbidden
 # Create your views here.
 SORT_SQL = {
     'newest': '`activated_date` DESC',
@@ -22,10 +25,17 @@ SORT_SQL = {
     'highest_price': '`price` DESC',
     'appreciated': '(`merchandise`.`total_star`/`merchandise`.`times_rated`) DESC',
 }
-def get_books(request, url_category):
+def get_books(request):
     ## Get category, children categories
-    category = BookCategory.objects.filter(url_name = url_category).first()
+    if request.GET.get('category'):
+        category = BookCategory.objects.filter(url_name = request.GET.get('category')).first()
+        children_categories_where_clause = "WHERE `cat`.`id_parent` = {};".format(category.id)
+    else:
+        category = Map(url_name = '', name = 'Sách')
+        children_categories_where_clause = "WHERE `cat`.`id_parent` IS NULL;"
+    print(category)
     #children_categories = category.bookcategory_set.annotate(num_books=Count('bookcategorydetail'))
+    
     children_categories = BookCategory.objects.raw('''
         SELECT 
             `cat`.`id` as `id`,
@@ -37,71 +47,18 @@ def get_books(request, url_category):
             AND `mer`.`blocked_date` IS NULL AND `mer`.`activated_date` IS NOT NULL
             ) AS num_books
         FROM `book_category` `cat`
-        WHERE `cat`.`id_parent` = %s;
-    ''',[category.id])
-    base_sql = '''
-        {select}
-        FROM
-            `merchandise` JOIN `store` JOIN `address` JOIN `book` JOIN `book_category_detail` JOIN `book_category` 
-            JOIN `merchandise_image` JOIN `image` JOIN `merchandise_portfolio` JOIN `merchandise_condition`
-            ON  `merchandise`.`id_user` = `store`.`id_user`
-                AND `merchandise`.`id_address` = `address`.`id`
-                AND `merchandise`.`id` = `book`.`id`
-                AND `book`.`id` = `book_category_detail`.`id_book`
-                AND `book_category_detail`.`id_category` = `book_category`.`id`
-                AND `merchandise_image`.`id_merchandise` = `merchandise`.`id`
-                AND `merchandise_image`.`id_image` = `image`.`id`
-                AND `merchandise`.`id_portfolio` = `merchandise_portfolio`.`id`
-                AND `merchandise`.`id_condition` = `merchandise_condition`.`id`
-        {where}
-        {group}
-        {order};
-    '''
-    sqlutils = SQLUtils()
-    sqlutils.add_where('`book_category`.`url_name` = %s', url_category)
-    sqlutils.add_where(Merchandise.check_book_raw_query())
-    sqlutils.add_where(Merchandise.check_selling_raw_query())
-    sqlutils.add_where(Store.check_opening_raw_query())
-    sqlutils.add_order(SORT_SQL.get(request.GET.get('sort'),None))
-    ### Handle url queries
-    if request.GET.get('location'):
-        sqlutils.add_where('`address`.`city` = %s', request.GET.get('location'))
-    if request.GET.get('condition'):
-        sqlutils.add_where('`merchandise_condition`.`code` = %s', request.GET.get('condition'))
-    if request.GET.get('low_price'):
-        sqlutils.add_where('`merchandise`.`price` >= %s', request.GET.get('low_price'))
-    if request.GET.get('high_price'):
-        sqlutils.add_where('`merchandise`.`price` <= %s', request.GET.get('high_price'))
-    ## Get cities
-    cities_select_clause = 'SELECT `address`.`city` as `id`, COUNT(DISTINCT `merchandise`.`id`) AS `num_books`'
-    cities = Merchandise.objects.raw(
-        base_sql.format(select=cities_select_clause, where=sqlutils.get_where_clause(),
-                        group=' GROUP BY `address`.`city` ', order=' ORDER BY `num_books` DESC '),
-        sqlutils.get_params())
-    ## Get conditions
-    conditions_select_clause = 'SELECT `merchandise_condition`.*, COUNT(DISTINCT `merchandise`.`id`) AS `num_books`'
-    conditions = Merchandise.objects.raw(
-        base_sql.format(select=conditions_select_clause, where=sqlutils.get_where_clause(),
-                        group=' GROUP BY `merchandise_condition`.`id` ', order=' ORDER BY `num_books` DESC '),
-        sqlutils.get_params())
-    ## Get books and paging
-    products_select_clause = '''
-        SELECT 
-            `merchandise`.*, `image`.`url`, `book`.`name`, `book`.`publisher`, `book`.`publication_date`,
-            `book`.`width`, `book`.`height`, `book`.`length`, `book`.`pages_num`, `address`.`city`,
-            (SELECT `tb_cat`.`name` 
-                FROM `book_category` `tb_cat` JOIN `book_category_detail` `tb_det`
-                ON `tb_cat`.`id` = `tb_det`.`id_category`
-                WHERE `tb_det`.`id_book` = `book`.`id` 
-                ORDER BY `tb_cat`.`id` DESC
-                LIMIT 1) AS `category`, 
-            (`merchandise`.`total_star`/`merchandise`.`times_rated`) AS `rate_point`
-    '''
+    ''' + children_categories_where_clause)
 
-    merchandises = Merchandise.objects.raw(
-        base_sql.format(select=products_select_clause, where=sqlutils.get_where_clause(), 
-                        group=' GROUP BY `merchandise`.`id` ', order=sqlutils.get_order_clause()),
-        sqlutils.get_params())
+    merchandise_repo = MerchandiseRepo(
+        is_book=True, merchandise_status='selling', is_opening_store=True,
+        category=request.GET.get('category'), author=request.GET.get('author'), location=request.GET.get('location'),
+        condition=request.GET.get('condition'), low_price=request.GET.get('low_price'),
+        high_price=request.GET.get('high_price'), sort=request.GET.get('sort'))
+
+    merchandises = merchandise_repo.get_merchandises()
+    cities = merchandise_repo.get_cities()
+    conditions = merchandise_repo.get_conditions()
+
     paginator = Paginator(merchandises, 9)
     page_number = request.GET.get('page')
     pager = paginator.get_page(page_number)
@@ -111,7 +68,7 @@ def get_books(request, url_category):
     page_navigator.append(pager.number)
     for i in range(pager.number + 1, min(pager.number + 2, pager.paginator.num_pages) + 1):
         page_navigator.append(i)
-    
+
     return render(request, 'book/books.html', {
         'pager':pager, 'page_navigator': page_navigator, 'children_categories':children_categories, 
         'current_category':category, 'cities':cities, 'conditions':conditions})
@@ -157,7 +114,73 @@ def add_book(request):
     merchandise_portfolios = MerchandisePortfolio.objects.filter(delete_date = None)
     deliveries = Delivery.objects.filter(delete_date = None)
     conditions = MerchandiseCondition.objects.filter(delete_date = None)
+
+    authors_autocomplete = "[" + ", ".join(['"'+author.id+'"' for author in get_avaiable_authors()]) + "]"
+
     return render(request, 'seller/add_book.html', 
         {'book_categories':book_categories_json,'cities':CITIES, 'addresses':addresses, 'store':store,
-        'portfolios':merchandise_portfolios, 'deliveries': deliveries, 'conditions': conditions})
+        'portfolios':merchandise_portfolios, 'deliveries': deliveries, 'conditions': conditions, 'authors_autocomplete': authors_autocomplete})
+
+@login_required
+def get_my_merchandises(request):
+    merchandise_status = request.GET.get('status')
+    if not merchandise_status:
+        merchandise_status = 'selling'
+    merchandise_repo = MerchandiseRepo(
+        is_book=True, merchandise_status=merchandise_status, is_opening_store=True,
+        category=request.GET.get('category'), author=request.GET.get('author'), location=request.GET.get('location'),
+        condition=request.GET.get('condition'), low_price=request.GET.get('low_price'),
+        high_price=request.GET.get('high_price'), sort=request.GET.get('sort'), owner=request.user.pk)
+
+    merchandises = merchandise_repo.get_merchandises()
+
+    page_number = request.GET.get('page')
+    paginator = Paginator(merchandises, 10)
+    pager = paginator.get_page(page_number)
+    page_navigator = []
+    for i in range(max(1, pager.number - 2), pager.number):
+        page_navigator.append(i)
+    page_navigator.append(pager.number)
+    for i in range(pager.number + 1, min(pager.number + 2, pager.paginator.num_pages) + 1):
+        page_navigator.append(i)
+
+    return render(request, 'seller/books.html', {'pager':pager, 'page_navigator':page_navigator})
+
+@ajax_login_required
+def toggle_merchandise_status_by_seller(request):
+    if request.method == 'POST':
+        merchandise = Merchandise.objects.get(pk=request.POST.get('id_merchandise'))
+        if merchandise.user != request.user:
+            return JsonResponse({}, status=403)
+        merchandise_status = merchandise.get_merchandise_status()['code']
+        if merchandise_status == 'selling':
+            merchandise.stopped_date = timezone.now()
+            merchandise.save()
+            return JsonResponse({}, status=200)
+        elif merchandise_status == 'stopping':
+            merchandise.stopped_date = None
+            merchandise.save()
+            return JsonResponse({}, status=200)
+    return JsonResponse({}, status=400)
+
+@login_required
+def get_own_merchandise(request, id):
+    merchandise = Merchandise.objects.get(pk=id)
+    if merchandise.user != request.user:
+        return HttpResponseForbidden()
+    if merchandise.portfolio.code == 'book':
+        product = Book.objects.get(pk=merchandise.id_product)
     
+    return render(request, 'seller/book.html', {'merchandise':merchandise, 'product':product})
+
+@ajax_login_required
+def update_own_merchandise(request):
+    if request.method == 'POST':
+        merchandise = Merchandise.objects.get(pk=request.POST.get('id_merchandise'))
+        if merchandise.user != request.user or merchandise.get_merchandise_status()['code'] not in ['selling', 'stopping']:
+            return HttpResponseForbidden()
+        book_form = UpdateBookForm(request.POST, current_user = request.user)
+        if book_form.is_valid():
+            book_form.save(merchandise)
+            return JsonResponse({}, status=200)
+    return JsonResponse({}, status=400)

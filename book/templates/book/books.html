@@ -33,12 +33,12 @@
                     {% if current_category %}
                     <div class="widget category-list">
                         <h4 class="widget-header">
-                            <a href="{% url 'book:get_books' current_category.url_name %}">{{ current_category.name }}</a>
+                            <a href="{% url 'book:get_books' %}?category={{ current_category.url_name }}">{{ current_category.name }}</a>
                         </h4>
                         <ul class="category-list">
                             {% for item in children_categories %}
                             <li>
-                                <a href="{% url 'book:get_books' item.url_name %}">{{ item.name }}<span>{{ item.num_books }}</span></a>
+                                <a href="{% url 'book:get_books'%}?category={{ item.url_name }}">{{ item.name }}<span>{{ item.num_books }}</span></a>
                             </li>
                             {% endfor %}
                         </ul>
@@ -131,7 +131,7 @@
                                                 <font color="red" size="4px"><b>{{ book.get_saving_rate|floatformat:0 }}%</b>&nbsp;&nbsp;<i class="fas fa-bookmark"></i></font></p>
                                             {% endif %}
                                         </div>
-                                        <p class="card-text">{{ book.description|truncatechars:100 }}</p>
+                                        <p class="card-text">{{ book.description|striptags|truncatechars:100 }}</p>
                                         <div class="product-ratings list-inline">
                                             <ul class="list-inline list-inline-item">
                                                 {% with t_star=book.rate_point|floatformat:0 %}

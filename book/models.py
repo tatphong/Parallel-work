@@ -5,6 +5,7 @@ from django.utils import timezone
 
 class Book(models.Model):
     name = models.CharField(max_length=256)
+    author = models.CharField(max_length=256)
     publisher = models.CharField(max_length=256)
     publication_date = models.DateField()
     width = models.SmallIntegerField()
@@ -127,6 +128,32 @@ class Merchandise(models.Model):
     def is_selling(self):
         return self.stopped_date is None and self.blocked_date is None and self.activated_date is not None
 
+    ### Merchandise status: Bị khóa, Bị từ chối, Đang chờ kiểm duyệt, Hết hàng, Đang bán, Dừng bán
+    def was_sold_out(self):
+        return self.quantity == 0
+    
+    def was_blocked(self):
+        return self.blocked_date is not None
+    
+    def is_not_activated(self):
+        return self.activated_date is None
+
+    def get_merchandise_status(self):
+        if self.is_not_activated():
+            if self.was_blocked():
+                return {'code': 'rejected', 'name': 'Bị từ chối'}
+            else:
+                return {'code': 'pending', 'name': 'Đang chờ kiểm duyệt'}
+        else:
+            if self.was_blocked():
+                return {'code': 'blocked', 'name': 'Bị khóa'}
+            if self.was_sold_out():
+                return {'code': 'sold_out', 'name': 'Đã bán hết'}
+            elif self.stopped_date is not None:
+                return {'code': 'stopping', 'name': 'Tạm dừng'}
+            return {'code': 'selling', 'name': 'Đang bán'}
+
+
     def get_product(self):
         if self.portfolio.code == 'book':
             return Book.objects.get(pk=self.id_product)
@@ -136,6 +163,16 @@ class Merchandise(models.Model):
         return (1 - self.price / self.origin_price) * 100
     def get_rate_point(self):
         return self.total_star/self.times_rated if self.times_rated else 0
+    
+    STATUS_RAW_QUERY = {
+        'rejected':['`merchandise`.`activated_date` IS NULL', '`merchandise`.`blocked_date` IS NOT NULL'],
+        'pending':['`merchandise`.`activated_date` IS NULL', '`merchandise`.`blocked_date` IS NULL'],
+        'blocked':['`merchandise`.`activated_date` IS NOT NULL', '`merchandise`.`blocked_date` IS NOT NULL'],
+        'sold_out':['`merchandise`.`activated_date` IS NOT NULL', '`merchandise`.`blocked_date` IS NULL', '`merchandise`.`quantity` = 0'],
+        'stopping':['`merchandise`.`activated_date` IS NOT NULL', '`merchandise`.`blocked_date` IS NULL', '`merchandise`.`quantity` > 0', '`merchandise`.`stopped_date` IS NOT NULL'],
+        'selling':['`merchandise`.`activated_date` IS NOT NULL', '`merchandise`.`blocked_date` IS NULL', '`merchandise`.`stopped_date` IS NULL']
+    }
+
     @staticmethod
     def check_selling_raw_query():
         return ['`merchandise`.`blocked_date` IS NULL',
@@ -143,7 +180,6 @@ class Merchandise(models.Model):
     @staticmethod
     def check_book_raw_query():
         return ['`merchandise_portfolio`.`code` = "book"']
-
 
 class MerchandiseDelivery(models.Model):
     merchandise = models.ForeignKey(Merchandise, models.DO_NOTHING, db_column='id_merchandise')

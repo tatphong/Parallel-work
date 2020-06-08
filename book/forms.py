@@ -14,6 +14,7 @@ class BookForm(forms.Form):
 
     name = forms.CharField(widget=forms.TextInput())
     id_portfolio = forms.CharField(widget=forms.TextInput())
+    author = forms.CharField(widget=forms.TextInput())
     publisher = forms.CharField(widget=forms.TextInput())
     publicdate = forms.CharField(widget=forms.TextInput())
     length = forms.DecimalField(min_value=0)
@@ -71,6 +72,7 @@ class BookForm(forms.Form):
 
                 book = Book(
                     name=self.cleaned_data['name'],
+                    author=self.cleaned_data['author'],
                     publisher=self.cleaned_data['publisher'],
                     publication_date=publicdate,
                     width=self.cleaned_data['width'],
@@ -130,4 +132,20 @@ class BookForm(forms.Form):
                 path_in_disk = path[1:] if path[0] == '/' else path
                 if path_in_disk and os.path.isfile(path_in_disk):
                     os.remove(path_in_disk)
-        
+
+
+class UpdateBookForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        self.current_user = kwargs.pop('current_user')
+        super(UpdateBookForm, self).__init__(*args, **kwargs)
+    
+    price = forms.DecimalField(widget=forms.TextInput())
+    description = forms.CharField(widget=forms.TextInput())
+
+    def save(self, merchandise):
+        merchandise.description = self.cleaned_data['description']
+        merchandise.price = self.cleaned_data['price']
+        merchandise.save()
+
+
+    

@@ -9,7 +9,7 @@
             <div class="col-md-12">
                 <!-- Recently Favorited -->
                 <div class="widget dashboard-container my-adslist">
-                    <h3 class="widget-header">THÊM SẢN PHẨM MỚI</h3>
+                    <h3 class="widget-header title-text-color">THÊM SẢN PHẨM MỚI</h3>
                     <form method="POST" id="form-add-product" enctype="multipart/form-data">
                         {% csrf_token %}
                         <div class="form-group">
@@ -49,6 +49,11 @@
                                 <table class="table table-add-products">
                                     <tbody>
                                         <tr class="form-group">
+                                            <td><label for="pro-publisher">Tác giả:</label> </td>
+                                            <td><input class="form-control" type="text" class="input-add-spec"
+                                                    id="pro-author" name="author" required></td>
+                                        </tr>
+                                        <tr class="form-group">
                                             <td><label for="pro-publisher">Nhà xuất bản:</label> </td>
                                             <td><input class="form-control" type="text" class="input-add-spec"
                                                     id="pro-publisher" name="publisher" required></td>
@@ -63,18 +68,18 @@
                                             <td class="row">
                                                 <div class="col">
                                                     <input class="form-control input-add-spec" type="number"
-                                                        placeholder="Dài (cm)" id="pro-length" name="length"
-                                                        min="0" required>
+                                                        placeholder="Dài (cm)" id="pro-length" name="length" min="0"
+                                                        required>
                                                 </div>
                                                 <div class="col">
                                                     <input class="form-control input-add-spec" type="number"
-                                                        placeholder="Rộng (cm)" id="pro-width" name="width"
-                                                        min="0" required>
+                                                        placeholder="Rộng (cm)" id="pro-width" name="width" min="0"
+                                                        required>
                                                 </div>
                                                 <div class="col">
                                                     <input class="form-control input-add-spec" type="number"
-                                                        placeholder="Cao (cm)" id="pro-height" name="height"
-                                                        min="0" required>
+                                                        placeholder="Cao (cm)" id="pro-height" name="height" min="0"
+                                                        required>
                                                 </div>
                                             </td>
                                         </tr>
@@ -96,7 +101,8 @@
                         </div>
                         <div class="form-group">
                             <label for="pro-quantity">6. Số lượng: </label>
-                            <input type="number" class="form-control" id="pro-quantity" name="quantity" min="0" required>
+                            <input type="number" class="form-control" id="pro-quantity" name="quantity" min="0"
+                                required>
                         </div>
                         <div class="form-group">
                             <label for="pro-price">7. Giá (đồng): </label>
@@ -119,8 +125,8 @@
                             <label>10. Phương thức giao hàng: </label>
                             <div class="form-check">
                                 {% for item in deliveries %}
-                                <input class="form-check-input" type="checkbox" value="{{ item.id }}" id="pro-delivery-{{ item.id }}"
-                                    name="id_delivery">
+                                <input class="form-check-input" type="checkbox" value="{{ item.id }}"
+                                    id="pro-delivery-{{ item.id }}" name="id_delivery">
                                 <label class="form-check-label" for="pro-delivery-{{ item.id }}">{{ item.name }}</label>
                                 {% endfor %}
                             </div>
@@ -140,23 +146,23 @@
                                         </tr>
                                         <tr class="form-group">
                                             <td><label for="pro-no">Số nhà:</label> </td>
-                                            <td><span id ="pro-no"></span></td>
+                                            <td><span id="pro-no"></span></td>
                                         </tr>
                                         <tr class="form-group">
                                             <td><label for="pro-street">Đường:</label> </td>
-                                            <td><span id ="pro-street"></span></td>
+                                            <td><span id="pro-street"></span></td>
                                         </tr>
                                         <tr class="form-group">
                                             <td><label for="pro-ward">Phường:</label> </td>
-                                            <td><span id ="pro-ward"></span></td>
+                                            <td><span id="pro-ward"></span></td>
                                         </tr>
                                         <tr class="form-group">
                                             <td><label for="pro-district">Quận:</label> </td>
-                                            <td><span id ="pro-district"></span></td>
+                                            <td><span id="pro-district"></span></td>
                                         </tr>
                                         <tr class="form-group">
                                             <td><label for="pro-city">Thành phố/Tỉnh thành:</label> </td>
-                                            <td> <span id ="pro-city"></span> </td>
+                                            <td> <span id="pro-city"></span> </td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -181,8 +187,8 @@
         <!-- Row End -->
     </div>
     <!-- Container End -->
-    <div class="modal fade bd-example-modal-xl" id="address-modal" tabindex="-1" role="dialog" aria-labelledby="address-modal"
-        aria-hidden="true">
+    <div class="modal fade bd-example-modal-xl" id="address-modal" tabindex="-1" role="dialog"
+        aria-labelledby="address-modal" aria-hidden="true">
         <div class="modal-dialog modal-xl" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -210,7 +216,8 @@
                             <tr class="row">
                                 <td class="col-1">
                                     <div class="radio">
-                                    <input type="radio" name="address" value="{{ address.id }}" onchange="select_address({{ address.id }});">
+                                        <input type="radio" name="address" value="{{ address.id }}"
+                                            onchange="select_address({{ address.id }});">
                                     </div>
                                 </td>
                                 <td class="col-2" id="add-no-{{ address.id }}">
@@ -238,7 +245,8 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
-                    <a href="{% url 'user:address' %}" type="button" class="btn" target="_blank"><i class="fas fa-plus-circle"></i> Tạo mới</a>
+                    <a href="{% url 'user:address' %}" type="button" class="btn" target="_blank"><i
+                            class="fas fa-plus-circle"></i> Tạo mới</a>
                 </div>
             </div>
         </div>
@@ -287,6 +295,115 @@
     }
 
     render_categories();
+
+    function autocomplete(inp, arr) {
+        /*the autocomplete function takes two arguments,
+        the text field element and an array of possible autocompleted values:*/
+        var currentFocus;
+        /*execute a function when someone writes in the text field:*/
+        inp.addEventListener("input", function (e) {
+            var a, b, i, val = this.value;
+            /*close any already open lists of autocompleted values*/
+            closeAllLists();
+            if (!val) {
+                return false;
+            }
+            currentFocus = -1;
+            /*create a DIV element that will contain the items (values):*/
+            a = document.createElement("DIV");
+            a.setAttribute("id", this.id + "autocomplete-list");
+            a.setAttribute("class", "autocomplete-items");
+            /*append the DIV element as a child of the autocomplete container:*/
+            this.parentNode.appendChild(a);
+            /*for each item in the array...*/
+            for (i = 0; i < arr.length; i++) {
+                /*check if the item starts with the same letters as the text field value:*/
+                if (arr[i].substr(0, val.length).toUpperCase() == val.toUpperCase()) {
+                    /*create a DIV element for each matching element:*/
+                    b = document.createElement("DIV");
+                    /*make the matching letters bold:*/
+                    b.innerHTML = "<strong>" + arr[i].substr(0, val.length) + "</strong>";
+                    b.innerHTML += arr[i].substr(val.length);
+                    /*insert a input field that will hold the current array item's value:*/
+                    b.innerHTML += "<input type='hidden' value='" + arr[i] + "'>";
+                    /*execute a function when someone clicks on the item value (DIV element):*/
+                    b.addEventListener("click", function (e) {
+                        /*insert the value for the autocomplete text field:*/
+                        inp.value = this.getElementsByTagName("input")[0].value;
+                        /*close the list of autocompleted values,
+                        (or any other open lists of autocompleted values:*/
+                        closeAllLists();
+                    });
+                    a.appendChild(b);
+                }
+            }
+        });
+        /*execute a function presses a key on the keyboard:*/
+        inp.addEventListener("keydown", function (e) {
+            var x = document.getElementById(this.id + "autocomplete-list");
+            if (x) x = x.getElementsByTagName("div");
+            if (e.keyCode == 40) {
+                /*If the arrow DOWN key is pressed,
+                increase the currentFocus variable:*/
+                currentFocus++;
+                /*and and make the current item more visible:*/
+                addActive(x);
+            } else if (e.keyCode == 38) { //up
+                /*If the arrow UP key is pressed,
+                decrease the currentFocus variable:*/
+                currentFocus--;
+                /*and and make the current item more visible:*/
+                addActive(x);
+            } else if (e.keyCode == 13) {
+                /*If the ENTER key is pressed, prevent the form from being submitted,*/
+                e.preventDefault();
+                if (currentFocus > -1) {
+                    /*and simulate a click on the "active" item:*/
+                    if (x) x[currentFocus].click();
+                }
+            }
+        });
+
+        function addActive(x) {
+            /*a function to classify an item as "active":*/
+            if (!x) return false;
+            /*start by removing the "active" class on all items:*/
+            removeActive(x);
+            if (currentFocus >= x.length) currentFocus = 0;
+            if (currentFocus < 0) currentFocus = (x.length - 1);
+            /*add class "autocomplete-active":*/
+            x[currentFocus].classList.add("autocomplete-active");
+        }
+
+        function removeActive(x) {
+            /*a function to remove the "active" class from all autocomplete items:*/
+            for (var i = 0; i < x.length; i++) {
+                x[i].classList.remove("autocomplete-active");
+            }
+        }
+
+        function closeAllLists(elmnt) {
+            /*close all autocomplete lists in the document,
+            except the one passed as an argument:*/
+            var x = document.getElementsByClassName("autocomplete-items");
+            for (var i = 0; i < x.length; i++) {
+                if (elmnt != x[i] && elmnt != inp) {
+                    x[i].parentNode.removeChild(x[i]);
+                }
+            }
+        }
+        /*execute a function when someone clicks in the document:*/
+        document.addEventListener("click", function (e) {
+            closeAllLists(e.target);
+        });
+    }
+    {% autoescape off %}
+    var authors = {{ authors_autocomplete }};
+    {% endautoescape %}
+    
+
+    /*initiate the autocomplete function on the "myInput" element, and pass along the countries array as possible autocomplete values:*/
+    autocomplete(document.getElementById("pro-author"), authors);
 
     function render_categories(parent_category = null) {
         $("#category-selection").empty();
@@ -359,7 +476,7 @@
                 var reader = new FileReader();
                 reader.onload = function (e) {
                     $("#selected_avatar").append(
-                    `
+                        `
                         <div class="image-zone"><img src="${e.target.result}" width="200" /></div>
                     `
                     )
@@ -377,6 +494,8 @@
             error_message = "Xin hãy nhập tên sản phẩm.";
         } else if (!form_data.get("avatar").name) {
             error_message = "Xin hãy chọn hình đại diện của sản phẩm.";
+        } else if (!form_data.get("author")) {
+            error_message = "Xin hãy nhập tên tác giả.";
         } else if (!form_data.get("publisher")) {
             error_message = "Xin hãy nhập nhà xuất bản.";
         } else if (!form_data.get("publicdate")) {
@@ -395,7 +514,7 @@
             error_message = "Xin hãy nhập giá thị trường của sản phẩm.";
         } else if (form_data.getAll("id_delivery").length === 0) {
             error_message = "Xin hãy chọn phương thức giao hàng.";
-        } else if (!form_data.get("id_address")){
+        } else if (!form_data.get("id_address")) {
             error_message = "Xin hãy chọn địa chỉ";
         } else if (!$("#form-add-product").find('.nicEdit-main').text()) {
             error_message = "Xin hãy viết mô tả sản phẩm.";
@@ -450,7 +569,7 @@
         });
     }
 
-    function select_address(id_address){
+    function select_address(id_address) {
         $("#pro-no").html($("#add-no-" + id_address).html());
         $("#pro-street").html($("#add-street-" + id_address).html());
         $("#pro-ward").html($("#add-ward-" + id_address).html());

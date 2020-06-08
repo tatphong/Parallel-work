@@ -27,9 +27,9 @@
                                 <!-- Dropdown list -->
                                 <div class="dropdown-menu">
                                     {% for item in sub_menu.bookcategory_set.all %}
-                                    <a class="dropdown-item" href="{% url 'book:get_books' item.url_name %}">{{ item.name }}</a>
+                                    <a class="dropdown-item" href="{% url 'book:get_books'%}?category={{ item.url_name }}">{{ item.name }}</a>
                                     {% endfor %}
-                                    <a class="dropdown-item" href="{% url 'book:get_books' sub_menu.url_name %}">Tất cả</a>
+                                    <a class="dropdown-item" href="{% url 'book:get_books' %}?category={{ sub_menu.url_name }}">Tất cả</a>
                                 </div>
                                 
                             </li>

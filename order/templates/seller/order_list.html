@@ -104,23 +104,35 @@
 										{% csrf_token %}
                                         <!--Nếu trạng thái là hủy hoặc giao thành công thì 0 cho đổi nữa-->
                                         {% ifequal item.status_code "3" %}
-                                                <p align="center">{{item.status}}</p>
+                                                <p>{{item.status}}</p>
                                         {% else %}
-                                            {% ifequal item.status_code "4" %}
-                                                <p align="center">{{item.status}}</p>
-                                            {% else %}
-                                        <!--Nếu trạng thái là 3 cái còn lại thì đc phép đổi-->
+                                        {% ifequal item.status_code "4" %}
+                                            <p>{{item.status}}</p>
+                                        {% else %}
+                                        <!--3 trường hợp còn lại đều đc select-->
                                             <input name="id_order" value="{{item.id}}" hidden/>
                                             <input type="text" name="order_note" id="order_note" value="" hidden/>
                                             <select id="{{item.id}}" name="change_status_{{item.id}}" onchange="change_status(this, {{item.id}}, {{item.status_code}})">
+                                            {% ifequal item.status_code "1" %}
+                                        <!--Nếu là đã tiếp nhận thì đc chọn hết-->
                                                 {% for i in all_status %}
                                                     <option value="{{i.code}}"
                                                         {% ifequal i.code item.status_code %} selected="selected" {% endifequal %} 
                                                     >{{i.name}}</option>
                                                 {% endfor %}
+                                            {% else %}
+                                        <!--Nếu trạng thái là dời lại hay đang giao hàng thì 0 đc quay về tiếp nhận-->
+                                                {% for i in all_status %}
+                                                    {% if not i.code == "1" %}
+                                                    <option value="{{i.code}}"
+                                                        {% ifequal i.code item.status_code %} selected="selected" {% endifequal %} 
+                                                    >{{i.name}}</option>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            {% endifequal %}
                                             </select>
                                             <button id="submit_status_{{item.id}}" type="submit" hidden></button>
-                                            {% endifequal %}
+                                        {% endifequal %}
                                         {% endifequal %}
                                     </form>
                                 </td>
@@ -236,7 +248,7 @@
         window.location.href=window.location.href.split('?')[0]
     }
 
-    function change_status(e, id_order, status_code){
+    function change_status(e, id_order, curent_status_code){
         console.log("change_Status running ")
         if (document.getElementById(id_order).value == 4){
             note = prompt("Hãy nêu lý do bạn hủy đơn")
@@ -245,14 +257,24 @@
                 document.getElementById("submit_status_"+id_order).click()
             }
             else {
-                document.getElementById(id_order).selectedIndex = status_code-1
+                document.getElementById(id_order).selectedIndex = curent_status_code-1
+            }
+        }
+        else if (document.getElementById(id_order).value == 2){
+            note = prompt("Hãy nêu lý do bạn dời lại đơn hàng")
+            if (note != null) {
+                document.getElementById("order_note").value = note
+                document.getElementById("submit_status_"+id_order).click()
+            }
+            else {
+                document.getElementById(id_order).selectedIndex = curent_status_code-1
             }
         }
         else
             if (confirm('Xác nhận thay đổi trạng thái đơn hàng: '+id_order))
                 document.getElementById("submit_status_"+id_order).click()
             else {
-                document.getElementById(id_order).selectedIndex = status_code-1
+                document.getElementById(id_order).selectedIndex = curent_status_code-1
             }
     }
 </script>

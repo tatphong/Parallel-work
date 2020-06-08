@@ -44,7 +44,7 @@ def get_products(request):
     if request.GET.get('high_price'):
         sqlutils.add_where('`merchandise`.`price` <= %s', request.GET.get('high_price'))
     if request.GET.get('q'):
-        sqlutils.add_where('`book`.`name` LIKE %s', '%'+request.GET.get('q')+'%')
+        sqlutils.add_where('( `book`.`name` LIKE %s OR `book`.`author` LIKE %s )', ['%'+request.GET.get('q')+'%', '%'+request.GET.get('q')+'%'])
     ## Get cities
     cities_select_clause = 'SELECT `address`.`city` as `id`, COUNT(DISTINCT `merchandise`.`id`) AS `num_products`'
     cities = Merchandise.objects.raw(

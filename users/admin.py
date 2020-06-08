@@ -12,11 +12,12 @@ class CustomUserAdmin(UserAdmin):
     list_display = ('email', 'fullname', 'gender', 'phone_number' ,'is_staff', 'is_active',)
     list_filter = ('email', 'is_staff', 'is_active',)
     fieldsets = (
-        (None, {'fields': ('email', 'password')}),
-        ('Permissions', {'fields': ('is_staff', 'is_active')}),
+        ('Thông tin tài khoản', {'fields': ('email', 'fullname', 'gender', 'phone_number', 'date_joined')}),
+        ('Quyền', {'fields': ('is_staff', 'is_active')}),
     )
+    #readonly_fields = ('email', 'fullname', 'gender', 'phone_number', 'date_joined', 'is_staff', 'is_active')
     add_fieldsets = (
-        (None, {
+        ('None', {
             'classes': ('wide',),
             'fields': ('email', 'password1', 'password2', 'fullname', 'gender', 'phone_number', 'is_staff', 'is_active')}
         ),

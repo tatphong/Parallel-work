@@ -1,0 +1,232 @@
+{% extends 'seller_base.html' %}
+{% load static %}
+{% load url_helper %}
+{% load humanize %}
+{% block content %}
+<section class="dashboard section">
+    <!-- Container Start -->
+    <div class="container">
+        <!-- Row Start -->
+        <div class="row">
+
+            <div class="col-md-12">
+                <!-- Recently Favorited -->
+                <div class="widget dashboard-container my-adslist">
+                    <h3 class="widget-header title-text-color">DANH SÁCH SẢN PHẨM </h3>
+                    <div class="row" style="margin-bottom: 0.8em;">
+                        <div class="col-md-6">
+                            <strong>Trạng thái</strong>
+                            {% with status=request.GET.status %}
+                            <select onchange="location = this.value;">
+                                <option {%if status == 'selling'%}selected{%endif%}
+                                    value="{% query_url 'status' 'selling' request.GET.urlencode %}">Đang bán</option>
+                                <option {%if status == 'sold_out'%}selected{%endif%}
+                                    value="{% query_url 'status' 'sold_out' request.GET.urlencode %}">Đã bán hết</option>
+                                <option {%if status == 'pending'%}selected{%endif%}
+                                    value="{% query_url 'status' 'pending' request.GET.urlencode %}">Đang chờ kiểm duyệt</option>
+                                <option {%if status == 'stopping'%}selected{%endif%}
+                                    value="{% query_url 'status' 'stopping' request.GET.urlencode %}">Tạm dừng</option>
+                                <option {%if status == 'blocked'%}selected{%endif%}
+                                    value="{% query_url 'status' 'blocked' request.GET.urlencode %}">Bị khoá</option>
+                                <option {%if status == 'rejected'%}selected{%endif%}
+                                    value="{% query_url 'status' 'rejected' request.GET.urlencode %}">Bị từ chối</option>
+                            </select>
+                            {% endwith %}
+                        </div>
+                    </div>
+                    <table class="table product-dashboard-table">
+                        <thead class="container">
+                            <tr class="row">
+                                <th class="text-center col-1">Hình ảnh</th>
+                                <th class="text-center col-3">Sản phẩm</th>
+                                <th class="text-center col-1">Loại sản phẩm</th>
+                                <th class="text-center col-1">Số lượng gốc</th>
+                                <th class="text-center col-1">Số lượng</th>
+                                <th class="text-center col-1">Số lượng tồn</th>
+                                <th class="text-center col-1">Đơn giá</th>
+                                <th class="text-center col-1">Trạng thái</th>
+                                <th class="text-center col-2">Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody class="container">
+                            {% for merchandise in pager %}
+                            {% with merchandise_status=merchandise.get_merchandise_status %}
+                            <tr class="row">
+                                <td class="product-thumb col-1">
+                                    <img width="100%" height="auto" src="{{ merchandise.url }}" alt="Hình sản phẩm">
+                                </td>
+                                <td class="product-details col-3" style="width:350px;">
+                                    <h3 class="title">{{ merchandise.name }}</h3>
+                                    <span><b>Ngày đăng: </b><time>{{ merchandise.created_date|date:"d/m/Y G:i" }}</time> </span>
+                                    {% if merchandise.activated_date %}
+                                    <span><b>Ngày duyệt: </b><time>{{ merchandise.activated_date|date:"d/m/Y G:i" }}</time> </span>
+                                    {% endif %}
+                                    {% if merchandise.blocked_date %}
+                                    <span class="text-danger">
+                                        {% if merchandise_status.code == "rejected" %}
+                                        <b>Ngày bị từ chối: </b>
+                                        {% else %}
+                                        <b>Ngày bị khóa: </b>
+                                        {% endif %}
+                                        <time>{{ merchandise.blocked_date|date:"d/m/Y G:i" }}</time> 
+                                    </span>
+                                    {% endif %}
+                                </td>
+                                <td class="product-category col-1">
+                                    <span class="categories">{{ merchandise.portfolio_name }}</span>
+                                </td>
+                                <td class="col-1">
+                                    <p style="text-align:center">{{ merchandise.origin_quantity }}</p>
+                                </td>
+                                <td class="col-1">
+                                    <p style="text-align:center">{{ merchandise.quantity }}</p>
+                                </td>
+                                <td class="col-1">
+                                    <p style="text-align:center">{{ merchandise.quantity_exists }}</p>
+                                </td>
+                                <td class="col-1">
+                                    <p style="text-align:center">{{ merchandise.price|floatformat:0|intcomma }} đ</p>
+                                </td>
+                                <td class="col-1">
+                                    <p style="text-align:center">{{ merchandise_status.name }}</p>
+                                </td>
+                                <td class="action col-2" data-title="Action">
+                                    <div class="">
+                                        <ul class="list-inline justify-content-center">
+                                            <li class="list-inline-item">
+                                                <a data-toggle="tooltip" data-placement="top" disable
+                                                    title="Xem sản phẩm trên BOOK MARKET" class="view"
+                                                    href="{% url 'book:get_book' merchandise.id %}">
+                                                    <i class="fa fa-eye"></i>
+                                                </a>
+                                            </li>
+                                            <li class="list-inline-item">
+                                                <a data-toggle="tooltip" data-placement="top" title="Sửa" class="edit" href="{% url 'seller:get_own_merchandise' merchandise.id %}">
+                                                    <i class="fa fa-pencil"></i>
+                                                </a>
+                                            </li>
+                                            {% if merchandise_status.code == "selling" %}
+                                            <li class="list-inline-item">
+                                                <a data-toggle="tooltip" data-placement="top" title="Dừng bán" class="delete"
+                                                    onclick="toggle_status_by_seller({{ merchandise.id }});">
+                                                    <i class="fas fa-pause"></i>
+                                                </a>
+                                            </li>
+                                            {% elif merchandise_status.code == "stopping" %}
+                                            <li class="list-inline-item">
+                                                <a data-toggle="tooltip" data-placement="top" title="Tiếp tục bán" class="edit"
+                                                    onclick="toggle_status_by_seller({{ merchandise.id }});">
+                                                    <i class="fas fa-caret-right"></i>
+                                                </a>
+                                            </li>
+                                            {% endif %}
+                                        </ul>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endwith %}
+                            {% endfor %}
+                        </tbody>
+                    </table>
+
+                </div>
+
+                <!-- pagination -->
+                <div class="pagination justify-content-center">
+                    <nav aria-label="Page navigation example">
+                        <ul class="pagination">
+                            {% with params=request.GET.urlencode %}           
+                            {% if pager.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="{% query_url 'page' '1' params %}" aria-label="Previous">
+                                    <span aria-hidden="true">&laquo;</span>
+                                    <span class="sr-only">Previous</span>
+                                </a>
+                            </li>
+                            {% endif %}
+                            {% for page_index in page_navigator %}
+                            {% ifequal page_index pager.number %}
+                            <li class="page-item active">
+                                <a class="page-link" href="{% query_url 'page' page_index params %}">{{page_index}}</a>
+                            </li>
+                            {% else %}
+                            <li class="page-item">
+                                <a class="page-link" href="{% query_url 'page' page_index params %}">{{page_index}}</a>
+                            </li>
+                            {% endifequal %}
+                            {% endfor %}
+                            {% if pager.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="{% query_url 'page' pager.paginator.num_pages params %}" aria-label="Next">
+                                    <span aria-hidden="true">&raquo;</span>
+                                    <span class="sr-only">Next</span>
+                                </a>
+                            </li>
+                            {% endif %}
+                            {% endwith %}
+                        </ul>
+                    </nav>
+                </div>
+                <!-- pagination -->
+
+            </div>
+        </div>
+        <!-- Row End -->
+    </div>
+    <!-- Container End -->
+</section>
+{% endblock %}
+
+{% block js %}
+<script>
+    $.ajaxSetup({
+        beforeSend: function (xhr, settings) {
+            function getCookie(name) {
+                var cookieValue = null;
+                if (document.cookie && document.cookie != '') {
+                    var cookies = document.cookie.split(';');
+                    for (var i = 0; i < cookies.length; i++) {
+                        var cookie = jQuery.trim(cookies[i]);
+                        // Does this cookie string begin with the name we want?
+                        if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                            break;
+                        }
+                    }
+                }
+                return cookieValue;
+            }
+            if (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url))) {
+                // Only send the token to relative URLs i.e. locally.
+                xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+            }
+        }
+    });
+    function toggle_status_by_seller(id_merchandise){
+        console.log(id_merchandise)
+        $.ajax({
+            type: "POST",
+            url: "{% url 'seller:toggle_merchandise_status' %}",
+            data: {
+                "id_merchandise": id_merchandise
+            },
+            success: function (response) {
+                location.reload();
+            },
+            error: function (response) {
+                switch (response.status) {
+                    case 401:
+                        $.notify("Xin hãy đăng nhập.", "warn");
+                        break;
+                    case 400:
+                        $.notify(response["responseJSON"]["error"], "error");
+                        break;
+                    case 500:
+                        $.notify("Đã có lỗi xảy ra, xin hãy thử lại sau.", "error")
+                        break;
+                }
+            }
+        });
+    }
+</script>
+{% endblock %}

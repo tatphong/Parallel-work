@@ -92,7 +92,7 @@
 										<h5>{{ merchandise.price|floatformat:0|intcomma }} đ</h5>
 										{% if merchandise.origin_price != book.price %}
 										<p><strike>{{ merchandise.origin_price|floatformat:0|intcomma }} đ</strike>
-											{{ merchandise.get_saving_rate|floatformat:0 }}%</p>
+											<font color="red" size="4px"><b>{{ merchandise.get_saving_rate|floatformat:0 }}%</b>&nbsp;&nbsp;<i class="fas fa-bookmark"></i></font></p>
 										{% endif %}
 									</div>
 									<p class="card-text">{{ merchandise.description|truncatechars:100 }}</p>
@@ -163,7 +163,7 @@
 										<h5>{{ merchandise.price|floatformat:0|intcomma }} đ</h5>
 										{% if merchandise.origin_price != book.price %}
 										<p><strike>{{ merchandise.origin_price|floatformat:0|intcomma }} đ</strike>
-											{{ merchandise.get_saving_rate|floatformat:0 }}%</p>
+											<font color="red" size="4px"><b>{{ merchandise.get_saving_rate|floatformat:0 }}%</b>&nbsp;&nbsp;<i class="fas fa-bookmark"></i></font></p>
 										{% endif %}
 									</div>
 									<p class="card-text">{{ merchandise.description|truncatechars:100 }}</p>

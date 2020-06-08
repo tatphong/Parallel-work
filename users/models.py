@@ -16,13 +16,13 @@ class User(AbstractBaseUser, PermissionsMixin):
     PHONE_REGEX = RegexValidator(regex=r'^\+?1?\d{9,15}$', 
         message="Phone number must be entered in the format: '+999999999'.")
 
-    email = models.EmailField(_('email address'), unique=True)
-    phone_number = models.CharField(validators=[PHONE_REGEX], max_length=17, unique=True)
-    is_staff = models.BooleanField(default=False)
-    is_active = models.BooleanField(default=True)
-    fullname = models.CharField(max_length=256)
-    gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
-    date_joined = models.DateTimeField(default=timezone.now)
+    email = models.EmailField(_('Địa chỉ email'), unique=True)
+    phone_number = models.CharField(_('Số điện thoại'), validators=[PHONE_REGEX], max_length=17, unique=True)
+    is_staff = models.BooleanField(_('Là nhân viên'), default=False)
+    is_active = models.BooleanField(_('Đã kích hoạt'), default=True)
+    fullname = models.CharField(_('Họ và tên'), max_length=256)
+    gender = models.CharField(_('Giới tính'), max_length=1, choices=GENDER_CHOICES)
+    date_joined = models.DateTimeField(_('Ngày tham gia'),default=timezone.now)
     blocked_date = models.DateTimeField(blank=True, null=True, default=None)
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []

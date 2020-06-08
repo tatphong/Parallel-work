@@ -7,9 +7,8 @@
 	<div class="container">
 		<!-- Row Start -->
 		<div class="row">
-			
+			<!--Đơn hàng của tôi-->
 			<div class="col-md-12">
-				<!-- Recently Favorited -->
 				<div class="widget dashboard-container my-adslist">
 					<h3 class="widget-header">ĐƠN HÀNG CỦA TÔI</h3>
 					<table class="table  product-dashboard-table">
@@ -88,6 +87,27 @@
 				</div>
 				<!-- pagination -->
 
+			</div>
+			<!--Lịch sử trạng thái đơn hàng-->
+			<div class="col-md-12">
+				<div class="widget dashboard-container my-adslist">
+					<h3 class="widget-header">Chi tiết trạng thái đơn hàng</h3>
+					<table class="table  product-dashboard-table">
+						<thead>
+							{% for each_status in detail_order_status %}
+							<tr>
+                                <th scope="col">{{each_status.created_date|date:"d/m/Y G:i"}}</th>
+								<th scope="col">{{each_status.name}}&nbsp;
+									{% if each_status.note %}
+										<span>({{each_status.note}})</span>
+									{% endif %}
+								</th>
+							</tr>
+							{% endfor %}
+						</thead>
+						
+					</table>
+				</div>
 			</div>
 		</div>
 		<!-- Row End -->
