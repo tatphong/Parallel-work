@@ -31,38 +31,19 @@ def get_profit_of_user(user, filter_date_begin=None, filter_date_end=None, order
 
 def count_status_order(user):
     count = OrderStatus.objects.raw('''
-        select `order`.`id`, (select `tb1`.`id_order_status`
-                from `history_order_status` `tb1` join `order` `tb2`
-                where `tb1`.`id_order` = `tb2`.`id` and `tb2`.`id` = `order`.`id`
-                order by tb1.`id` desc
-                LIMIT 1) as `id_order_status`, count(`order`.`id`) `count`
-        from `order`
-        where `order`.`id_user` = %s
-        group by `id_order_status`
-        order by `id_order_status`;
+        select os.id, os.`name`, count(tb2.id_order_status) `count`
+        from (select tb1.id, h.id_order_status, max(h.created_date)
+            from (select o.id
+                    from `order` as o join detail_order as d join merchandise as m
+                    where o.id=d.id_order and m.id=d.id_merchandise and
+                        m.id_user = %s
+                    group by o.id) as tb1 join history_order_status as h
+            where tb1.id = h.id_order
+            group by tb1.id) as tb2 right join order_status as os on os.id=tb2.id_order_status
+        group by os.id ;
     ''', [user])
 
-    count_1, count_2, count_3, count_4, count_5 = 0, 0, 0, 0, 0
-    for i in count:
-        if i.id_order_status == 1:
-            count_1 = i.count
-        if i.id_order_status == 2:
-            count_2 = i.count
-        if i.id_order_status == 3:
-            count_3 = i.count
-        if i.id_order_status == 4:
-            count_4 = i.count
-        if i.id_order_status == 5:
-            count_5 = i.count
-
-    count_status = {
-        "order_status_1":count_1,
-        "order_status_2":count_2,
-        "order_status_3":count_3,
-        "order_status_4":count_4,
-        "order_status_5":count_5,
-    }
-    return count_status
+    return count
 
 def get_product_income_rank(user):
     income_rank = DetailOrder.objects.raw('''
@@ -70,7 +51,7 @@ def get_product_income_rank(user):
         from `order` join  `detail_order` `d_o` join `merchandise` `m` join `merchandise_image` `mi` join `book` join `image` 
         where `order`.`id` = `d_o`.`id_order` and `d_o`.`id_merchandise` = `m`.`id` and `m`.`id` = `mi`.`id_merchandise` and `mi`.`id_image` = `image`.`id` 
             and `m`.`id_product` = `book`.`id`
-	        and `order`.`id_user` = %s
+	        and `m`.`id_user` = %s
         group by `d_o`.`id_merchandise`
         order by `income` desc
         ;

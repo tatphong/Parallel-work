@@ -41,27 +41,13 @@
                 </div>
                 <div class="widget text-center">
                     <h5 class="widget-header title-text-color">Hiệu quả hoạt động</h5>
-
+                    {% for each_status in count_status %}
                     <a href="">
-                        <p class="title-text-color">{{count_status.order_status_1}}</p>
-                        <p>Đang xử lý</p>
+                        <p class="title-text-color">{{each_status.count}}</p>
+                        <p>{{each_status.name}}</p>
                     </a>
-                    <a href="">
-                        <p class="title-text-color">{{count_status.order_status_2}}</p>
-                        <p>Đã dời lại</p>
-                    </a>
-                    <a href="">
-                        <p class="title-text-color">{{count_status.order_status_3}}</p>
-                        <p>Giao hàng thành công</p>
-                    </a>
-                    <a href="">
-                        <p class="title-text-color">{{count_status.order_status_4}}</p>
-                        <p>Đã hủy</p>
-                    </a>
-                    <a href="">
-                        <p class="title-text-color">{{count_status.order_status_5}}</p>
-                        <p>Đang giao hàng</p>
-                    </a>
+                    {% endfor %}
+                    
                 </div>
                 <div class="widget dashboard-container my-adslist">
 
