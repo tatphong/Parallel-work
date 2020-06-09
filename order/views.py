@@ -29,6 +29,7 @@ def get_order(request):
                 where `d_o`.`id_merchandise` = `m`.`id` AND `book`.`id` = `m`.`id_product` AND `m`.`id` = `m_img`.`id_merchandise` 
                     AND `m_img`.`id_image` = `image`.`id`
                     AND `d_o`.`id_order` = %s
+                group by `d_o`.`id`
             ''',[str(id_order)])
             address = Address.objects.get(pk = order.address_id)
             # get detail order status

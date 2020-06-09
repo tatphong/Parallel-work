@@ -57,6 +57,7 @@ def user_email_verify(request, code):
     if email_verify and email_verify.verify_date == None:
         email_verify.verify_date = timezone.now()
         email_verify.save()
+        send_notification_by_system(request.user, 'Xác nhận email thành công.')
     return redirect('home:index')
 
 @login_required
@@ -74,6 +75,7 @@ def user_info(request):
             password_change_form = PasswordChangeForm(request.POST, current_user=request.user)
             if password_change_form.is_valid():
                 password_change_form.save()
+                send_notification_by_system(request.user, 'Mật khẩu của bạn đã được cập nhật thành công.')
                 return redirect('user:info')
 
     return render(request, 'user/info.html',

@@ -31,14 +31,17 @@ def get_profit_of_user(user, filter_date_begin=None, filter_date_end=None, order
 
 def count_status_order(user):
     count = OrderStatus.objects.raw('''
-        select os.id, os.`name`, count(tb2.id_order_status) `count`
-        from (select tb1.id, h.id_order_status, max(h.created_date)
+        select os.id, os.`name`, count(id_order_status) `count`
+        from (select tb1.id, h.id_order_status, h.created_date
             from (select o.id
                     from `order` as o join detail_order as d join merchandise as m
                     where o.id=d.id_order and m.id=d.id_merchandise and
                         m.id_user = %s
-                    group by o.id) as tb1 join history_order_status as h
-            where tb1.id = h.id_order
+                    group by o.id) as tb1 join history_order_status as h join (select id_order, max(`created_date`) `max` 
+                                                                                from `history_order_status` 
+                                                                                group by `id_order`) as `latest_status` 
+                on tb1.id = h.id_order and h.id_order = latest_status.id_order
+            where h.created_date = latest_status.max
             group by tb1.id) as tb2 right join order_status as os on os.id=tb2.id_order_status
         group by os.id ;
     ''', [user])
@@ -47,14 +50,14 @@ def count_status_order(user):
 
 def get_product_income_rank(user):
     income_rank = DetailOrder.objects.raw('''
-        select `m`.`id`, `book`.`name`, `image`.`url`, sum(`d_o`.`total_price_after_discount`) `income`, sum(`d_o`.`quantity`) `count`
-        from `order` join  `detail_order` `d_o` join `merchandise` `m` join `merchandise_image` `mi` join `book` join `image` 
-        where `order`.`id` = `d_o`.`id_order` and `d_o`.`id_merchandise` = `m`.`id` and `m`.`id` = `mi`.`id_merchandise` and `mi`.`id_image` = `image`.`id` 
-            and `m`.`id_product` = `book`.`id`
-	        and `m`.`id_user` = %s
+        select `m`.`id`, `book`.`name`, `img`.`url` `url`, sum(`d_o`.`total_price_after_discount`) `income`, sum(`d_o`.`quantity`) `count`
+        from `order` join  `detail_order` `d_o` join `book` join `merchandise` `m` 
+            on `order`.`id` = `d_o`.`id_order` and `d_o`.`id_merchandise` = `m`.`id` and `m`.`id_product` = `book`.`id`
+            join (select `mi`.`id_merchandise`, `image`.`url` from `merchandise_image` `mi` join `image` on `mi`.`id_image`=`image`.`id`
+                group by `mi`.`id_merchandise`) `img` on `img`.`id_merchandise` = `m`.`id`
+        where `m`.`id_user` = %s
         group by `d_o`.`id_merchandise`
-        order by `income` desc
-        ;
+        order by `income` desc ;
     ''', [user])
 
     return income_rank

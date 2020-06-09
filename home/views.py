@@ -7,6 +7,7 @@ from common.utils import SQLUtils
 from book.views import SORT_SQL
 from book.services import MerchandiseRepo
 from order.services import count_status_order, get_product_income_rank
+from django.core.paginator import Paginator
 # Create your views here.
 def index(request):
     base_sql = '''
@@ -78,4 +79,15 @@ def seller_dashboard(request):
     count_status = count_status_order(request.user.id)
     income_rank_list = get_product_income_rank(request.user.id)
 
-    return render(request, 'seller/dashboard.html', {'merchandise_counter':merchandise_counter, 'count_status':count_status, 'income_rank_list':income_rank_list})
+    # paginator
+    paginator = Paginator(income_rank_list, 6)
+    page_number = request.GET.get('page')
+    pager = paginator.get_page(page_number)
+    page_navigator = []
+    for i in range(max(1, pager.number - 2), pager.number):
+        page_navigator.append(i)
+    page_navigator.append(pager.number)
+    for i in range(pager.number + 1, min(pager.number + 2, pager.paginator.num_pages) + 1):
+        page_navigator.append(i)
+
+    return render(request, 'seller/dashboard.html', {'merchandise_counter':merchandise_counter, 'count_status':count_status, 'pager':pager, 'page_navigator': page_navigator})

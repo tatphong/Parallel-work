@@ -12,7 +12,12 @@ from common.utils import ajax_login_required
 def add_book_to_cart(request):
      if request.method == "POST":
           merchandise = Merchandise.objects.get(pk=request.POST.get("merchandise"))
+          # seller not allow to buy their product
+          if merchandise.user==request.user:
+               return JsonResponse({'error': 'Bạn không thể mua sản phẩm của chính mình.'},status=400)
+          
           quantity = int(request.POST.get("quantity"))
+          # check for valid product
           if not merchandise.is_selling():
                return JsonResponse({'error': 'Sản phẩm hiện không còn bán.'},status=400)
           if quantity <= 0:
