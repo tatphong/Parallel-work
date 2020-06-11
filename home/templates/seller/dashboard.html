@@ -42,13 +42,12 @@
                 </div>
                 <div class="widget text-center">
                     <h5 class="widget-header title-text-color">Hiệu quả hoạt động</h5>
-                    {% for each_status in count_status %}
+                    {% for order_status in count_status %}
                     <a href="">
-                        <p class="title-text-color">{{each_status.count}}</p>
-                        <p>{{each_status.name}}</p>
+                        <p class="title-text-color">{{order_status.count}}</p>
+                        <p>{{ order_status.name }}</p>
                     </a>
                     {% endfor %}
-                    
                 </div>
                 <div class="widget dashboard-container my-adslist">
 
@@ -234,34 +233,67 @@
         x: new Date("8/25/2020"),
         y: 16
     }];
-    console.log(data)
-    var ctx = document.getElementById('profit-chart').getContext('2d');
-    var chart = new Chart(ctx, {
-        type: 'bar',
-        data: {
+    
+    //render_profit_chart(data)
+    get_data_profit()
+    function render_profit_chart(data){
+        console.log(data)
+        var ctx = document.getElementById('profit-chart').getContext('2d');
+        var chart = new Chart(ctx, {
+            type: 'bar',
+            data: {
 
-            datasets: [{
-                data: data,
-                fill: false,
-                borderColor: 'green'
-            }]
-        },
-        options: {
-            scales: {
-                xAxes: [{
-                    type: 'time',
-                    time: {
-                        parser: 'MM/DD/YYYY HH:mm',
-                        tooltipFormat: 'll HH:mm',
-                        unit: 'month',
-                        unitStepSize: 1,
-                        displayFormats: {
-                            'month': 'MM YYYY'
-                        }
-                    },
-                }],
+                datasets: [{
+                    data: data,
+                    fill: false,
+                    borderColor: 'green'
+                }]
+            },
+            options: {
+                scales: {
+                    xAxes: [{
+                        type: 'time',
+                        time: {
+                            parser: 'MM/DD/YYYY HH:mm',
+                            tooltipFormat: 'll HH:mm',
+                            unit: 'month',
+                            unitStepSize: 1,
+                            displayFormats: {
+                                'month': 'MM YYYY'
+                            }
+                        },
+                    }],
+                }
             }
-        }
     });
+    }
+
+    function get_data_profit(){
+        $.ajax({
+            type: "GET",
+            url: "{% url 'seller:get_profit' %}",
+            data: {},
+            success: function (response) {
+                render_profit_chart(response['data']);
+            },
+            error: function (response) {
+                // alert the error if any error occured
+                // console.log(response["responseJSON"]["error"]);
+                switch (response.status) {
+                    case 401:
+                        alert("Xin hãy đăng nhập.");
+                        break;
+                    case 400:
+                        alert(response["responseJSON"]["error"]);
+                        break;
+                    case 500:
+                        alert("Đã có lỗi xảy ra, xin hãy thử lại sau.")
+                        break;
+                }
+            }
+        });
+
+    }
+
 </script>
 {% endblock %}

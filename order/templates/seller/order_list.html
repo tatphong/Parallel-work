@@ -2,6 +2,7 @@
 {% load static %}
 {% load url_helper %}
 {% load humanize %}
+{% load tz %}
 {% block content %}
 <section class="dashboard section">
 	<!-- Container Start -->
@@ -88,7 +89,9 @@
                                 </td>
                                 <!--Ngày mua-->
 								<td>
+                                    {% timezone "Asia/Ho_Chi_Minh" %}
 									<p class="title price-order">{{item.created_date|date:"d/m/Y G:i"}}</p>
+                                    {% endtimezone %}
 								</td>
                                 <!--Sản phẩm-->
 								<td class=" product-collum-order ">

@@ -1,6 +1,7 @@
 {% extends 'user/user_base.html' %}
 {% load static %}
 {% load humanize %}
+{% load tz %}
 {% load url_helper %}
 {% block content_user %}
 	<div class="col-md-10 offset-md-1 col-lg-9 offset-lg-0">
@@ -52,7 +53,9 @@
                                 </td>
                                 <!--Ngày mua-->
 								<td>
+									{% timezone "Asia/Ho_Chi_Minh" %}
 									<p class="price-order">{{item.created_date|date:"d/m/Y G:i"}}</p>
+									{% endtimezone %}
 								</td>
                                 <!--Giá tiền-->
 								<td >

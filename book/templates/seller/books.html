@@ -2,6 +2,7 @@
 {% load static %}
 {% load url_helper %}
 {% load humanize %}
+{% load tz %}
 {% block content %}
 <section class="dashboard section">
     <!-- Container Start -->
@@ -56,6 +57,7 @@
                                     <img width="100%" height="auto" src="{{ merchandise.url }}" alt="Hình sản phẩm">
                                 </td>
                                 <td class="product-details col-3" style="width:350px;">
+                                    {% timezone "Asia/Ho_Chi_Minh" %}
                                     <h3 class="title">{{ merchandise.name }}</h3>
                                     <span><b>Ngày đăng: </b><time>{{ merchandise.created_date|date:"d/m/Y G:i" }}</time> </span>
                                     {% if merchandise.activated_date %}
@@ -68,9 +70,10 @@
                                         {% else %}
                                         <b>Ngày bị khóa: </b>
                                         {% endif %}
-                                        <time>{{ merchandise.blocked_date|date:"d/m/Y G:i" }}</time> 
+                                        <time>{{ merchandise.blocked_date|date:"d/m/Y G:i" }}</time>
                                     </span>
                                     {% endif %}
+                                    {% endtimezone %}
                                 </td>
                                 <td class="product-category col-1">
                                     <span class="categories">{{ merchandise.portfolio_name }}</span>

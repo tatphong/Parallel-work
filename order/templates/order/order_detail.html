@@ -1,6 +1,7 @@
 {% extends 'customer_base.html' %}
 {% load static %}
 {% load humanize %}
+{% load tz %}
 {% block content %}
 <section class="dashboard section">
 	<!-- Container Start -->
@@ -94,6 +95,7 @@
 					<h3 class="widget-header">Chi tiết trạng thái đơn hàng</h3>
 					<table class="table  product-dashboard-table">
 						<thead>
+							{% timezone "Asia/Ho_Chi_Minh" %}
 							{% for each_status in detail_order_status %}
 							<tr>
                                 <th scope="col">{{each_status.created_date|date:"d/m/Y G:i"}}</th>
@@ -104,6 +106,7 @@
 								</th>
 							</tr>
 							{% endfor %}
+							{% endtimezone %}
 						</thead>
 						
 					</table>

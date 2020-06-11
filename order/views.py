@@ -4,14 +4,15 @@ from cart.models import Cart
 from book.models import Merchandise
 from users.models import Address
 from review.models import AllowedReviewTimes
-from common.utils import SQLUtils, get_object_or_none
+from common.utils import SQLUtils, get_object_or_none, ajax_login_required
 from notification.services import send_notification_by_system
 from .forms import NewAddressForm
 from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 from django.db import transaction, DatabaseError
-
+from .services import get_profit_of_user
+from django.http import JsonResponse
 # Create your views here.
 @login_required
 def get_order(request):
@@ -78,10 +79,9 @@ def cancel_order(request):
 def check_out(request):
     #get cart item
     cart_items = list(Cart.objects.raw('''
-        select `cart`.`id`, `book`.`name`, `cart`.`quantity`, `m`.`id` `merchandise_id`, `m`.`price`, `image`.`url`
-        from `cart` join `merchandise` `m` join `book` join `merchandise_image` `m_img` join `image`
-        where `cart`.`id_merchandise` = `m`.`id` AND `m`.`id_product` = `book`.`id` AND `m_img`.`id_merchandise` = `m`.`id` 
-            AND `image`.`id`= `m_img`.`id_image`
+        select `cart`.`id`, `book`.`name`, `cart`.`quantity`, `m`.`id` `merchandise_id`, `m`.`price`
+        from `cart` join `merchandise` `m` join `book`
+        where `cart`.`id_merchandise` = `m`.`id` AND `m`.`id_product` = `book`.`id`
             AND `cart`.`id_user` = %s
         group by `cart`.`id`;
     ''',[str(request.user.id)]))
@@ -211,6 +211,7 @@ def seller_get_order(request):
                 where `d_o`.`id_merchandise` = `m`.`id` AND `book`.`id` = `m`.`id_product` AND `m`.`id` = `m_img`.`id_merchandise` 
                     AND `m_img`.`id_image` = `image`.`id`
                     AND `d_o`.`id_order` = %s
+                group by `d_o`.`id`
             ''',[str(id_order)])
             address = Address.objects.get(pk = order.address_id)
             return render (request, 'order/order_detail.html', {'order':order, 'details':details, 'address':address})
@@ -279,3 +280,12 @@ def seller_get_order(request):
     #         print(i.code)
 
     return render(request, 'seller/order_list.html', {'pager':pager, 'page_navigator': page_navigator, 'all_status':order_status, 'post_value':post_param})
+
+
+@ajax_login_required
+def get_profit_data(request):
+    profit_data = get_profit_of_user(request.user.id)#, order_status=3)
+    response_profit_data = []
+    for data in profit_data:
+        response_profit_data.append({'x': data.id, 'y': int(data.profit)})
+    return JsonResponse({'data': response_profit_data}, status=200)

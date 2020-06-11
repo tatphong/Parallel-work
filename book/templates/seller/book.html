@@ -1,5 +1,6 @@
 {% extends 'seller_base.html' %}
 {% load static %}
+{% load tz %}
 {% block content %}
 <section class="dashboard section">
     <!-- Container Start -->
@@ -57,9 +58,11 @@
                                                     id="pro-publisher" name="publisher" value="{{ product.publisher }}" disabled></td>
                                         </tr>
                                         <tr class="form-group">
+                                            {% timezone "Asia/Ho_Chi_Minh" %}
                                             <td><label for="pro-publicdate">Ngày xuất bản:</label> </td>
                                             <td><input class="form-control" type="month" class="input-add-spec"
                                                     id="pro-publicdate" name="publicdate" value="{{ product.publication_date }}" disabled></td>
+                                            {% endtimezone %}
                                         </tr>
                                         <tr class="form-group">
                                             <td><label for="pro-length">Kích thước:</label> </td>
