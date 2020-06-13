@@ -123,6 +123,11 @@ def add_book(request):
 
 @login_required
 def get_my_merchandises(request):
+    # search product
+    # if request.GET.get('search_product'):
+    #     search_product_name = request.GET.get('search_product')
+    #     sqlutils.add_where('`order`.`id` = %s', search_product_name)
+
     merchandise_status = request.GET.get('status')
     if not merchandise_status:
         merchandise_status = 'selling'

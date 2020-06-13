@@ -135,7 +135,7 @@
                             {% with sorted=request.GET.sort %}
                             <select onchange="location = this.value;">
                                 <option {%if sorted == 'newest'%}selected{%endif%}
-                                    value="{% query_url 'sort' 'newest' request.GET.urlencode %}">Hàng mới</option>
+                                    value="{% query_url 'sort' 'newest' request.GET.urlencode %}">Sách mới</option>
                                 <option {%if sorted == 'hotest'%}selected{%endif%}
                                     value="{% query_url 'sort' 'hotest' request.GET.urlencode %}">Bán chạy</option>
                                 <option {%if sorted == 'appreciated'%}selected{%endif%}
@@ -176,7 +176,7 @@
                                             <h5>{{ product.price|floatformat:0|intcomma }} đ</h5>
                                             {% if product.origin_price != product.price %}
                                             <p><strike>{{ product.origin_price|floatformat:0|intcomma }} đ</strike>
-                                                {{ product.get_saving_rate|floatformat:0 }}%</p>
+                                                <font color="red" size="4px"><b>{{ product.get_saving_rate|floatformat:0 }}%</b>&nbsp;&nbsp;<i class="fas fa-bookmark"></i></font></p>
                                             {% endif %}
                                         </div>
                                         <p class="card-text">{{ product.description|truncatechars:100 }}</p>

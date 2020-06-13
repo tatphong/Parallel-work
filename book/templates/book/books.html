@@ -87,7 +87,7 @@
                             {% with sorted=request.GET.sort %}
                             <select onchange="location = this.value;">
                                 <option {%if sorted == 'newest'%}selected{%endif%}
-                                    value="{% query_url 'sort' 'newest' request.GET.urlencode %}">Hàng mới</option>
+                                    value="{% query_url 'sort' 'newest' request.GET.urlencode %}">Sách mới</option>
                                 <option {%if sorted == 'hotest'%}selected{%endif%}
                                     value="{% query_url 'sort' 'hotest' request.GET.urlencode %}">Bán chạy</option>
                                 <option {%if sorted == 'appreciated'%}selected{%endif%}

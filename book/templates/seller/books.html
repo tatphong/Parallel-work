@@ -15,24 +15,28 @@
                 <div class="widget dashboard-container my-adslist">
                     <h3 class="widget-header title-text-color">DANH SÁCH SẢN PHẨM </h3>
                     <div class="row" style="margin-bottom: 0.8em;">
-                        <div class="col-md-6">
-                            <strong>Trạng thái</strong>
-                            {% with status=request.GET.status %}
-                            <select onchange="location = this.value;">
-                                <option {%if status == 'selling'%}selected{%endif%}
-                                    value="{% query_url 'status' 'selling' request.GET.urlencode %}">Đang bán</option>
-                                <option {%if status == 'sold_out'%}selected{%endif%}
-                                    value="{% query_url 'status' 'sold_out' request.GET.urlencode %}">Đã bán hết</option>
-                                <option {%if status == 'pending'%}selected{%endif%}
-                                    value="{% query_url 'status' 'pending' request.GET.urlencode %}">Đang chờ kiểm duyệt</option>
-                                <option {%if status == 'stopping'%}selected{%endif%}
-                                    value="{% query_url 'status' 'stopping' request.GET.urlencode %}">Tạm dừng</option>
-                                <option {%if status == 'blocked'%}selected{%endif%}
-                                    value="{% query_url 'status' 'blocked' request.GET.urlencode %}">Bị khoá</option>
-                                <option {%if status == 'rejected'%}selected{%endif%}
-                                    value="{% query_url 'status' 'rejected' request.GET.urlencode %}">Bị từ chối</option>
-                            </select>
-                            {% endwith %}
+                        <div class="col-12"> 
+                                <strong>Trạng thái</strong>
+                                {% with status=request.GET.status %}
+                                <select onchange="location = this.value;">
+                                    <option {%if status == 'selling'%}selected{%endif%}
+                                        value="{% query_url 'status' 'selling' request.GET.urlencode %}">Đang bán</option>
+                                    <option {%if status == 'sold_out'%}selected{%endif%}
+                                        value="{% query_url 'status' 'sold_out' request.GET.urlencode %}">Đã bán hết</option>
+                                    <option {%if status == 'pending'%}selected{%endif%}
+                                        value="{% query_url 'status' 'pending' request.GET.urlencode %}">Đang chờ kiểm duyệt</option>
+                                    <option {%if status == 'stopping'%}selected{%endif%}
+                                        value="{% query_url 'status' 'stopping' request.GET.urlencode %}">Tạm dừng</option>
+                                    <option {%if status == 'blocked'%}selected{%endif%}
+                                        value="{% query_url 'status' 'blocked' request.GET.urlencode %}">Bị khoá</option>
+                                    <option {%if status == 'rejected'%}selected{%endif%}
+                                        value="{% query_url 'status' 'rejected' request.GET.urlencode %}">Bị từ chối</option>
+                                </select>
+                                {% endwith %}
+                            <!--search order with id-->
+                                <input id="search_product" class="search-seller" type="text" name="search_product" placeholder="Tìm theo tên" 
+                                    value="{{request.GET.search_product}}" onkeypress="search_product(event)">
+                                
                         </div>
                     </div>
                     <table class="table product-dashboard-table">
@@ -230,6 +234,19 @@
                 }
             }
         });
+    }
+    function search_product(e){
+        if (e.keyCode == 13){
+            console.log("pressed enter");   
+            search_product = document.getElementById("search_product").value
+            var urlParams = new URLSearchParams(window.location.search);
+            if(urlParams.has("search_product") === true){
+                urlParams.set("search_product", search_product)
+            } else {
+                urlParams.append("search_product", search_product)
+            }
+            location.href = "?"+urlParams.toString()
+        }
     }
 </script>
 {% endblock %}

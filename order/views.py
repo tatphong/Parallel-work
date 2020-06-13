@@ -2,7 +2,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from .models import Order, OrderStatus, DetailOrder, HistoryOrderStatus, Payment, Delivery
 from cart.models import Cart
 from book.models import Merchandise
-from users.models import Address
+from users.models import Address, User
 from review.models import AllowedReviewTimes
 from common.utils import SQLUtils, get_object_or_none, ajax_login_required
 from notification.services import send_notification_by_system
@@ -177,12 +177,16 @@ def change_status(request):
         created_by = request.user,
         note = note
     )
+    # lấy id_user của người order
+    order_user_id = Order.objects.get( id=id_order ).user_id
+    order_user = User.objects.get(id=order_user_id)
+
     if id_status == 4:
         # gửi thông báo hủy kèm lý do
-        send_notification_by_system(request.user, "Đơn hàng của bạn đã bị hủy với lý do "+note)
+        send_notification_by_system(order_user, "Đơn hàng của bạn đã bị hủy với lý do "+note)
     elif id_status == 2:
         # gửi thông báo dời lại kèm lý do
-        send_notification_by_system(request.user, "Đơn hàng của bạn đã bị dời lại với lý do "+note)
+        send_notification_by_system(order_user, "Đơn hàng của bạn đã bị dời lại với lý do "+note)
     elif id_status == 3:
         # giảm số lượng trong merchandise và kiểm tra còn hàng 0 sau khi giao thành công
         detail_order = DetailOrder.objects.filter(order_id = id_order)

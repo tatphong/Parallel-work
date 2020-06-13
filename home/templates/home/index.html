@@ -90,7 +90,7 @@
 									</ul>
 									<div class="price">
 										<h5>{{ merchandise.price|floatformat:0|intcomma }} đ</h5>
-										{% if merchandise.origin_price != book.price %}
+										{% if merchandise.origin_price != merchandise.price %}
 										<p><strike>{{ merchandise.origin_price|floatformat:0|intcomma }} đ</strike>
 											<font color="red" size="4px"><b>{{ merchandise.get_saving_rate|floatformat:0 }}%</b>&nbsp;&nbsp;<i class="fas fa-bookmark"></i></font></p>
 										{% endif %}
