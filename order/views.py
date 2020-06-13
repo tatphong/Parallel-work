@@ -13,6 +13,7 @@ from django.utils import timezone
 from django.db import transaction, DatabaseError
 from .services import get_profit_of_user
 from django.http import JsonResponse
+import datetime
 # Create your views here.
 @login_required
 def get_order(request):
@@ -136,15 +137,6 @@ def check_out(request):
                         merchandise.quantity_exists -= item.quantity
                         merchandise.save()
 
-                        # increase review times
-                        try:
-                            allow_rv = AllowedReviewTimes.objects.get(user_id = request.user.id, merchandise_id = item.id)
-                            allow_rv.times += 1
-                            allow_rv.save()
-                            pass    
-                        except:
-                            AllowedReviewTimes.objects.create(user_id = request.user.id, merchandise_id = item.id, times = 1) 
-
                     # create history_status gor current order
                     HistoryOrderStatus.objects.create(order_id = new_order.pk, order_status_id = 1, created_date = timezone.now(), 
                                                             created_by = request.user)
@@ -169,33 +161,46 @@ def change_status(request):
     else:
         note = None
     
-    id_status = int(request.POST.get("change_status_"+id_order))
-    HistoryOrderStatus.objects.create(
-        order_id = id_order, 
-        order_status_id = id_status,
-        created_date = timezone.now(),
-        created_by = request.user,
-        note = note
-    )
-    # lấy id_user của người order
-    order_user_id = Order.objects.get( id=id_order ).user_id
-    order_user = User.objects.get(id=order_user_id)
+    try:
+        with transaction.atomic(): 
+            id_status = int(request.POST.get("change_status_"+id_order))
+            HistoryOrderStatus.objects.create(
+                order_id = id_order, 
+                order_status_id = id_status,
+                created_date = timezone.now(),
+                created_by = request.user,
+                note = note
+            )
+            # lấy id_user của người order
+            order_user_id = Order.objects.get( id=id_order ).user_id
+            order_user = User.objects.get(id=order_user_id)
 
-    if id_status == 4:
-        # gửi thông báo hủy kèm lý do
-        send_notification_by_system(order_user, "Đơn hàng của bạn đã bị hủy với lý do "+note)
-    elif id_status == 2:
-        # gửi thông báo dời lại kèm lý do
-        send_notification_by_system(order_user, "Đơn hàng của bạn đã bị dời lại với lý do "+note)
-    elif id_status == 3:
-        # giảm số lượng trong merchandise và kiểm tra còn hàng 0 sau khi giao thành công
-        detail_order = DetailOrder.objects.filter(order_id = id_order)
-        for item in detail_order:
-            merchandise = Merchandise.objects.get(pk = item.merchandise_id)
-            merchandise.quantity -= item.quantity
-            if merchandise.quantity == 0:
-                merchandise.stopped_date = timezone.now()
-            merchandise.save()
+            if id_status == 4:
+                # gửi thông báo hủy kèm lý do
+                send_notification_by_system(order_user, "Đơn hàng của bạn đã bị hủy với lý do "+note)
+            elif id_status == 2:
+                # gửi thông báo dời lại kèm lý do
+                send_notification_by_system(order_user, "Đơn hàng của bạn đã bị dời lại với lý do "+note)
+            elif id_status == 3:
+                # giảm số lượng trong merchandise và kiểm tra còn hàng 0 sau khi giao thành công
+                detail_order = DetailOrder.objects.filter(order_id = id_order)
+                for item in detail_order:
+                    merchandise = Merchandise.objects.get(pk = item.merchandise_id)
+                    merchandise.quantity -= item.quantity
+                    if merchandise.quantity == 0:
+                        merchandise.stopped_date = timezone.now()
+                    merchandise.save()
+
+                    # increase review times
+                    try:
+                        allow_rv = AllowedReviewTimes.objects.get(user = order_user, merchandise = merchandise)
+                        allow_rv.times += 1
+                        allow_rv.save()
+                    except:
+                        AllowedReviewTimes.objects.create(user = order_user, merchandise = merchandise, times = 1) 
+
+    except DatabaseError as error:
+        print(error)
 
 def seller_get_order(request):
     post_param = {}
@@ -288,8 +293,16 @@ def seller_get_order(request):
 
 @ajax_login_required
 def get_profit_data(request):
-    profit_data = get_profit_of_user(request.user.id)#, order_status=3)
+    if request.GET.get('date_from'):
+        date_begin = datetime.datetime.strptime(request.GET.get('date_from'), '%Y-%m-%d')
+    else:
+        date_begin = None
+    if request.GET.get('date_to'):
+        date_end = datetime.datetime.strptime(request.GET.get('date_to'), '%Y-%m-%d')
+    else:
+        date_end = None
+    profit_data = get_profit_of_user(request.user.id, order_status=3, filter_date_begin=date_begin, filter_date_end=date_end)
     response_profit_data = []
     for data in profit_data:
-        response_profit_data.append({'x': data.id, 'y': int(data.profit)})
+        response_profit_data.append({'date': data.id, 'profit': data.total_price_after_discount})
     return JsonResponse({'data': response_profit_data}, status=200)

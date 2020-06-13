@@ -65,3 +65,7 @@ class Address(models.Model):
     class Meta:
         managed = False
         db_table = 'address'
+    def __str__(self):
+        return 'Chủ sở hữu: {}, Số điện thoại: {}, Số nhà: {}, Đường: {}, Phường: {}, Quận: {}, Thành phố: {}'.format(
+            self.owner, self.phone_number, self.no, self.street, self.ward, self.district, self.city
+        )

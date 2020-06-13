@@ -140,8 +140,8 @@ def store_info(request):
             if not avatar_url and not avatar:
                 avatar_error = 'Xin hãy chọn ảnh đại diện cho cửa hàng của bạn.'
             elif avatar:
-                print(avatar_url, os.path.isfile(avatar_url))
-                path_in_disk = avatar_url[1:] if avatar_url[0] == '/' else avatar_url
+                #print(avatar_url, os.path.isfile(avatar_url))
+                path_in_disk = avatar_url[1:] if avatar_url and avatar_url[0] == '/' else avatar_url
                 if path_in_disk and os.path.isfile(path_in_disk):
                     os.remove(path_in_disk)
                 image_path = save_image(request.user, avatar, 'store/avatar_store')

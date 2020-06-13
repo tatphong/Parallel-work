@@ -79,6 +79,8 @@ class MerchandiseRepo:
             sqlutils.add_where('`merchandise`.`price` >= %s', self.kwargs.get('low_price'))
         if self.kwargs.get('high_price'):
             sqlutils.add_where('`merchandise`.`price` <= %s', self.kwargs.get('high_price'))
+        if self.kwargs.get('search_product'):
+            sqlutils.add_where('`book`.`name` LIKE %s', '%' + self.kwargs.get('search_product') + '%')
         
         sqlutils.add_order(SORT_SQL.get(self.kwargs.get('sort'),SORT_SQL.get('newest')))
         return sqlutils

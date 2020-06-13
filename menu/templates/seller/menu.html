@@ -31,11 +31,9 @@
                                 
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="{% url 'order:seller_order' %}">Đơn hàng</a>
+                                <a class="nav-link" href="{% url 'seller:get_order' %}">Đơn hàng</a>
                             </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="contact-us.html">Bình luận</a>
-                            </li>
+                            
                         </ul>
                         {% if user.is_authenticated %}
                         <ul class="navbar-nav ml-auto mt-10">

@@ -17,6 +17,7 @@ import os
 from django.utils import timezone
 from django.http import JsonResponse
 from django.http import HttpResponseForbidden
+from django.urls import reverse
 # Create your views here.
 SORT_SQL = {
     'newest': '`activated_date` DESC',
@@ -86,10 +87,10 @@ def get_book(request, id):
 @login_required
 def add_book(request):
     store = get_object_or_none(Store, pk=request.user)
-    
+    print( reverse('user:store_info'))
     if request.method == 'POST':
         if not store:
-            return redirect('user:store_info')
+            return JsonResponse({'url': reverse('user:store_info')}, status=405)
         if get_avaiable_merchandises(request.user).count() < 3:
             book_form = BookForm(request.POST, current_user = request.user)
             if book_form.is_valid():
@@ -135,7 +136,7 @@ def get_my_merchandises(request):
         is_book=True, merchandise_status=merchandise_status, is_opening_store=True,
         category=request.GET.get('category'), author=request.GET.get('author'), location=request.GET.get('location'),
         condition=request.GET.get('condition'), low_price=request.GET.get('low_price'),
-        high_price=request.GET.get('high_price'), sort=request.GET.get('sort'), owner=request.user.pk)
+        high_price=request.GET.get('high_price'), search_product=request.GET.get('search_product'), sort=request.GET.get('sort'), owner=request.user.pk)
 
     merchandises = merchandise_repo.get_merchandises()
 
@@ -162,7 +163,7 @@ def toggle_merchandise_status_by_seller(request):
             merchandise.stopped_date = timezone.now()
             merchandise.save()
             return JsonResponse({}, status=200)
-        elif merchandise_status == 'stopping':
+        elif merchandise_status == 'stopping' and get_avaiable_merchandises(request.user).count() < 3:
             merchandise.stopped_date = None
             merchandise.save()
             return JsonResponse({}, status=200)

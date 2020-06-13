@@ -564,6 +564,10 @@
                         //alert("Đã có lỗi xảy ra, xin hãy thử lại sau.")
                         $.notify("Đã có lỗi xảy ra, xin hãy thử lại sau.", "error");
                         break;
+                    case 405:
+                        console.log(response)
+                        window.location.replace(response["responseJSON"]["url"])
+                        break;
                 }
             }
         });

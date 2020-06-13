@@ -1,0 +1,21 @@
+{% extends 'admin/change_form.html' %}
+
+{% block submit_buttons_bottom %}
+    <!--{{ block.super }}-->
+    <div class="submit-row">
+        {% if original.get_merchandise_status.code == 'pending' %}
+        <input type="submit" value="Từ chối" name="pending_reject">
+        <input type="submit" value="Duyệt bán" name="pending_accept">
+        {% elif original.get_merchandise_status.code == 'stopping' or original.get_merchandise_status.code == 'selling' %}
+        <input type="submit" value="Khóa" name="block">
+        {% endif %}
+    </div>
+{% endblock %}
+
+{% block admin_change_form_document_ready %}
+    {{ block.super }}
+    <script src="http://js.nicedit.com/nicEdit-latest.js" type="text/javascript"></script>
+    <script>
+        bkLib.onDomLoaded(nicEditors.allTextAreas);
+    </script>
+{% endblock %}

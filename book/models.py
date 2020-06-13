@@ -1,6 +1,7 @@
 from django.db import models
 from users.models import User, Address
 from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 # Create your models here.
 
 class Book(models.Model):
@@ -48,6 +49,8 @@ class BookCategory(models.Model):
     def is_leaf(self):
         return not self.bookcategory_set.all().exists()
 
+    def __str__(self):
+        return self.name
 
 class BookCategoryDetail(models.Model):
     book = models.ForeignKey(Book, models.DO_NOTHING, db_column='id_book')
@@ -70,6 +73,10 @@ class MerchandisePortfolio(models.Model):
     class Meta:
         managed = False
         db_table = 'merchandise_portfolio' 
+    
+    def __str__(self):
+        return self.name
+
 class MerchandiseCondition(models.Model):
     code = models.CharField(unique=True, max_length=64)
     name = models.CharField(max_length=256)
@@ -80,6 +87,9 @@ class MerchandiseCondition(models.Model):
     class Meta:
         managed = False
         db_table = 'merchandise_condition'
+    
+    def __str__(self):
+        return self.name
 
 class Delivery(models.Model):
     name = models.CharField(max_length=256)
@@ -91,6 +101,9 @@ class Delivery(models.Model):
     class Meta:
         managed = False
         db_table = 'delivery'
+    
+    def __str__(self):
+        return self.name
 
 class Image(models.Model):
     url = models.CharField(max_length=2083)
@@ -103,24 +116,24 @@ class Image(models.Model):
 
 
 class Merchandise(models.Model):
-    user = models.ForeignKey(User, models.DO_NOTHING, db_column='id_user')
+    user = models.ForeignKey(User, models.DO_NOTHING, db_column='id_user', verbose_name =_('Người tạo'))
     id_product = models.IntegerField()
-    portfolio = models.ForeignKey(MerchandisePortfolio, models.DO_NOTHING, db_column='id_portfolio')
-    condition = models.ForeignKey(MerchandiseCondition, models.DO_NOTHING, db_column='id_condition')
-    address = models.ForeignKey(Address, models.DO_NOTHING, db_column='id_address')
-    origin_quantity = models.IntegerField()
-    quantity = models.IntegerField()
-    quantity_exists = models.IntegerField()
-    price = models.DecimalField(max_digits=13, decimal_places=4)
-    origin_price = models.DecimalField(max_digits=13, decimal_places=4)
-    description = models.TextField()
-    total_star = models.IntegerField(blank=True, null=True)
-    times_rated = models.IntegerField(blank=True, null=True)
-    stopped_date = models.DateTimeField(blank=True, null=True)
-    blocked_date = models.DateTimeField(blank=True, null=True)
-    created_date = models.DateTimeField(default=timezone.now)
-    activated_date = models.DateTimeField(blank=True, null=True)
-    activated_by = models.ForeignKey(User, models.DO_NOTHING, db_column='activated_by', blank=True, null=True, related_name='activated_merchandise_set')
+    portfolio = models.ForeignKey(MerchandisePortfolio, models.DO_NOTHING,  db_column='id_portfolio', verbose_name =_('Loại sản phẩm'))
+    condition = models.ForeignKey(MerchandiseCondition, models.DO_NOTHING, db_column='id_condition', verbose_name =_('Tình trạng sản phẩm'))
+    address = models.ForeignKey(Address, models.DO_NOTHING, db_column='id_address', verbose_name =_('Địa chỉ'))
+    origin_quantity = models.IntegerField(verbose_name =_('Số lượng gốc'))
+    quantity = models.IntegerField(verbose_name =_('Số lượng'))
+    quantity_exists = models.IntegerField(verbose_name =_('Số lượng tồn'))
+    price = models.DecimalField(max_digits=13, decimal_places=4, verbose_name =_('Giá'))
+    origin_price = models.DecimalField(max_digits=13, decimal_places=4, verbose_name =_('Giá thị trường'))
+    description = models.TextField(verbose_name =_('Mô tả'))
+    total_star = models.IntegerField(blank=True, null=True, verbose_name =_('Tổng số sao'))
+    times_rated = models.IntegerField(blank=True, null=True, verbose_name =_('Tổng lượt đánh giá'))
+    stopped_date = models.DateTimeField(blank=True, null=True, verbose_name =_('Ngày dừng bán'))
+    blocked_date = models.DateTimeField(blank=True, null=True, verbose_name =_('Ngày khóa'))
+    created_date = models.DateTimeField(default=timezone.now, verbose_name =_('Ngày tạo'))
+    activated_date = models.DateTimeField(blank=True, null=True, verbose_name =_('Ngày kích hoạt'))
+    activated_by = models.ForeignKey(User, models.DO_NOTHING, db_column='activated_by', blank=True, null=True, related_name='activated_merchandise_set', verbose_name =_('Người kích hoạt'))
     class Meta:
         managed = False
         db_table = 'merchandise'

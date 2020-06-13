@@ -49,59 +49,6 @@
                     </a>
                     {% endfor %}
                 </div>
-                <div class="widget dashboard-container my-adslist">
-
-                    <table class="table product-dashboard-table">
-                        <thead>
-                            <tr>
-                                <th>CHƯƠNG TRÌNH KHUYẾN MÃI</th>
-                                <th class="text-center"></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td class="product-details">
-                                    <span class="status active">Sắp diễn ra</span>
-                                    <p>Khuyến mãi mừng lễ 30/4, siêu giảm giá</p>
-                                </td>
-
-                                <td class="action">
-                                    <div class="">
-                                        <ul class="list-inline justify-content-center">
-
-                                            <li class="list-inline-item">
-                                                <a data-toggle="tooltip" data-placement="top" title="Đăng ký"
-                                                    class="delete" href="">
-                                                    <i class="fa fa-plus-circle"></i>
-                                                </a>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="product-details">
-                                    <span class="status active">Sắp diễn ra</span>
-                                    <p>Khuyến mãi mừng lễ 30/4, siêu giảm giá</p>
-                                </td>
-
-                                <td class="action">
-                                    <div class="">
-                                        <ul class="list-inline justify-content-center">
-
-                                            <li class="list-inline-item">
-                                                <a data-toggle="tooltip" data-placement="top" title="Đăng ký"
-                                                    class="delete" href="">
-                                                    <i class="fa fa-plus-circle"></i>
-                                                </a>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
             </div>
 
             <div class="col-md-10 offset-md-1 col-lg-8 offset-lg-0">
@@ -113,11 +60,11 @@
                         <div class="row">
                             <div class="col-sm">
                                 <label for="profit-from-date">Từ: &nbsp;&nbsp;&nbsp;</label>
-                                <input type="date" id="profit-from-date">
+                                <input type="date" id="profit-from-date" onchange="set_data_profit_url('date_from', this.value);">
                             </div>
                             <div class="col-sm">
-                                <label for="profit-to-date">Đến: &nbsp;&nbsp;&nbsp;</label>
-                                <input type="date" id="profit-to-date">
+                                <label for="profit-to-date" >Đến: &nbsp;&nbsp;&nbsp;</label>
+                                <input type="date" id="profit-to-date" onchange="set_data_profit_url('date_to', this.value);">
                             </div>
                         </div>       
                     </div>
@@ -126,14 +73,8 @@
 
                 <div class="widget dashboard-container my-adslist box-analysic">
                     <h3 class="widget-header">
-                        SẢN PHẨM BÁN CHẠY NHẤT
+                        SẢN PHẨM CÓ DOANH THU CAO NHẤT
                     </h3>
-                    <div style="margin-bottom:20px">
-                        <select>
-                            <option>Doanh thu cao nhất</option>
-                            <option>Số lượng bán ra nhiều nhất</option>
-                        </select>
-                    </div>
                     <table class="table table-responsive product-dashboard-table">
                         <thead>
                             <tr>
@@ -214,38 +155,31 @@
 
 {% block js %}
 <script>
-    data = [{
-        x: new Date("5/1/2020"),
-        y: 1
-    }, {
-        t: new Date("5/2/2020"),
-        y: 10
-    }, {
-        x: new Date("5/3/2020"),
-        y: 4
-    }, {
-        x: new Date("6/1/2020"),
-        y: 5
-    }, {
-        x: new Date("6/2/2020"),
-        y: 9
-    }, {
-        x: new Date("8/25/2020"),
-        y: 16
-    }];
-    
-    //render_profit_chart(data)
+    data_profit_query = ""
+    function set_data_profit_url(key, value){
+        var urlParams = new URLSearchParams(data_profit_query);
+        if(urlParams.has(key)){
+            urlParams.set(key, value);
+        }else{
+            urlParams.append(key, value);
+        }
+        data_profit_query = urlParams.toString();
+        //console.log(urlParams.toString())
+        get_data_profit();
+    }
     get_data_profit()
     function render_profit_chart(data){
         console.log(data)
         var ctx = document.getElementById('profit-chart').getContext('2d');
         var chart = new Chart(ctx, {
-            type: 'bar',
+            type: 'line',
             data: {
 
                 datasets: [{
+                    label: 'Số tiền thu được',
                     data: data,
                     fill: false,
+                    backgroundColor: 'green',
                     borderColor: 'green'
                 }]
             },
@@ -254,27 +188,35 @@
                     xAxes: [{
                         type: 'time',
                         time: {
-                            parser: 'MM/DD/YYYY HH:mm',
-                            tooltipFormat: 'll HH:mm',
-                            unit: 'month',
+                            parser: 'DD/MM/YYYY',
+                            tooltipFormat: 'DD/MM/YYYY',
+                            unit: 'day',
                             unitStepSize: 1,
                             displayFormats: {
-                                'month': 'MM YYYY'
+                                'day': 'DD/MM/YYYY'
                             }
-                        },
-                    }],
+                        }
+                    }]
+                    
                 }
             }
     });
     }
-
+    
     function get_data_profit(){
         $.ajax({
             type: "GET",
-            url: "{% url 'seller:get_profit' %}",
+            url: "{% url 'seller:get_profit' %}?"+data_profit_query,
             data: {},
             success: function (response) {
-                render_profit_chart(response['data']);
+                var profit_data = new Array();
+                for(let i = 0; i < response['data'].length; ++i){
+                    profit_data.push({
+                        x: new Date(response['data'][i]['date']),
+                        y: response['data'][i]['profit']
+                    });
+                }
+                render_profit_chart(profit_data);
             },
             error: function (response) {
                 // alert the error if any error occured
