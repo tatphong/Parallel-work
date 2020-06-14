@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404
-from django.http import HttpResponseNotFound
+from django.http import HttpResponseNotFound, Http404
 from django.contrib.auth.decorators import login_required
 from .models import Cart
 from book.models import Merchandise
@@ -63,7 +63,7 @@ def get_cart(request):
 
      # update quantity
      if request.method == "POST":
-          update_quantity(request)
+          update_quantity(request.POST.get("id_cart"), request.POST.get("qty"))
 
      # get cart
      cart_items = Cart.objects.raw('''
@@ -76,17 +76,16 @@ def get_cart(request):
           group by `cart`.`id`;
      ''',[str(request.user.id)])
 
-     # subtotal
      sub_total = 0
      for i in cart_items:
+          # subtotal
           sub_total += i.quantity * i.merchandise.price
+          # check if quantity valid
+          update_quantity(i.id, i.quantity)
 
      return render(request, 'cart/cart.html', {'cart_items':cart_items, 'sub_total':sub_total, 'stopped_selling':stopped_selling})
 
-@login_required
-def update_quantity(request):
-     id_cart = request.POST.get("id_cart")
-     qty = int(request.POST.get("qty"))
+def update_quantity(id_cart, qty):
      # check qty valid
      if qty<1: qty=1
      cart = Cart.objects.get(pk=id_cart)
@@ -94,7 +93,6 @@ def update_quantity(request):
      qty = min(merchandise.quantity_exists, qty)
      # update cart quantity
      Cart.objects.filter(pk=id_cart).update(quantity=qty)
-     # return get_cart(request)
 
 def secure_cart_request(request, id_cart):
      cart_owner = Cart.objects.get(pk=id_cart)
@@ -105,7 +103,7 @@ def secure_cart_request(request, id_cart):
 @login_required
 def delete_cart(request, id_cart):
      if not secure_cart_request(request, id_cart):
-          return HttpResponseNotFound()
+          raise Http404
      Cart.objects.filter(pk=id_cart).delete()
      return get_cart(request)
      
