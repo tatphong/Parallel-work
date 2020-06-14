@@ -22,19 +22,21 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_active = models.BooleanField(_('Đã kích hoạt'), default=True)
     fullname = models.CharField(_('Họ và tên'), max_length=256)
     gender = models.CharField(_('Giới tính'), max_length=1, choices=GENDER_CHOICES)
-    date_joined = models.DateTimeField(_('Ngày tham gia'),default=timezone.now)
-    blocked_date = models.DateTimeField(blank=True, null=True, default=None)
+    date_joined = models.DateTimeField(_('Ngày tham gia'), default=timezone.now)
+    blocked_date = models.DateTimeField(_('Ngày bị khóa'), blank=True, null=True, default=None)
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
 
     objects = CustomUserManager()
     def is_accepted_login(self):
-        return self.blocked_date == None
+        return self.blocked_date == None and self.is_active
     
     def __str__(self):
         return self.email
     class Meta:
         db_table = 'user'
+        verbose_name = 'Tài khoản'
+        verbose_name_plural = 'Tài khoản'
 
 class EmailVerify(models.Model):
     user = models.OneToOneField(User, models.DO_NOTHING, db_column='id_user', primary_key=True)
@@ -51,16 +53,16 @@ class EmailVerify(models.Model):
         db_table = 'email_verify'
 
 class Address(models.Model):
-    owner = models.CharField(max_length=256)
+    owner = models.CharField(_('Chủ sở hữu'), max_length=256)
     user = models.ForeignKey(User, models.DO_NOTHING, db_column='id_user')
-    phone_number = models.CharField(validators=[User.PHONE_REGEX], max_length=15)
-    no = models.CharField(max_length=32)
-    street = models.CharField(max_length=64)
-    ward = models.CharField(max_length=64)
-    district = models.CharField(max_length=64)
-    city = models.CharField(max_length=64)
-    created_date = models.DateTimeField(default=timezone.now)
-    delete_date = models.DateTimeField(blank=True, null=True)
+    phone_number = models.CharField(_('Số điện thoại'), validators=[User.PHONE_REGEX], max_length=15)
+    no = models.CharField(_('Số nhà'), max_length=32)
+    street = models.CharField(_('Đường'), max_length=64)
+    ward = models.CharField(_('Phường'), max_length=64)
+    district = models.CharField(_('Quận'), max_length=64)
+    city = models.CharField(_('Thành phố'), max_length=64)
+    created_date = models.DateTimeField(_('Ngày tạo'), default=timezone.now)
+    delete_date = models.DateTimeField(_('Ngày xóa'), blank=True, null=True)
 
     class Meta:
         managed = False

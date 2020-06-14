@@ -4,7 +4,7 @@ from cart.models import Cart
 from book.models import Merchandise
 from users.models import Address, User
 from review.models import AllowedReviewTimes
-from common.utils import SQLUtils, get_object_or_none, ajax_login_required
+from common.utils import SQLUtils, get_object_or_none, ajax_login_required, date_range
 from notification.services import send_notification_by_system
 from .forms import NewAddressForm
 from django.core.paginator import Paginator
@@ -14,6 +14,7 @@ from django.db import transaction, DatabaseError
 from .services import get_profit_of_user
 from django.http import JsonResponse
 import datetime
+from django.utils.timezone import make_aware
 # Create your views here.
 @login_required
 def get_order(request):
@@ -301,8 +302,20 @@ def get_profit_data(request):
         date_end = datetime.datetime.strptime(request.GET.get('date_to'), '%Y-%m-%d')
     else:
         date_end = None
-    profit_data = get_profit_of_user(request.user.id, order_status=3, filter_date_begin=date_begin, filter_date_end=date_end)
+    profit_data_raw = get_profit_of_user(request.user.id, order_status=3, filter_date_begin=date_begin, filter_date_end=date_end)
+    
+    profit_data = dict()
+    if len(list(profit_data_raw)) > 0:
+        date_begin = profit_data_raw[0].id
+        date_end = profit_data_raw[-1].id
+        
+        for idate in date_range(date_begin, date_end):
+            profit_data[idate] = 0
+        for item in profit_data_raw:
+            profit_data[item.id] = item.total_price_after_discount
+        profit_data[profit_data_raw[-1].id] = profit_data_raw[-1].total_price_after_discount
+    
     response_profit_data = []
-    for data in profit_data:
-        response_profit_data.append({'date': data.id, 'profit': data.total_price_after_discount})
+    for key, val in profit_data.items():
+        response_profit_data.append({'date': key, 'profit': val})
     return JsonResponse({'data': response_profit_data}, status=200)

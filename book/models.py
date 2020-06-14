@@ -2,6 +2,7 @@ from django.db import models
 from users.models import User, Address
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
+
 # Create your models here.
 
 class Book(models.Model):
@@ -137,6 +138,8 @@ class Merchandise(models.Model):
     class Meta:
         managed = False
         db_table = 'merchandise'
+        verbose_name = 'Sản phẩm'
+        verbose_name_plural = 'Sản phẩm'
     
     def is_selling(self):
         return self.stopped_date is None and self.blocked_date is None and self.activated_date is not None

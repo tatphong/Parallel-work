@@ -6,7 +6,9 @@ from .models import Merchandise, Book
 from django.http import HttpResponse, HttpResponseRedirect
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.admin import SimpleListFilter
-
+from django.utils import timezone
+from django.utils.html import escape
+from django.utils.safestring import mark_safe
 class StatusFilter(SimpleListFilter):
     title = _('Trạng thái')
 
@@ -58,13 +60,13 @@ class MerchandiseAdmin(admin.ModelAdmin):
     list_filter = [StatusFilter,]
     fieldsets = (
         (None, {'fields': ('get_product_status', 'user', 'portfolio', 'condition', 
-                    'get_product_name', 'get_product_categories', 'get_product_author', 'get_product_publisher', 'get_product_publication_date',
+                    'get_product_name', 'get_product_images' ,'get_product_categories', 'get_product_author', 'get_product_publisher', 'get_product_publication_date',
                     'get_product_width', 'get_product_height', 'get_product_length', 'get_product_pages_num',
                     'address', 'origin_quantity', 'quantity', 
                     'quantity_exists', 'price', 'origin_price', 'description', 'times_rated', 'created_date', 'activated_date', 'activated_by')}),
     )
     readonly_fields = ('get_product_status', 'user', 'portfolio', 'condition', 
-                    'get_product_name', 'get_product_categories', 'get_product_author', 'get_product_publisher', 'get_product_publication_date',
+                    'get_product_name', 'get_product_images', 'get_product_categories', 'get_product_author', 'get_product_publisher', 'get_product_publication_date',
                     'get_product_width', 'get_product_height', 'get_product_length', 'get_product_pages_num',
                     'address', 'origin_quantity', 'quantity', 
                     'quantity_exists', 'price', 'origin_price', 'times_rated', 'created_date', 'activated_date', 'activated_by')
@@ -129,15 +131,30 @@ class MerchandiseAdmin(admin.ModelAdmin):
         return obj.get_merchandise_status()['name']
     get_product_status.short_description = 'Trạng thái'
 
+    def get_product_images(self, obj):
+        images_data = ''
+        for image in obj.merchandiseimage_set.all():
+            images_data += u'<img src="%s" width="300px" height="auto" />' % escape(image.image.url)
+        return mark_safe(images_data)
+    get_product_images.short_description = 'Hình ảnh'
+    get_product_images.allow_tags = True
+
     def response_change(self, request, obj):
         status_code = obj.get_merchandise_status()['code']
         if 'block' in request.POST and status_code in ['stopping', 'selling']:
+            obj.blocked_date = timezone.now()
+            obj.save()
             self.message_user(request, "Đã khóa sản phẩm.")
             return HttpResponseRedirect(".")
         if 'pending_reject' in request.POST and status_code == 'pending':
+            obj.blocked_date = timezone.now()
+            obj.save()
             self.message_user(request, "Đã từ chối sản phẩm.")
             return HttpResponseRedirect(".")
         if 'pending_accept' in request.POST and status_code == 'pending':
+            obj.activated_date = timezone.now()
+            obj.activated_by = request.user
+            obj.save()
             self.message_user(request, "Đã cho phép bán sản phẩm.")
             return HttpResponseRedirect(".")
         

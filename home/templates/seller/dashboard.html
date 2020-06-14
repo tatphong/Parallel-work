@@ -180,7 +180,9 @@
                     data: data,
                     fill: false,
                     backgroundColor: 'green',
-                    borderColor: 'green'
+                    borderColor: 'green',
+                    lineTension: 0,
+                    borderWidth: 2,
                 }]
             },
             options: {
@@ -195,8 +197,10 @@
                             displayFormats: {
                                 'day': 'DD/MM/YYYY'
                             }
-                        }
-                    }]
+                        },
+                        
+                    }],
+                    
                     
                 }
             }
@@ -212,7 +216,7 @@
                 var profit_data = new Array();
                 for(let i = 0; i < response['data'].length; ++i){
                     profit_data.push({
-                        x: new Date(response['data'][i]['date']),
+                        x: moment(response['data'][i]['date']),
                         y: response['data'][i]['profit']
                     });
                 }

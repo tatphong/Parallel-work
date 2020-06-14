@@ -1,4 +1,4 @@
-from common.utils import SQLUtils
+from common.utils import SQLUtils, date_range
 from .models import OrderStatus, DetailOrder, Order
 
 def get_profit_of_user(user, filter_date_begin=None, filter_date_end=None, order_status=None, sort_date_cond='ASC'):
@@ -32,25 +32,7 @@ def get_profit_of_user(user, filter_date_begin=None, filter_date_end=None, order
     sqlutils.add_order('`id` ' + sort_date_cond)
     profit_data = Order.objects.raw(base_sql.format(select=select_clause, where=sqlutils.get_where_clause(),
                                                     group='GROUP BY `id`', order=sqlutils.get_order_clause()), sqlutils.get_params())
-    #print(profit_data)
     
-    # profit_data = OrderStatus.objects.raw('''
-    #     SELECT `history_order_status`.`created_date` AS `id`, SUM(`detail_order`.`total_price_after_discount`) AS `total_price_after_discount`
-    #     FROM `order` JOIN `detail_order` JOIN `merchandise` JOIN `history_order_status`
-    #     ON  
-    #         `order`.`id` = `detail_order`.`id_order` AND 
-    #         `detail_order`.`id_merchandise` = `merchandise`.`id`
-    #     WHERE
-    #         `merchandise`.`id_user` = %s AND
-    #         `history_order_status`.`id` = (SELECT `tb1`.`id` 
-    #             FROM `history_order_status` `tb1`
-    #             WHERE `tb1`.`id_order` = `order`.`id`
-    #             ORDER BY tb1.`id` DESC
-    #             LIMIT 1)
-    #     GROUP BY `id`
-    #     ORDER BY `id`;
-    # ''', [user])
-
     return profit_data
 
 def count_status_order(user):

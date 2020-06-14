@@ -1,0 +1,12 @@
+{% extends 'admin/change_form.html' %}
+
+{% block submit_buttons_bottom %}
+    <!--{{ block.super }}-->
+    <div class="submit-row">
+        {% if original.is_accepted_login %}
+        <input type="submit" value="Khóa" name="toggle_login_status">
+        {% else %}
+        <input type="submit" value="Mở khóa" name="toggle_login_status">
+        {% endif %}
+    </div>
+{% endblock %}

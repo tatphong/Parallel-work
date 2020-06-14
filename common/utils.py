@@ -6,6 +6,13 @@ from functools import wraps
 from django.http import JsonResponse
 import re 
 from django.shortcuts import redirect
+from django.utils.timezone import timedelta
+#from datetime import timedelta, date
+
+def date_range(start_date, end_date):
+    for n in range(int ((end_date - start_date).days)):
+        yield start_date + timedelta(n)
+
 def send_mail(send_to, subject, message):
     django_send_mail(subject, message, EMAIL_HOST_USER, [send_to], fail_silently=False)
 
