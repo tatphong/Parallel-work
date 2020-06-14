@@ -65,6 +65,48 @@ class BookForm(forms.Form):
             return id_address
         raise forms.ValidationError('Địa chỉ không tồn tại.', code='invalid_id_address')
 
+    def clean_price(self):
+        price = self.cleaned_data['price']
+        if price > 0:
+            return price
+        raise forms.ValidationError('Giá tiền không hợp lệ.', code='invalid_price')
+
+    def clean_origin_price(self):
+        origin_price = self.cleaned_data['origin_price']
+        if origin_price > 0:
+            return origin_price
+        raise forms.ValidationError('Giá tiền không hợp lệ.', code='invalid_origin_price')
+
+    def clean_length(self):
+        length = self.cleaned_data['length']
+        if length > 10:
+            return length
+        raise forms.ValidationError('Chiều dài không hợp lệ.', code='invalid_length')
+
+    def clean_height(self):
+        height = self.cleaned_data['height']
+        if height > 0:
+            return height
+        raise forms.ValidationError('Chiều cao không hợp lệ.', code='invalid_height')
+
+    def clean_width(self):
+        width = self.cleaned_data['width']
+        if width > 5 :
+            return width
+        raise forms.ValidationError('Chiều rộng không hợp lệ.', code='invalid_width')
+
+    def clean_pagesnum(self):
+        pagesnum = self.cleaned_data['pagesnum']
+        if pagesnum > 4:
+            return pagesnum
+        raise forms.ValidationError('Số trang không đúng.', code='invalid_pagesnum')
+
+    def clean_quantity(self):
+        quantity = self.cleaned_data['quantity']
+        if quantity > 0:
+            return quantity
+        raise forms.ValidationError('Số lượng phải lớn hơn 0', code='invalid_quantity')
+
     def save(self, image_paths):
         try:
             with transaction.atomic():

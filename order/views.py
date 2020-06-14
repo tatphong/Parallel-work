@@ -75,7 +75,15 @@ def get_order(request):
     return render(request, 'user/order.html', {'pager':pager, 'page_navigator': page_navigator})
 
 def cancel_order(request):
-    HistoryOrderStatus.objects.filter(order=request.POST.get("id_order")).update(order_status=4)
+    try:
+        with transaction.atomic():
+            # update status
+            HistoryOrderStatus.objects.filter(order=request.POST.get("id_order")).update(order_status=4)
+            # update quantity_exists
+            update_quantity_after_cancel_order(request.POST.get("id_order"))
+    except DatabaseError as error:
+        print(error)
+
 
 @login_required
 def check_out(request):
@@ -155,6 +163,13 @@ def check_out(request):
     address = Address.objects.filter(user_id=request.user.id, delete_date=None)
     return render (request, 'order/check_out.html', {'cart':cart_items, 'sub_total':sub_total, 'payment':payment, 'delivery':delivery, 'address':address})
 
+def update_quantity_after_cancel_order(id_order):
+    detail_order = DetailOrder.objects.filter(order_id = id_order)
+    for item in detail_order:
+        merchandise = Merchandise.objects.get(pk = item.merchandise_id)
+        merchandise.quantity_exists += item.quantity
+        merchandise.save()
+
 def change_status(request):
     id_order = request.POST.get("id_order")
     if request.POST.get("order_note") != "" :
@@ -177,8 +192,10 @@ def change_status(request):
             order_user = User.objects.get(id=order_user_id)
 
             if id_status == 4:
+                update_quantity_after_cancel_order(id_order)
                 # gửi thông báo hủy kèm lý do
                 send_notification_by_system(order_user, "Đơn hàng của bạn đã bị hủy với lý do "+note)
+
             elif id_status == 2:
                 # gửi thông báo dời lại kèm lý do
                 send_notification_by_system(order_user, "Đơn hàng của bạn đã bị dời lại với lý do "+note)
@@ -260,6 +277,8 @@ def seller_get_order(request):
     # sort order
     if request.GET.get('sort'):
         sqlutils.add_order('`order`.`created_date` '+ request.GET.get('sort'))
+    else:
+        sqlutils.add_order('`order`.`created_date` '+ 'desc')
 
     order_select_clause = '''
         select `order`.`id`, `order`.`created_date`, `book`.`name`, sum(`d_o`.`total_price_after_discount`) `price`

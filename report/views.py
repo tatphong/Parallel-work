@@ -26,6 +26,11 @@ def post_report(request):
         )
         if today_report:
             return JsonResponse({'error':'Hôm nay bạn đã phản ánh sản phẩm này rồi.'}, status=400)
+        # kiểm tra có tự bóp mình 0 @@
+
+        if Merchandise.objects.get(pk = id_object).user == request.user:
+            return JsonResponse({'error':'Bạn không thể tự báo cáo sản phẩm của mình.'}, status=400)
+
         Report(
             id_object = id_object,
             sample_report = sample_report,
