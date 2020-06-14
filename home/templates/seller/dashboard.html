@@ -43,7 +43,7 @@
                 <div class="widget text-center">
                     <h5 class="widget-header title-text-color">Hiệu quả hoạt động</h5>
                     {% for order_status in count_status %}
-                    <a href="">
+                    <a href="{% url 'seller:get_order' %}?status={{order_status.id}}">
                         <p class="title-text-color">{{order_status.count}}</p>
                         <p>{{ order_status.name }}</p>
                     </a>

@@ -241,7 +241,14 @@ def seller_get_order(request):
                 group by `d_o`.`id`
             ''',[str(id_order)])
             address = Address.objects.get(pk = order.address_id)
-            return render (request, 'order/order_detail.html', {'order':order, 'details':details, 'address':address})
+            # get detail order status
+            detail_order_status = HistoryOrderStatus.objects.raw('''
+                select `h`.*, `os`.`name`
+                from `history_order_status` `h` join `order_status` `os`
+                where `h`.`id_order_status` = `os`.`id` AND `h`.`id_order` = %s
+                order by `h`.`created_date` desc;
+            ''', [id_order])
+            return render (request, 'seller/order_detail.html', {'order':order, 'details':details, 'address':address, 'detail_order_status':detail_order_status})
 
     base_sql = '''
         {select}
