@@ -194,11 +194,11 @@ def change_status(request):
             if id_status == 4:
                 update_quantity_after_cancel_order(id_order)
                 # gửi thông báo hủy kèm lý do
-                send_notification_by_system(order_user, "Đơn hàng của bạn đã bị hủy với lý do "+note)
+                send_notification_by_system(order_user, "Đơn hàng "+ id_order +" đã bị hủy với lý do "+note)
 
             elif id_status == 2:
                 # gửi thông báo dời lại kèm lý do
-                send_notification_by_system(order_user, "Đơn hàng của bạn đã bị dời lại với lý do "+note)
+                send_notification_by_system(order_user, "Đơn hàng "+ id_order +" đã bị dời lại với lý do "+note)
             elif id_status == 3:
                 # giảm số lượng trong merchandise và kiểm tra còn hàng 0 sau khi giao thành công
                 detail_order = DetailOrder.objects.filter(order_id = id_order)

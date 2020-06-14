@@ -63,11 +63,16 @@ def count_status_order(user):
 def get_product_income_rank(user):
     income_rank = DetailOrder.objects.raw('''
         select `m`.`id`, `book`.`name`, `img`.`url` `url`, sum(`d_o`.`total_price_after_discount`) `income`, sum(`d_o`.`quantity`) `count`
-        from `order` join  `detail_order` `d_o` join `book` join `merchandise` `m` 
+        from `order` join  `detail_order` `d_o` join `book` join `merchandise` `m` join history_order_status
             on `order`.`id` = `d_o`.`id_order` and `d_o`.`id_merchandise` = `m`.`id` and `m`.`id_product` = `book`.`id`
             join (select `mi`.`id_merchandise`, `image`.`url` from `merchandise_image` `mi` join `image` on `mi`.`id_image`=`image`.`id`
                 group by `mi`.`id_merchandise`) `img` on `img`.`id_merchandise` = `m`.`id`
         where `m`.`id_user` = %s
+            and `history_order_status`.`id` = (SELECT `tb1`.`id` 
+                        FROM `history_order_status` `tb1`
+                        WHERE `tb1`.`id_order` = `order`.`id` and tb1.id_order_status = 3
+                        ORDER BY tb1.`id` DESC
+                        LIMIT 1)
         group by `d_o`.`id_merchandise`
         order by `income` desc ;
     ''', [user])
