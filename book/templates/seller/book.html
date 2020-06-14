@@ -10,19 +10,21 @@
             <div class="col-md-12">
                 <!-- Recently Favorited -->
                 <div class="widget dashboard-container my-adslist">
-                    <h3 class="widget-header title-text-color">THÊM SẢN PHẨM MỚI</h3>
+                    <h3 class="widget-header title-text-color">THÔNG TIN SẢN PHẨM</h3>
                     <form method="POST" id="form-product" enctype="multipart/form-data">
                         {% csrf_token %}
                         <div class="form-group">
                             <label for="pro-name">1. Tên sản phẩm: </label>
-                            <input type="text" class="form-control" id="pro-name" name="name" value="{{ product.name }}" disabled>
+                            <input type="text" class="form-control" id="pro-name" name="name" value="{{ product.name }}"
+                                disabled>
                         </div>
 
                         <div class="form-group">
                             <label>2. Hình đại diện: </label>
                         </div>
                         <div id="selected_avatar">
-                            <div class="image-zone col-4"><img src="{{ merchandise.merchandiseimage_set.all.0.image.url }}" width="200" /></div>
+                            <div class="image-zone col-4"><img
+                                    src="{{ merchandise.merchandiseimage_set.all.0.image.url }}" width="200" /></div>
                         </div>
 
                         <div class="form-group">
@@ -50,18 +52,21 @@
                                         <tr class="form-group">
                                             <td><label for="pro-publisher">Tác giả:</label> </td>
                                             <td><input class="form-control" type="text" class="input-add-spec"
-                                                    id="pro-author" name="author" value="{{ product.author }}" disabled></td>
+                                                    id="pro-author" name="author" value="{{ product.author }}" disabled>
+                                            </td>
                                         </tr>
                                         <tr class="form-group">
                                             <td><label for="pro-publisher">Nhà xuất bản:</label> </td>
                                             <td><input class="form-control" type="text" class="input-add-spec"
-                                                    id="pro-publisher" name="publisher" value="{{ product.publisher }}" disabled></td>
+                                                    id="pro-publisher" name="publisher" value="{{ product.publisher }}"
+                                                    disabled></td>
                                         </tr>
                                         <tr class="form-group">
                                             {% timezone "Asia/Ho_Chi_Minh" %}
                                             <td><label for="pro-publicdate">Ngày xuất bản:</label> </td>
                                             <td><input class="form-control" type="month" class="input-add-spec"
-                                                    id="pro-publicdate" name="publicdate" value="{{ product.publication_date }}" disabled></td>
+                                                    id="pro-publicdate" name="publicdate"
+                                                    value="{{ product.publication_date }}" disabled></td>
                                             {% endtimezone %}
                                         </tr>
                                         <tr class="form-group">
@@ -87,12 +92,15 @@
                                         <tr class="form-group">
                                             <td><label for="pro-pagesnum">Số trang:</label> </td>
                                             <td><input class="form-control" type="number" class="input-add-spec"
-                                                    id="pro-pagesnum" name="pagesnum" min="0" value="{{ product.pages_num }}" disabled></td>
+                                                    id="pro-pagesnum" name="pagesnum" min="0"
+                                                    value="{{ product.pages_num }}" disabled></td>
                                         </tr>
                                         <tr class="form-group">
                                             <td><label id="label-category">Chọn thể loại:</label> </td>
                                             <td>
-                                                <input class="form-control" type="text" value="{{ product.bookcategorydetail_set.all.first.category.name }}" disabled>
+                                                <input class="form-control" type="text"
+                                                    value="{{ product.bookcategorydetail_set.all.first.category.name }}"
+                                                    disabled>
                                             </td>
                                         </tr>
                                     </tbody>
@@ -101,8 +109,8 @@
                         </div>
                         <div class="form-group">
                             <label for="pro-quantity">6. Số lượng gốc: </label>
-                            <input type="number" class="form-control" id="pro-originquantity" name="originquantity" min="0"
-                                value="{{ merchandise.origin_quantity }}" disabled>
+                            <input type="number" class="form-control" id="pro-originquantity" name="originquantity"
+                                min="0" value="{{ merchandise.origin_quantity }}" disabled>
                         </div>
                         <div class="form-group">
                             <label for="pro-quantity">7. Số lượng: </label>
@@ -111,12 +119,13 @@
                         </div>
                         <div class="form-group">
                             <label for="pro-quantity">8. Số lượng tồn: </label>
-                            <input type="number" class="form-control" id="pro-quantityexists" name="quantityexists" min="0"
-                                value="{{ merchandise.quantity_exists }}" disabled>
+                            <input type="number" class="form-control" id="pro-quantityexists" name="quantityexists"
+                                min="0" value="{{ merchandise.quantity_exists }}" disabled>
                         </div>
                         <div class="form-group">
                             <label for="pro-price">9. Giá (đồng): </label>
-                            <input type="number" class="form-control" id="pro-price" name="price" min="0" value="{{ merchandise.price|floatformat:0 }}">
+                            <input type="number" class="form-control" id="pro-price" name="price" min="0"
+                                value="{{ merchandise.price|floatformat:0 }}">
                         </div>
                         <div class="form-group">
                             <label for="pro-originprice">10. Giá thị trường (đồng): </label>
@@ -135,7 +144,8 @@
                                 {% for item in merchandise.merchandisedelivery_set.all %}
                                 <input class="form-check-input" type="checkbox" value="{{ item.delivery.id }}"
                                     id="pro-delivery-{{ item.delivery.id }}" name="id_delivery" checked disabled>
-                                <label class="form-check-label" for="pro-delivery-{{ item.delivery.id }}">{{ item.delivery.name }}</label>
+                                <label class="form-check-label"
+                                    for="pro-delivery-{{ item.delivery.id }}">{{ item.delivery.name }}</label>
                                 {% endfor %}
                             </div>
 
@@ -180,11 +190,39 @@
                                 placeholder="Thêm mô tả">{{ merchandise.description }}</textarea>
                         </div>
                         <div class="text-right">
-                            <button onclick="submit_form();" type="button" class="btn btn-primary">Sửa thông tin</button>
+                            {% if merchandise.is_avaiable_for_seller %}
+                            <button type="button" class="btn btn-primary" data-toggle="modal"
+                                data-target="#addQuantityModal">Nhập thêm sản phẩm</button>
+                            {% endif %}
+                            <button onclick="submit_form();" type="button" class="btn btn-primary">Sửa thông
+                                tin</button>
                         </div>
 
 
                     </form>
+                </div>
+                <div class="modal fade" id="addQuantityModal" tabindex="-1" role="dialog"
+                    aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel">Nhập thêm sản phẩm</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="form-group">
+                                    <label for="pro-addquantity">Số lượng nhập: </label>
+                                    <input type="number" min="1" class="form-control" id="pro-addquantity" name="addquantity">
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+                                <button type="button" class="btn btn-primary" onclick="add_product_quantity()">Thêm</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <p><br /><br /></p>
             </div>
@@ -246,7 +284,7 @@
             $.notify(error_message, "error");
             return;
         }
-        
+
         $.ajax({
             type: "POST",
             url: "{% url 'seller:update_own_merchandise' %}",
@@ -255,6 +293,50 @@
             contentType: false,
             success: function (response) {
                 $.notify("Đã sửa sản phẩm thành công.", "success");
+            },
+            error: function (response) {
+                // alert the error if any error occured
+                // console.log(response["responseJSON"]["error"]);
+                switch (response.status) {
+                    case 401:
+                        //alert("Xin hãy đăng nhập.");
+                        $.notify("Xin hãy đăng nhập.", "error");
+                        break;
+                    case 400:
+                        //alert(response["responseJSON"]["error"]);
+                        $.notify(response["responseJSON"]["error"], "error");
+                        break;
+                    case 500:
+                        //alert("Đã có lỗi xảy ra, xin hãy thử lại sau.")
+                        $.notify("Đã có lỗi xảy ra, xin hãy thử lại sau.", "error");
+                        break;
+                }
+            }
+        });
+    }
+    function add_product_quantity() {
+        var quantity = document.getElementById("pro-addquantity").value
+        if(!quantity){
+            $.notify("Xin nhập số lượng.", "error");
+            return
+        }
+        if(quantity <= 0){
+            $.notify("Xin nhập số lượng lớn hơn 0.", "error");
+            return
+        }
+        $.ajax({
+            type: "POST",
+            url: "{% url 'seller:add_product_quantity' %}",
+            data: {"quantity": quantity, "id_merchandise": "{{ merchandise.pk }}"},
+            success: function (response) {
+                $.notify("Đã thêm sản phẩm thành công.", "success");
+                console.log(response)
+                if(response["merchandise_status_code"] === 'stopping'){
+                    $.notify("Sản phẩm đang ở trạng thái tạm dừng bán", "info");
+                }else if(response["merchandise_status_code"] === "selling"){
+                    $.notify("Sản phẩm đang được đăng bán.", "info");
+                }
+                $('#addQuantityModal').modal('hide')
             },
             error: function (response) {
                 // alert the error if any error occured

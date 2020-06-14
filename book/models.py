@@ -144,6 +144,9 @@ class Merchandise(models.Model):
     def is_selling(self):
         return self.stopped_date is None and self.blocked_date is None and self.activated_date is not None
 
+    def is_avaiable_for_seller(self):
+        return self.get_merchandise_status()['code'] in {'selling', 'stopping', 'sold_out'}
+
     ### Merchandise status: Bị khóa, Bị từ chối, Đang chờ kiểm duyệt, Hết hàng, Đang bán, Dừng bán
     def was_sold_out(self):
         return self.quantity == 0

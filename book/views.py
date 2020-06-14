@@ -159,6 +159,7 @@ def toggle_merchandise_status_by_seller(request):
         if merchandise.user != request.user:
             return JsonResponse({}, status=403)
         merchandise_status = merchandise.get_merchandise_status()['code']
+        #print(merchandise_status)
         if merchandise_status == 'selling':
             merchandise.stopped_date = timezone.now()
             merchandise.save()
@@ -189,4 +190,18 @@ def update_own_merchandise(request):
         if book_form.is_valid():
             book_form.save(merchandise)
             return JsonResponse({}, status=200)
+    return JsonResponse({}, status=400)
+
+@ajax_login_required
+def add_product_quantity(request):
+    if request.method == 'POST':
+        merchandise = Merchandise.objects.get(pk=request.POST.get('id_merchandise'))
+        quantity = int(request.POST.get('quantity'))
+        if merchandise.user == request.user and merchandise.is_avaiable_for_seller() and quantity > 0:
+            merchandise.quantity += quantity
+            merchandise.quantity_exists += quantity
+            merchandise.origin_quantity += quantity
+            merchandise.save()
+            status_code = merchandise.get_merchandise_status()['code']
+            return JsonResponse({'merchandise_status_code': status_code}, status=200)
     return JsonResponse({}, status=400)
