@@ -56,14 +56,26 @@ def update_stopped_selling_quantity_to_zero(request):
                stopped_selling = True
      return stopped_selling
 
+def clean_quantity_before_get_cart(request):
+     cart_items = Cart.objects.raw('''
+          select `cart`.`id`, `cart`.`quantity`, `m`.`quantity_exists`
+          from `cart` join `merchandise` `m`
+          where `cart`.`id_merchandise` = `m`.`id`
+               AND `cart`.`id_user` = %s
+          group by `cart`.`id`;
+     ''',[str(request.user.id)])
+     for item in cart_items:
+          update_quantity(item.id, item.quantity)
+
 @login_required
 def get_cart(request):
      delete_expired_item(request)
      stopped_selling = update_stopped_selling_quantity_to_zero(request)
-
+     clean_quantity_before_get_cart(request)
+     
      # update quantity
      if request.method == "POST":
-          update_quantity(request.POST.get("id_cart"), request.POST.get("qty"))
+          update_quantity(request.POST.get("id_cart"), int(request.POST.get("qty")))
 
      # get cart
      cart_items = Cart.objects.raw('''
@@ -80,14 +92,12 @@ def get_cart(request):
      for i in cart_items:
           # subtotal
           sub_total += i.quantity * i.merchandise.price
-          # check if quantity valid
-          update_quantity(i.id, i.quantity)
 
      return render(request, 'cart/cart.html', {'cart_items':cart_items, 'sub_total':sub_total, 'stopped_selling':stopped_selling})
 
 def update_quantity(id_cart, qty):
      # check qty valid
-     if qty<1: qty=1
+     if qty < 1: qty=1
      cart = Cart.objects.get(pk=id_cart)
      merchandise = Merchandise.objects.get(pk=cart.merchandise_id)
      qty = min(merchandise.quantity_exists, qty)
