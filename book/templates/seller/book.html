@@ -315,7 +315,7 @@
         });
     }
     function add_product_quantity() {
-        var quantity = document.getElementById("pro-addquantity").value
+        var quantity = parseInt(document.getElementById("pro-addquantity").value)
         if(!quantity){
             $.notify("Xin nhập số lượng.", "error");
             return
@@ -330,6 +330,9 @@
             data: {"quantity": quantity, "id_merchandise": "{{ merchandise.pk }}"},
             success: function (response) {
                 $.notify("Đã thêm sản phẩm thành công.", "success");
+                $('#pro-originquantity').val(parseInt($('#pro-originquantity').val()) + quantity)
+                $('#pro-quantity').val(parseInt($('#pro-quantity').val()) + quantity)
+                $('#pro-quantityexists').val(parseInt($('#pro-quantityexists').val()) + quantity)
                 console.log(response)
                 if(response["merchandise_status_code"] === 'stopping'){
                     $.notify("Sản phẩm đang ở trạng thái tạm dừng bán", "info");

@@ -1,5 +1,6 @@
 from django.contrib import admin
 from .models import Merchandise, Book
+from notification.services import send_notification_by_system
 #from django.conf.urls import patterns, include, url
 # from .forms import MerchandiseChangeAdminForm
 # # Register your models here.
@@ -145,17 +146,20 @@ class MerchandiseAdmin(admin.ModelAdmin):
             obj.blocked_date = timezone.now()
             obj.save()
             self.message_user(request, "Đã khóa sản phẩm.")
+            send_notification_by_system(obj.user, "Sản phẩm có mã "+ str(obj.id) +" đã bị quản trị viên khóa")
             return HttpResponseRedirect(".")
         if 'pending_reject' in request.POST and status_code == 'pending':
             obj.blocked_date = timezone.now()
             obj.save()
             self.message_user(request, "Đã từ chối sản phẩm.")
+            send_notification_by_system(obj.user, "Sản phẩm có mã "+ str(obj.id) +" đã bị quản trị viên từ chối")
             return HttpResponseRedirect(".")
         if 'pending_accept' in request.POST and status_code == 'pending':
             obj.activated_date = timezone.now()
             obj.activated_by = request.user
             obj.save()
             self.message_user(request, "Đã cho phép bán sản phẩm.")
+            send_notification_by_system(obj.user, "Sản phẩm có mã "+ str(obj.id) +" đã được phê duyệt")
             return HttpResponseRedirect(".")
         
         return super().response_change(request, obj)

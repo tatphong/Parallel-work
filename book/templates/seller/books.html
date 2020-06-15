@@ -226,7 +226,7 @@
                         $.notify("Xin hãy đăng nhập.", "warn");
                         break;
                     case 400:
-                        $.notify(response["responseJSON"]["error"], "error");
+                        $.notify(response["error"], "error");
                         break;
                     case 500:
                         $.notify("Đã có lỗi xảy ra, xin hãy thử lại sau.", "error")

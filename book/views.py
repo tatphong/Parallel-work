@@ -168,6 +168,8 @@ def toggle_merchandise_status_by_seller(request):
             merchandise.stopped_date = None
             merchandise.save()
             return JsonResponse({}, status=200)
+        else:
+            return JsonResponse({"error":"Số lượng sản phẩm được bán đã đạt giới hạn."}, status=400)
     return JsonResponse({}, status=400)
 
 @login_required

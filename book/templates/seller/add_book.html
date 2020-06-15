@@ -502,7 +502,7 @@
             error_message = "Xin hãy nhập ngày xuất bản.";
         } else if (!form_data.get("length") || !form_data.get("width") || !form_data.get("height")) {
             error_message = "Xin hãy nhập đầy đủ kích thước sách.";
-        } else if (form_data.get("length") <=5 || !form_data.get("width") <=5 || !form_data.get("height") <=0) {
+        } else if (form_data.get("length") <=5 || form_data.get("width") <=5 || form_data.get("height") <=0) {
             error_message = "Kich thước sách không hợp lệ.";
         } else if (!form_data.get("pagesnum")) {
             error_message = "Xin hãy nhập số trang của sách.";

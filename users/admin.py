@@ -1,4 +1,4 @@
-from django.contrib import admin
+from django.contrib import admin, messages
 from django.contrib.auth.admin import UserAdmin
 from django.http import HttpResponse, HttpResponseRedirect
 from .forms import CustomUserCreationForm, CustomUserChangeForm
@@ -62,6 +62,10 @@ class CustomUserAdmin(UserAdmin):
     def response_change(self, request, obj):
         if 'toggle_login_status' in request.POST:
             if obj.is_accepted_login():
+                if obj.is_staff:
+                    self.message_user(request, "Không thể khóa tài khoản", level=messages.ERROR)
+                    return HttpResponseRedirect(".")
+
                 obj.blocked_date = timezone.now()
                 obj.is_active = False
                 [s.delete() for s in Session.objects.all() if s.get_decoded().get('_auth_user_id') == obj.id]
