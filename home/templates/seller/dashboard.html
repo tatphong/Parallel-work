@@ -55,7 +55,9 @@
                 <div class="col-md-12 box-analysic">
                     <div class="container">
                         <h3 class="title-text-color">Thống kê doanh thu</h3>
-                        <canvas id="profit-chart" width="800" height="450"></canvas>
+                        <div id="chart-container">
+                            <canvas id="profit-chart" width="800" height="450"></canvas>
+                        </div>
                         <br>
                         <div class="row">
                             <div class="col-sm">
@@ -170,7 +172,13 @@
     get_data_profit()
     function render_profit_chart(data){
         console.log(data)
-        var ctx = document.getElementById('profit-chart').getContext('2d');
+        $('#profit-chart').remove(); // this is my <canvas> element
+        $('#chart-container').append('<canvas id="profit-chart" width="800" height="450"></canvas>');
+
+        var canvas = document.getElementById('profit-chart')
+        var ctx = canvas.getContext('2d');
+        //ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
         var chart = new Chart(ctx, {
             type: 'line',
             data: {

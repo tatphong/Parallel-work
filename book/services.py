@@ -13,7 +13,7 @@ def save_image(user, image, filename):
     return uploaded_file_url
 
 def get_avaiable_merchandises(user):
-    merchandises = Merchandise.objects.filter(user=user, blocked_date=None, quantity__gt = 0)
+    merchandises = Merchandise.objects.filter(user=user, blocked_date=None, activated_date__isnull=False, stopped_date=None, quantity__gt = 0)
     return merchandises
 
 def get_avaiable_authors():
